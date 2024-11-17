@@ -3,10 +3,10 @@ name: Flutter CI (Check for Errors)
 on:
   push:
     branches:
-      - main  # Thực hiện khi có thay đổi trên nhánh main
+      - main  
   pull_request:
     branches:
-      - main  # Thực hiện khi có pull request đến nhánh main
+      - main  
 
 jobs:
   flutter-ci:
@@ -14,24 +14,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Bước 1: Checkout mã nguồn
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      # Bước 2: Thiết lập Flutter
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v3
         with:
           flutter-version: 'stable'
 
-      # Bước 3: Cài đặt các phụ thuộc
       - name: Install dependencies
         run: flutter pub get
 
-      # Bước 4: Chạy kiểm tra mã nguồn (check code for errors)
       - name: Run Flutter Analyze
         run: flutter analyze
 
-      # Bước 5: Chạy kiểm tra tự động (Unit Test)
       - name: Run Tests
         run: flutter test
