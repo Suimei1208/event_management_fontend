@@ -14,7 +14,7 @@ class LanguageSelectionPage extends StatelessWidget {
       body: ListView(
         children: [
           ListTile(
-            title: Text(S.of(context)!.english),
+            title: Text(S.of(context).english),
             onTap: () {
               settingsController.updateLocale(const Locale('en', 'US'));
               Navigator.pop(context);
