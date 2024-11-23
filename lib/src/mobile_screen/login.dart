@@ -2,7 +2,6 @@
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/home_screen.dart';
 import 'package:event_management/src/mobile_screen/profile.dart';
-import 'package:event_management/src/mobile_screen/register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';

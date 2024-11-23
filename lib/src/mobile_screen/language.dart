@@ -5,7 +5,7 @@ import 'package:event_management/generated/l10n.dart';
 class LanguageSelectionPage extends StatelessWidget {
   final SettingsController settingsController;
 
-  const LanguageSelectionPage({Key? key, required this.settingsController}) : super(key: key);
+  const LanguageSelectionPage({super.key, required this.settingsController});
 
   @override
   Widget build(BuildContext context) {
@@ -16,14 +16,14 @@ class LanguageSelectionPage extends StatelessWidget {
           ListTile(
             title: Text(S.of(context)!.english),
             onTap: () {
-              settingsController.updateLocale(Locale('en', 'US'));
+              settingsController.updateLocale(const Locale('en', 'US'));
               Navigator.pop(context);
             },
           ),
           ListTile(
             title: Text(S.of(context)!.vietnamese),
             onTap: () {
-              settingsController.updateLocale(Locale('vi', 'VN'));
+              settingsController.updateLocale(const Locale('vi', 'VN'));
               Navigator.pop(context);
             },
           ),

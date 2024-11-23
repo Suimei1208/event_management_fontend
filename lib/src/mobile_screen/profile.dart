@@ -37,7 +37,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           leading: IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back_rounded,
               size: 30,
             ),
@@ -45,7 +45,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               // print('IconButton pressed ...');
             },
           ),
-          title: Text(
+          title: const Text(
             'Profile',
             style: TextStyle(
               fontFamily: 'Inter',
@@ -60,12 +60,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(0, 1, 0, 0),
+              padding: const EdgeInsetsDirectional.fromSTEB(0, 1, 0, 0),
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: brightness == Brightness.dark ? Colors.grey[850] : Colors.white, 
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       blurRadius: 50,
                       color: Color(0x33000000),
@@ -74,7 +74,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
                       Container(
@@ -89,7 +89,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           ),
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(2),
+                          padding: const EdgeInsets.all(2),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(50),
                             child: Image.network(
@@ -102,7 +102,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(16, 0, 0, 0),
+                        padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 0, 0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -117,7 +117,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                              padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
                               child: Text(
                                 'joy@augustin.com',
                                 style: TextStyle(
@@ -136,7 +136,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               ),
             ),
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
               child: Text(
                 S.of(context).account,
                 style: TextStyle(
@@ -154,7 +154,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               },
             ),
             Padding(
-              padding: EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
+              padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
               child: Text(
                 S.of(context).general,
                 style: TextStyle(

@@ -17,7 +17,7 @@ class OptionsWidget extends StatelessWidget {
     final brightness = Theme.of(context).brightness;
 
     return Padding(
-      padding: EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 16, 0),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
@@ -32,15 +32,15 @@ class OptionsWidget extends StatelessWidget {
                 blurRadius: 5,
                 color: brightness == Brightness.dark
                     ? Colors.black38 
-                    : Color(0x3416202A),  
-                offset: Offset(0.0, 2),
+                    : const Color(0x3416202A),  
+                offset: const Offset(0.0, 2),
               ),
             ],
             borderRadius: BorderRadius.circular(12),
             shape: BoxShape.rectangle,
           ),
           child: Padding(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             child: Row(
               mainAxisSize: MainAxisSize.max,
               children: [
@@ -53,7 +53,7 @@ class OptionsWidget extends StatelessWidget {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
+                    padding: const EdgeInsetsDirectional.fromSTEB(12, 0, 0, 0),
                     child: Text(
                       text,
                       style: TextStyle(
@@ -69,7 +69,7 @@ class OptionsWidget extends StatelessWidget {
                   ),
                 ),
                 Align(
-                  alignment: AlignmentDirectional(0.9, 0),
+                  alignment: const AlignmentDirectional(0.9, 0),
                   child: Icon(
                     Icons.arrow_forward_ios,
                     size: 18,
