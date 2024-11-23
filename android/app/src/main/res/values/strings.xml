@@ -1,0 +1,9 @@
+<?xml version ="1.0" encoding = "utf-8"?>
+<resource>
+
+    <string name="app_name">Event Management</string>
+    <string name="facebook_app_id">1507667579935506</string>
+    <string name="fb_login_protocol_scheme">fb1507667579935506</string>
+    <string name="facebook_client_token">ccae233991ed329232f3841452061dd2</string>
+
+</resource>
