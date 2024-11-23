@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 class HomeScreen extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  HomeScreen({Key? key}) : super(key: key);
+
   Future<void> _signOut() async {
     await _auth.signOut();
   }
@@ -38,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => LoginScreen()),
                 );
               },
-              child: Text('Đăng xuất'),
+              child: const Text('Đăng xuất'),
             ),
           ],
         ),

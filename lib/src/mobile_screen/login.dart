@@ -8,6 +8,8 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -16,21 +18,20 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  signInwithGoogle() async {
+  Future<void> signInwithGoogle() async {
     GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
     AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
     UserCredential userCredential =
         await FirebaseAuth.instance.signInWithCredential(credential);
-    print(userCredential.user?.displayName);
     if (userCredential.user != null) {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => HomeScreen()));
     }
   }
 
-  signInWithFacebook() async {
+  Future<void> signInWithFacebook() async {
     final LoginResult result = await FacebookAuth.instance.login();
 
     if (result.status == LoginStatus.success) {
@@ -47,8 +48,8 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } else {
-      print(result.status);
-      print(result.message);
+      // Avoid print in production
+      debugPrint(result.message);
     }
   }
 
@@ -64,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
-      print('Error during email/password login: $e');
+      debugPrint('Error during email/password login: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: ${e.message}')),
       );
@@ -74,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Đăng Nhập")),
+      appBar: AppBar(title: const Text("Đăng Nhập")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -82,34 +83,30 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
               ),
               obscureText: true,
             ),
-            SizedBox(height: 20),
-
-            // Login button
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _signInWithEmailPassword(context),
-              child: Text('Đăng nhập'),
+              child: const Text('Đăng nhập'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
+                minimumSize: const Size(double.infinity, 50),
               ),
             ),
-            SizedBox(height: 20),
-
-            // Register button
+            const SizedBox(height: 20),
             TextButton(
               onPressed: () {
                 Navigator.push(
@@ -117,26 +114,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   MaterialPageRoute(builder: (context) => RegisterScreen()),
                 );
               },
-              child: Text('Đăng ký tài khoản'),
+              child: const Text('Đăng ký tài khoản'),
             ),
-            SizedBox(height: 20),
-
-            // Google Login button
+            const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () => signInwithGoogle(),
               icon: Image.asset('assets/images/gmail_logo.png', width: 24),
-              label: Text('Đăng nhập với Google'),
+              label: const Text('Đăng nhập với Google'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
+                minimumSize: const Size(double.infinity, 50),
               ),
             ),
-
             ElevatedButton.icon(
               onPressed: () => signInWithFacebook(),
               icon: Image.asset('assets/images/facebook_logo.png', width: 24),
-              label: Text('Đăng nhập với Facebook'),
+              label: const Text('Đăng nhập với Facebook'),
               style: ElevatedButton.styleFrom(
-                minimumSize: Size(double.infinity, 50),
+                minimumSize: const Size(double.infinity, 50),
               ),
             ),
           ],
