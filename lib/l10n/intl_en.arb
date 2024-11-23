@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+  "language": "Language",
+  "english": "English",
+  "vietnamese": "Vietnamese",
+  "title": "Event Management",
+  "welcome": "Welcome to the Event Management app!",
+  "facebook_sign_in": "Sign in with Facebook",
+  "gmail_sign_in": "Sign in with Gmail",
+  "login": "Login",
+  "register_account": "Register Account",
+  "editProfile": "Edit Profile",
+  "general": "General",
+  "setting": "Setting",
+  "language": "Language",
+  "logout": "Logout",
+  "account": "Account"
+}

@@ -1,0 +1,18 @@
+{
+  "@@locale": "vi",
+  "language": "Ngôn ngữ",
+  "english": "Tiếng Anh",
+  "vietnamese": "Tiếng Việt",
+  "title": "Quản lý sự kiện",
+  "welcome": "Chào mừng bạn đến với ứng dụng Quản lý sự kiện!",
+  "facebook_sign_in": "Đăng nhập bằng Facebook",
+  "gmail_sign_in": "Đăng nhập bằng Gmail",
+  "login": "Đăng nhập",
+  "register_account": "Đăng ký tài khoản",
+  "editProfile": "Chỉnh sửa hồ sơ",
+  "general": "Tổng quan",
+  "setting": "Cài đặt",
+  "language": "Ngôn ngữ",
+  "logout": "Đăng xuất",
+  "account": "Tài khoản"
+}

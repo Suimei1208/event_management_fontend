@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
-
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/home_screen.dart';
-import 'package:event_management/src/mobile_screen/register.dart';
+import 'package:event_management/src/mobile_screen/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -9,6 +9,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  static const routeName = '/login';
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -64,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (userCredential.user != null && mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => const ProfileWidget()),
         );
       }
     } on FirebaseAuthException catch (e) {
@@ -80,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Đăng Nhập")),
+      appBar: AppBar(title: Text(S.of(context).welcome)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -109,23 +111,23 @@ class _LoginScreenState extends State<LoginScreen> {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
-              child: const Text('Đăng nhập'),
+              child:  Text(S.of(context).login),
             ),
             const SizedBox(height: 20),
             TextButton(
               onPressed: () {
-                Navigator.push(
+                Navigator.pushNamed(
                   context,
-                  MaterialPageRoute(builder: (context) => RegisterScreen()),
+                  '/register',
                 );
               },
-              child: const Text('Đăng ký tài khoản'),
+              child: Text(S.of(context).register_account),
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () => signInwithGoogle(),
               icon: Image.asset('assets/images/gmail_logo.png', width: 24),
-              label: const Text('Đăng nhập với Google'),
+              label:  Text(S.of(context).gmail_sign_in),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
@@ -133,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ElevatedButton.icon(
               onPressed: () => signInWithFacebook(),
               icon: Image.asset('assets/images/facebook_logo.png', width: 24),
-              label: const Text('Đăng nhập với Facebook'),
+              label:  Text(S.of(context).facebook_sign_in),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
