@@ -10,7 +10,7 @@ class LanguageSelectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(S.of(context)!.language)),
+      appBar: AppBar(title: Text(S.of(context).language)),
       body: ListView(
         children: [
           ListTile(

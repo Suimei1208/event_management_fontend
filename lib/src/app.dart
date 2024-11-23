@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
           restorationScopeId: 'app',
-          locale: settingsController.locale ?? const Locale('en', 'US'),
+          locale: settingsController.locale,
           localizationsDelegates: const [
             S.delegate,
             GlobalMaterialLocalizations.delegate,

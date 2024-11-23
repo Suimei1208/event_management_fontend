@@ -1,5 +1,5 @@
 import 'package:event_management/src/settings/settings_view.dart';
-import 'package:event_management/widget/OptionsWidget.dart';
+import 'package:event_management/widget/options_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/generated/l10n.dart';
 

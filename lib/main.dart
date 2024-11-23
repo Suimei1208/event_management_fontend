@@ -18,11 +18,10 @@ void main() async {
 }
 
 void _setupLogging() {
-  // Thiết lập mức độ logging, có thể là ALL, FINE, INFO, WARNING, SEVERE
   Logger.root.level = Level.ALL;
+  var logger = Logger('MyApp');
 
-  // Cấu hình handler cho logger (thường sẽ in ra console)
   Logger.root.onRecord.listen((record) {
-    print('${record.level.name}: ${record.time}: ${record.message}');
+    logger.log(record.level, '${record.time}: ${record.message}');
   });
 }
