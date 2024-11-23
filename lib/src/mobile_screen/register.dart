@@ -21,8 +21,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordConfirmController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _RoleController = TextEditingController();
-  final TextEditingController _NameController = TextEditingController();
+  final TextEditingController _roleController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
 
   Future<void> _registerWithEmailPassword(BuildContext context) async {
@@ -42,7 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'name': _usernameController.text.trim(),
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
-        'role': _RoleController.text.trim(), 
+        'role': _roleController.text.trim(), 
       };
 
       await _sendDataToBackend(data);
@@ -130,7 +130,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: _RoleController,
+              controller: _roleController,
               decoration: const InputDecoration(
                 labelText: 'Role',
                 border: OutlineInputBorder(),
@@ -139,7 +139,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 10),
             TextField(
-              controller: _NameController,
+              controller: _nameController,
               decoration: const InputDecoration(
                 labelText: 'Name',
                 border: OutlineInputBorder(),

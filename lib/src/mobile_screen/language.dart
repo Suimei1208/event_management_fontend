@@ -21,7 +21,7 @@ class LanguageSelectionPage extends StatelessWidget {
             },
           ),
           ListTile(
-            title: Text(S.of(context)!.vietnamese),
+            title: Text(S.of(context).vietnamese),
             onTap: () {
               settingsController.updateLocale(const Locale('vi', 'VN'));
               Navigator.pop(context);

@@ -37,7 +37,7 @@ class HomeScreen extends StatelessWidget {
                 _signOut();
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
                 );
               },
               child: const Text('Đăng xuất'),
