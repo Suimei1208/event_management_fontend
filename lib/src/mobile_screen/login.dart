@@ -1,4 +1,4 @@
-// login_screen.dart
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:event_management/src/mobile_screen/home_screen.dart';
 import 'package:event_management/src/mobile_screen/register.dart';
@@ -8,10 +8,10 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -25,7 +25,8 @@ class _LoginScreenState extends State<LoginScreen> {
         accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
     UserCredential userCredential =
         await FirebaseAuth.instance.signInWithCredential(credential);
-    if (userCredential.user != null) {
+
+    if (userCredential.user != null && mounted) {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => HomeScreen()));
     }
@@ -41,14 +42,13 @@ class _LoginScreenState extends State<LoginScreen> {
       final UserCredential userCredential = await FirebaseAuth.instance
           .signInWithCredential(facebookAuthCredential);
 
-      if (userCredential.user != null) {
+      if (userCredential.user != null && mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       }
     } else {
-      // Avoid print in production
       debugPrint(result.message);
     }
   }
@@ -60,15 +60,20 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+
+      if (userCredential.user != null && mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       debugPrint('Error during email/password login: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: ${e.message}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: ${e.message}')),
+        );
+      }
     }
   }
 
@@ -101,10 +106,10 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _signInWithEmailPassword(context),
-              child: const Text('Đăng nhập'),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
+              child: const Text('Đăng nhập'),
             ),
             const SizedBox(height: 20),
             TextButton(

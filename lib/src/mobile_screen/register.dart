@@ -1,14 +1,14 @@
-// register_screen.dart
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:event_management/src/mobile_screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
@@ -74,10 +74,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _registerWithEmailPassword(context),
-              child: const Text('Đăng ký'),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
               ),
+              child: const Text('Đăng ký'),
             ),
           ],
         ),
