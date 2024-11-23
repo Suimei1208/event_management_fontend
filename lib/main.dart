@@ -1,24 +1,16 @@
-import 'package:event_management/src/mobile_screen/login.dart';
+import 'package:event_management/firebase_options.dart';
+import 'package:event_management/generated/l10n.dart';
+import 'package:event_management/src/app.dart';
+import 'package:event_management/src/settings/settings_controller.dart';
+import 'package:event_management/src/settings/settings_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
+  final settingsController = SettingsController(SettingsService());
+  await settingsController.loadSettings();
+  S.load(const Locale('en'));
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Firebase Login',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: LoginScreen(),
-    );
-  }
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+  runApp(MyApp(settingsController: settingsController));
 }

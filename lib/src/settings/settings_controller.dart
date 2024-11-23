@@ -9,7 +9,10 @@ import 'settings_service.dart';
 /// uses the SettingsService to store and retrieve user settings.
 class SettingsController with ChangeNotifier {
   SettingsController(this._settingsService);
+  Locale _locale = const Locale('en', 'US');
 
+  Locale get locale => _locale;
+  
   // Make SettingsService a private variable so it is not used directly.
   final SettingsService _settingsService;
 
@@ -28,6 +31,11 @@ class SettingsController with ChangeNotifier {
 
     // Important! Inform listeners a change has occurred.
     notifyListeners();
+  }
+
+  void updateLocale(Locale newLocale) {
+    _locale = newLocale;
+    notifyListeners(); // Notify listeners to rebuild widgets
   }
 
   /// Update and persist the ThemeMode based on the user's selection.
