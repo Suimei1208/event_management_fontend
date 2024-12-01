@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
                     case LoginScreen.routeName:
                       return const LoginScreen();
                     case RoleSelectionScreen.routeName:
-                      return  RoleSelectionScreen();
+                      return  const RoleSelectionScreen();
                     case RegisterScreen.routeName:
                       return const RegisterScreen();
                     case ProfileWidget.routeName:
