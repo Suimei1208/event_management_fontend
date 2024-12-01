@@ -1,4 +1,5 @@
 import 'package:event_management/src/mobile_screen/register.dart';
+import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:flutter/foundation.dart'; 
 import 'package:flutter/material.dart';
 import 'package:event_management/src/mobile_screen/language.dart';
@@ -50,6 +51,8 @@ class MyApp extends StatelessWidget {
                       return LanguageSelectionPage(settingsController: settingsController);
                     case LoginScreen.routeName:
                       return const LoginScreen();
+                    case RoleSelectionScreen.routeName:
+                      return  const RoleSelectionScreen();
                     case RegisterScreen.routeName:
                       return const RegisterScreen();
                     case ProfileWidget.routeName:
