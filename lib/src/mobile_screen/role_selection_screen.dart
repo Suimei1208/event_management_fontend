@@ -1,10 +1,13 @@
-import 'package:event_management/src/service/authService.dart';
+import 'package:event_management/src/service/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
   static const routeName = '/role';
 
+  const RoleSelectionScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _RoleSelectionScreenState createState() => _RoleSelectionScreenState();
 }
 
@@ -66,7 +69,7 @@ class RoleCard extends StatelessWidget {
   final String buttonText;
   final VoidCallback onPressed;
 
-  RoleCard({
+  const RoleCard({super.key, 
     required this.icon,
     required this.title,
     required this.description,

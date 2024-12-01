@@ -1,5 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-import 'package:event_management/src/service/authService.dart';
+import 'package:event_management/src/service/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -102,22 +102,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () async {
                         await signInWithEmailPassword(context, _emailController.text, _passwordController.text);
                       },
-                      child: Text('Sign In'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                         textStyle: const TextStyle(fontSize: 16),
                       ),
+                      child: const Text('Sign In'),
                     ),
                     const SizedBox(height: 10),
                     TextButton(
                       onPressed: () {
                         // Add functionality for forgot password
-                      },
-                      child: Text('Forgot Password'),
+                      },                     
                       style: TextButton.styleFrom(
                         foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       ),
+                      child: const Text('Forgot Password'),
                     ),
                     const SizedBox(height: 20),
                     Text(

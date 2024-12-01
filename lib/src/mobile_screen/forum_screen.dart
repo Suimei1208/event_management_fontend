@@ -52,7 +52,7 @@ class CommunityForumScreen extends StatelessWidget {
                 size: 24.0,
               ),
               onPressed: () {
-                print('IconButton pressed ...');
+
               },
             ),
           ],
@@ -101,7 +101,6 @@ class CommunityForumScreen extends StatelessWidget {
                           const SizedBox(height: 12.0),
                           ElevatedButton(
                             onPressed: () {
-                              print('Button pressed ...');
                             },
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size(MediaQuery.of(context).size.width, 50.0),
@@ -210,7 +209,6 @@ class CommunityForumScreen extends StatelessWidget {
                                 typeColor: getTypeColor(item['type']),
                                 textColor: getTypeTextColor(item['type']),
                                 navigator: (BuildContext context){
-                                  print(item['id']);
                                 },
                               ),
                               const SizedBox(height: 16.0),
@@ -232,11 +230,11 @@ class CommunityForumScreen extends StatelessWidget {
   Color getTypeColor(String type) {
     switch (type) {
       case 'Question':
-        return Color(0xFFE3F2FD);
+        return const Color(0xFFE3F2FD);
       case 'Discussion':
-        return Color(0xFFE8F5E9);
+        return const Color(0xFFE8F5E9);
       case 'Event':
-        return Color(0xFFFCE4EC);
+        return const Color(0xFFFCE4EC);
       default:
         return Colors.white;
     }
@@ -245,11 +243,11 @@ class CommunityForumScreen extends StatelessWidget {
   Color getTypeTextColor(String type) {
     switch (type) {
       case 'Question':
-        return Color(0xFF1565C0);
+        return const Color(0xFF1565C0);
       case 'Discussion':
-        return Color(0xFF2E7D32);
+        return const Color(0xFF2E7D32);
       case 'Event':
-        return Color(0xFFC2185B);
+        return const Color(0xFFC2185B);
       default:
         return Colors.black;
     }
@@ -258,7 +256,7 @@ class CommunityForumScreen extends StatelessWidget {
 
 class DiscussionCard extends StatelessWidget {
   const DiscussionCard({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.type,
     required this.title,
@@ -267,7 +265,7 @@ class DiscussionCard extends StatelessWidget {
     required this.typeColor,
     required this.textColor,
     required this.navigator,
-  }) : super(key: key);
+  });
 
   final String imageUrl;
   final String type;
@@ -363,11 +361,11 @@ class DiscussionCard extends StatelessWidget {
 
 class TopicChip extends StatelessWidget {
   const TopicChip({
-    Key? key,
+    super.key,
     required this.label,
     required this.backgroundColor,
     required this.textColor,
-  }) : super(key: key);
+  });
 
   final String label;
   final Color backgroundColor;

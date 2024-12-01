@@ -9,7 +9,6 @@ import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 String uri = '${Config.baseUrl}/user-services';
-
 Future<void> signInWithGoogle(BuildContext context) async {
   try {
     final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -26,13 +25,14 @@ Future<void> signInWithGoogle(BuildContext context) async {
 
       if (userCredential.user != null) {
         Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       }
     }
   } catch (e) {
-    debugPrint('Error during Google sign-in: $e');
+    rethrow;
   }
 }
 
@@ -46,12 +46,12 @@ Future<void> signInWithFacebook(BuildContext context) async {
 
     if (userCredential.user != null) {
       Navigator.pushReplacement(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     }
   } else {
-    debugPrint(result.message);
   }
 }
 
@@ -74,23 +74,27 @@ Future<void> signInWithEmailPassword(BuildContext context, String email, String 
           final role = responseData['data']['role'];
           
           if (role == "None") {
+            // ignore: use_build_context_synchronously
             Navigator.pushNamed(context, '/role');
           } else {
+            // ignore: use_build_context_synchronously
             Navigator.pushNamed(context, '/profile');
           }
         } else {
+          // ignore: use_build_context_synchronously
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to get role: ${responseData['message']}'))
           );
         }
       } else {
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: ${response.statusCode}'))
         );
       }
     }
   } on FirebaseAuthException catch (e) {
-    debugPrint('Error during email/password login: $e');
+    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Login failed: ${e.message}'))
     );
@@ -109,6 +113,7 @@ Future<void> selectRole(BuildContext context, String role) async {
       );
 
       if (response.statusCode == 200) {
+        // ignore: use_build_context_synchronously
         Navigator.pushNamed(context, '/profile');
       } else {
         return;

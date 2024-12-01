@@ -1,5 +1,5 @@
 import 'package:event_management/src/mobile_screen/register.dart';
-import 'package:event_management/src/mobile_screen/roleSelectionScreen.dart';
+import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:flutter/foundation.dart'; 
 import 'package:flutter/material.dart';
 import 'package:event_management/src/mobile_screen/language.dart';

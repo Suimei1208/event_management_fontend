@@ -236,29 +236,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                          
                         );
                       },
-                      child: Text('Register'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                         padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                         textStyle: const TextStyle(fontSize: 16),
                       ),
+                      child: const Text('Register'),
                     ),
                     const SizedBox(height: 15),
                     TextButton(
                       onPressed: () {
                         // Navigate back to login screen
                         Navigator.pop(context);
-                      },
-                      child: Text(
+                      },                    
+                      style: TextButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                       child: Text(
                         'Already have an account? Sign in here',
                         style: TextStyle(
                           fontSize: 16,
                           color: Theme.of(context).colorScheme.onPrimary,
                           decoration: TextDecoration.underline,
                         ),
-                      ),
-                      style: TextButton.styleFrom(
-                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ],
