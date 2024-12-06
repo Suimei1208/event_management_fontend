@@ -41,7 +41,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ?.updateDisplayName(_usernameController.text.trim());
 
       final idToken = await userCredential.user?.getIdToken();
-
+      
       final Map<String, String> data = {
         'id': idToken ?? '',
         'name': _usernameController.text.trim(),

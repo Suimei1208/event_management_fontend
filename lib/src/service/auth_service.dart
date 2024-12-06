@@ -107,9 +107,11 @@ Future<void> selectRole(BuildContext context, String role) async {
 
     if (user != null) {
       String? idToken = await user.getIdToken();
-
       final response = await http.post(
-        Uri.parse('${Config.baseUrl}/user-services/api/Users/UpdateRole?role=$role&token=$idToken'),        
+        Uri.parse('${Config.baseUrl}/user-services/api/Users/UpdateRole?role=$role'),    
+        headers: {
+            'Authorization': '$idToken',
+          },    
       );
 
       if (response.statusCode == 200) {
