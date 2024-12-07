@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
+import 'package:event_management/src/mobile_screen/forgot_password.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:flutter/material.dart';
 
@@ -112,7 +113,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 10),
                     TextButton(
                       onPressed: () {
-                        // Add functionality for forgot password
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                        );
                       },                     
                       style: TextButton.styleFrom(
                         foregroundColor: Theme.of(context).colorScheme.onPrimary,

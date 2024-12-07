@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:event_management/config.dart';
 import 'package:event_management/src/mobile_screen/home_screen.dart';
+import 'package:event_management/src/mobile_screen/login.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -125,5 +126,47 @@ Future<void> selectRole(BuildContext context, String role) async {
     }
   } catch (e) {
     rethrow;
+  }
+}
+
+void resetPassword(String email, BuildContext context) async {
+  if (email.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please enter your email!')),
+    );
+    return;
+  }
+
+  try {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Password reset email sent to $email')),
+    );
+    Future.delayed(const Duration(seconds: 5), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      ); 
+    });
+  } on FirebaseAuthException catch (e) {
+    String errorMessage;
+    if (e.code == 'user-not-found') {
+      errorMessage = 'No user found with this email.';
+    } else if (e.code == 'invalid-email') {
+      errorMessage = 'The email address is not valid.';
+    } else {
+      errorMessage = 'Something went wrong. Please try again.';
+    }
+
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(errorMessage)),
+    );
+  } catch (e) {
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('An unexpected error occurred: $e')),
+    );
   }
 }
