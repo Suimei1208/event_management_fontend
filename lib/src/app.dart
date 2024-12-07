@@ -1,3 +1,4 @@
+import 'package:event_management/src/mobile_screen/forgot_password.dart';
 import 'package:event_management/src/mobile_screen/register.dart';
 import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:flutter/foundation.dart'; 
@@ -57,6 +58,8 @@ class MyApp extends StatelessWidget {
                       return const RegisterScreen();
                     case ProfileWidget.routeName:
                       return const ProfileWidget();
+                    case ForgotPasswordScreen.routeName:
+                      return const ForgotPasswordScreen();
                     default:
                       return const LoginScreen();
                   }
