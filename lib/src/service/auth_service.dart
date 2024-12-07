@@ -145,10 +145,13 @@ void resetPassword(String email, BuildContext context) async {
       SnackBar(content: Text('Password reset email sent to $email')),
     );
     Future.delayed(const Duration(seconds: 5), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      ); 
-    });
+        if (context.mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+            (route) => false,
+          );
+        }
+      });
   } on FirebaseAuthException catch (e) {
     String errorMessage;
     if (e.code == 'user-not-found') {
