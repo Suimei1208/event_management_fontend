@@ -1,64 +1,152 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:event_management/config.dart';
-import 'package:event_management/src/mobile_screen/home_screen.dart';
 import 'package:event_management/src/mobile_screen/login.dart';
+import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:logging/logging.dart';
 
 String uri = '${Config.baseUrl}/user-services';
-Future<void> signInWithGoogle(BuildContext context) async {
+final Logger _logger = Logger('MyApp');
+
+Future<void> signInWithFacebook(BuildContext context) async {
   try {
-    final GoogleSignIn googleSignIn = GoogleSignIn();
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    final LoginResult result = await FacebookAuth.instance.login();
 
-    if (googleUser != null) {
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final OAuthCredential googleAuthCredential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+    if (result.status == LoginStatus.success) {
+      final OAuthCredential facebookAuthCredential =
+          FacebookAuthProvider.credential(result.accessToken!.tokenString);
 
-      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(googleAuthCredential);
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(facebookAuthCredential);
 
       if (userCredential.user != null) {
-        Navigator.pushReplacement(
-          // ignore: use_build_context_synchronously
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+        final idToken = await userCredential.user?.getIdToken();
+
+        final response = await http.post(
+          Uri.parse('${Config.baseUrl}/user-services/api/Users/register'),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: json.encode({
+            'Id': idToken,
+            'Email': userCredential.user?.email,
+          }),
         );
+
+        if (response.statusCode == 200) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const RoleSelectionScreen()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('Error registering user: ${response.body}')));
+        }
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Facebook login failed: ${result.message}')));
     }
   } catch (e) {
     rethrow;
   }
 }
 
-Future<void> signInWithFacebook(BuildContext context) async {
-  final LoginResult result = await FacebookAuth.instance.login();
+Future<void> signInWithGoogle(BuildContext context) async {
+  try {
+    final GoogleSignIn googleSignIn = GoogleSignIn();
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
-  if (result.status == LoginStatus.success) {
-    final OAuthCredential facebookAuthCredential = FacebookAuthProvider.credential(result.accessToken!.tokenString);
-
-    final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
-
-    if (userCredential.user != null) {
-      Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+    if (googleUser != null) {
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final OAuthCredential googleAuthCredential =
+          GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
+
+      final UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(googleAuthCredential);
+
+      if (userCredential.user != null) {
+        final idToken = await userCredential.user?.getIdToken();
+
+        final response = await http.get(
+          Uri.parse(
+              '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
+        );
+
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          if (responseData['success'] == true && responseData['data'] != null) {
+            final role = responseData['data']['role'];
+
+            if (role == "None") {
+              Navigator.pushReplacementNamed(context, '/role');
+            } else {
+              Navigator.pushReplacementNamed(context, '/profile');
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content:
+                    Text('Failed to get role: ${responseData['message']}')));
+          }
+        } else if (response.statusCode == 500) {
+          final Map<String, String> data = {
+            'id': idToken ?? '',
+            'name': googleUser.displayName ?? 'default',
+            'email': googleUser.email,
+            'phone': '000000000',
+            'role': 'None',
+          };
+
+          await _sendDataToBackend(data);
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RoleSelectionScreen(),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: ${response.statusCode}')));
+        }
+      }
     }
-  } else {
+  } catch (e) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Login failed: ${e.toString()}')));
   }
 }
 
-Future<void> signInWithEmailPassword(BuildContext context, String email, String password) async {
+Future<void> _sendDataToBackend(Map<String, String> data) async {
+  final response = await http.post(
+    Uri.parse('${Config.baseUrl}/user-services/api/Users/register'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode(data),
+  );
+  if (response.statusCode == 200) {
+    _logger.info('Data sent successfully');
+  } else {
+    _logger.severe('Failed to send data: ${response.body}');
+  }
+}
+
+Future<void> signInWithEmailPassword(
+    BuildContext context, String email, String password) async {
   try {
-    final UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+    final UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
@@ -66,39 +154,32 @@ Future<void> signInWithEmailPassword(BuildContext context, String email, String 
     if (userCredential.user != null) {
       final idToken = await userCredential.user?.getIdToken();
       final response = await http.get(
-        Uri.parse('${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),      
+        Uri.parse(
+            '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
       );
-      
+
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         if (responseData['success'] == true && responseData['data'] != null) {
           final role = responseData['data']['role'];
-          
+
           if (role == "None") {
-            // ignore: use_build_context_synchronously
             Navigator.pushNamed(context, '/role');
           } else {
-            // ignore: use_build_context_synchronously
             Navigator.pushNamed(context, '/profile');
           }
         } else {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to get role: ${responseData['message']}'))
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('Failed to get role: ${responseData['message']}')));
         }
       } else {
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${response.statusCode}'))
-        );
+            SnackBar(content: Text('Error: ${response.statusCode}')));
       }
     }
   } on FirebaseAuthException catch (e) {
-    // ignore: use_build_context_synchronously
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Login failed: ${e.message}'))
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Login failed: ${e.message}')));
   }
 }
 
@@ -109,14 +190,14 @@ Future<void> selectRole(BuildContext context, String role) async {
     if (user != null) {
       String? idToken = await user.getIdToken();
       final response = await http.post(
-        Uri.parse('${Config.baseUrl}/user-services/api/Users/UpdateRole?role=$role'),    
+        Uri.parse(
+            '${Config.baseUrl}/user-services/api/Users/UpdateRole?role=$role'),
         headers: {
-            'Authorization': '$idToken',
-          },    
+          'Authorization': '$idToken',
+        },
       );
 
       if (response.statusCode == 200) {
-        // ignore: use_build_context_synchronously
         Navigator.pushNamed(context, '/profile');
       } else {
         return;
@@ -140,18 +221,17 @@ void resetPassword(String email, BuildContext context) async {
   try {
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 
-    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Password reset email sent to $email')),
     );
     Future.delayed(const Duration(seconds: 5), () {
-        if (context.mounted) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-            (route) => false,
-          );
-        }
-      });
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          (route) => false,
+        );
+      }
+    });
   } on FirebaseAuthException catch (e) {
     String errorMessage;
     if (e.code == 'user-not-found') {
@@ -162,14 +242,26 @@ void resetPassword(String email, BuildContext context) async {
       errorMessage = 'Something went wrong. Please try again.';
     }
 
-    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(errorMessage)),
     );
   } catch (e) {
-    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('An unexpected error occurred: $e')),
+    );
+  }
+}
+
+Future<void> logout(BuildContext context) async {
+  try {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error during logout: $e')),
     );
   }
 }

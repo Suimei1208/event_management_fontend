@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:event_management/config.dart';
 import 'package:http/http.dart' as http;
-import 'package:event_management/src/mobile_screen/home_screen.dart';
+import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logging/logging.dart';
@@ -21,7 +21,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfirmController = TextEditingController();
+  final TextEditingController _passwordConfirmController =
+      TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
 
@@ -41,20 +42,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ?.updateDisplayName(_usernameController.text.trim());
 
       final idToken = await userCredential.user?.getIdToken();
-      
+
       final Map<String, String> data = {
         'id': idToken ?? '',
         'name': _usernameController.text.trim(),
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
-        'role': 'None', 
+        'role': 'None',
       };
 
       await _sendDataToBackend(data);
-      
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
       );
     } on FirebaseAuthException catch (e) {
       debugPrint('Error during registration: $e');
@@ -64,24 +65,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-
   Future<void> _sendDataToBackend(Map<String, String> data) async {
-  final response = await http.post(
-    Uri.parse('${Config.baseUrl}/user-services/api/Users/register'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode(data),
-  );
+    final response = await http.post(
+      Uri.parse('${Config.baseUrl}/user-services/api/Users/register'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(data),
+    );
 
-  if (response.statusCode == 200) {
-    // Handle success
-    _logger.info('Data sent successfully');
-  } else {
-    // Handle failure
-    _logger.severe('Failed to send data: ${response.body}');
+    if (response.statusCode == 200) {
+      _logger.info('Data sent successfully');
+    } else {
+      _logger.severe('Failed to send data: ${response.body}');
+    }
   }
-}
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -191,7 +189,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                           onPressed: () {
@@ -216,12 +216,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
                             });
                           },
                         ),
@@ -233,12 +236,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Add sign-up logic
                         await _registerWithEmailPassword(
                           context,
-                         
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 15),
                         textStyle: const TextStyle(fontSize: 16),
                       ),
                       child: const Text('Register'),
@@ -248,11 +252,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       onPressed: () {
                         // Navigate back to login screen
                         Navigator.pop(context);
-                      },                    
+                      },
                       style: TextButton.styleFrom(
-                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
                       ),
-                       child: Text(
+                      child: Text(
                         'Already have an account? Sign in here',
                         style: TextStyle(
                           fontSize: 16,

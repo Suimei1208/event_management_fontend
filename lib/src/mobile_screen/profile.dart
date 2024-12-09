@@ -1,8 +1,9 @@
+import 'package:event_management/src/mobile_screen/login.dart';
+import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/settings/settings_view.dart';
 import 'package:event_management/widget/options_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/generated/l10n.dart';
-
 
 class ProfileWidget extends StatefulWidget {
   const ProfileWidget({super.key});
@@ -28,7 +29,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;  
+    final brightness = Theme.of(context).brightness;
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -41,9 +42,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               Icons.arrow_back_rounded,
               size: 30,
             ),
-            onPressed: () {
-              // print('IconButton pressed ...');
-            },
+            onPressed: () {},
           ),
           title: const Text(
             'Profile',
@@ -54,7 +53,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
           ),
           centerTitle: false,
           elevation: 0,
-          backgroundColor: brightness == Brightness.dark ? Colors.black : Colors.grey[200],
+          backgroundColor:
+              brightness == Brightness.dark ? Colors.black : Colors.grey[200],
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +64,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: brightness == Brightness.dark ? Colors.grey[850] : Colors.white, 
+                  color: brightness == Brightness.dark
+                      ? Colors.grey[850]
+                      : Colors.white,
                   boxShadow: const [
                     BoxShadow(
                       blurRadius: 50,
@@ -81,10 +83,12 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         width: 90,
                         height: 90,
                         decoration: BoxDecoration(
-                          color: brightness == Brightness.dark ? Colors.grey[600] : Colors.white, // Màu vòng tròn theo theme
+                          color: brightness == Brightness.dark
+                              ? Colors.grey[600]
+                              : Colors.white,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.grey, // Màu viền mặc định
+                            color: Colors.grey,
                             width: 2,
                           ),
                         ),
@@ -102,7 +106,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsetsDirectional.fromSTEB(16, 0, 0, 0),
+                        padding:
+                            const EdgeInsetsDirectional.fromSTEB(16, 0, 0, 0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -113,17 +118,22 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                 fontSize: 25,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 0.0,
-                                color: brightness == Brightness.dark ? Colors.white : Colors.black, // Màu chữ theo theme
+                                color: brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black, // Màu chữ theo theme
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(0, 4, 0, 0),
+                              padding: const EdgeInsetsDirectional.fromSTEB(
+                                  0, 4, 0, 0),
                               child: Text(
                                 'joy@augustin.com',
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontSize: 14,
-                                  color: brightness == Brightness.dark ? Colors.white : Colors.black, // Màu chữ theo theme
+                                  color: brightness == Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black,
                                 ),
                               ),
                             ),
@@ -142,16 +152,16 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 style: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 16,
-                  color: brightness == Brightness.dark ? Colors.white : Colors.black,
+                  color: brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
                 ),
               ),
             ),
             OptionsWidget(
-              icon: Icons.account_circle_outlined, 
-              text: S.of(context).editProfile, 
-              onTap: () {
-                // Thực hiện hành động chỉnh sửa profile
-              },
+              icon: Icons.account_circle_outlined,
+              text: S.of(context).editProfile,
+              onTap: () {},
             ),
             Padding(
               padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
@@ -159,34 +169,32 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                 S.of(context).general,
                 style: TextStyle(
                   fontFamily: 'Inter',
-                  fontSize: 16, 
-                  color: brightness == Brightness.dark ? Colors.white : Colors.black, 
+                  fontSize: 16,
+                  color: brightness == Brightness.dark
+                      ? Colors.white
+                      : Colors.black,
                 ),
               ),
             ),
             OptionsWidget(
-              icon: Icons.settings, 
-              text: S.of(context).setting, 
+              icon: Icons.settings,
+              text: S.of(context).setting,
               onTap: () {
                 Navigator.pushNamed(context, SettingsView.routeName);
               },
             ),
             OptionsWidget(
-              icon: Icons.language, 
-              text: S.of(context).language,  
+              icon: Icons.language,
+              text: S.of(context).language,
               onTap: () {
                 Navigator.pushNamed(context, '/language');
               },
             ),
-             OptionsWidget(
-              icon: Icons.logout, 
-              text: S.of(context).logout,  
+            OptionsWidget(
+              icon: Icons.logout,
+              text: S.of(context).logout,
               onTap: () {
-                // _signOut();
-                // Navigator.pushReplacement(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => LoginScreen()),
-                // );
+                logout(context);
               },
             ),
           ],

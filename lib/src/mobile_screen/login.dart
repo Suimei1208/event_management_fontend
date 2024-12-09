@@ -87,7 +87,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Theme.of(context).colorScheme.onSurface,
                           ),
                           onPressed: () {
@@ -101,11 +103,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        await signInWithEmailPassword(context, _emailController.text, _passwordController.text);
+                        await signInWithEmailPassword(context,
+                            _emailController.text, _passwordController.text);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 15),
                         textStyle: const TextStyle(fontSize: 16),
                       ),
                       child: const Text('Sign In'),
@@ -115,11 +120,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const ForgotPasswordScreen()),
                         );
-                      },                     
+                      },
                       style: TextButton.styleFrom(
-                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
                       ),
                       child: const Text('Forgot Password'),
                     ),
@@ -141,7 +149,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           icon: const Icon(Icons.g_mobiledata),
                           label: const Text('Continue with Google'),
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: Theme.of(context).colorScheme.onSurface, backgroundColor: Theme.of(context).colorScheme.surface,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onSurface,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.surface,
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -149,16 +160,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () async {
                             await signInWithFacebook(context);
                           },
-                          icon: const Icon(Icons.apple),
-                          label: const Text('Continue with Apple'),
+                          icon: const Icon(Icons.facebook),
+                          label: const Text('Continue with Facebook'),
                           style: ElevatedButton.styleFrom(
-                            foregroundColor: Theme.of(context).colorScheme.onSurface, backgroundColor: Theme.of(context).colorScheme.surface,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onSurface,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.surface,
                           ),
                         ),
                         const SizedBox(height: 20),
                         TextButton(
                           onPressed: () {
-                            // Navigate to the registration screen
                             Navigator.pushNamed(context, '/register');
                           },
                           // ignore: sort_child_properties_last
@@ -171,7 +184,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           style: TextButton.styleFrom(
-                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
                           ),
                         ),
                       ],
