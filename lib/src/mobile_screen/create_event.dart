@@ -160,7 +160,7 @@ class _CreateEventState extends State<CreateEvent> {
               Navigator.of(context).pop();
             },
           ),
-          actions: [],
+          actions: const [],
           centerTitle: false,
           elevation: 0,
         ),
