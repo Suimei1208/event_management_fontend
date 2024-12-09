@@ -1,4 +1,3 @@
-import 'package:event_management/src/mobile_screen/login.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/settings/settings_view.dart';
 import 'package:event_management/widget/options_widget.dart';
