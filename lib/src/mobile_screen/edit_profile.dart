@@ -6,6 +6,8 @@ import 'package:event_management/src/service/user_service.dart';
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
+  static const routeName = '/edit_profile';
+
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
 }
