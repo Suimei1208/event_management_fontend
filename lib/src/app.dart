@@ -1,7 +1,9 @@
+import 'package:event_management/src/mobile_screen/create_event.dart';
+import 'package:event_management/src/mobile_screen/edit_profile.dart';
 import 'package:event_management/src/mobile_screen/forgot_password.dart';
 import 'package:event_management/src/mobile_screen/register.dart';
 import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
-import 'package:flutter/foundation.dart'; 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/mobile_screen/language.dart';
 import 'package:event_management/src/mobile_screen/login.dart';
@@ -10,6 +12,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'settings/settings_controller.dart';
 import 'package:event_management/generated/l10n.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({
@@ -42,6 +45,21 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(),
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
+          home: StreamBuilder<User?>(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasData) {
+                // Nếu người dùng đã đăng nhập, điều hướng đến màn hình chính của bạn
+                return const ProfileWidget(); // Thay bằng màn hình chính của bạn
+              } else {
+                // Nếu chưa đăng nhập, hiển thị màn hình đăng nhập
+                return const LoginScreen();
+              }
+            },
+          ),
           onGenerateRoute: (RouteSettings routeSettings) {
             if (!kIsWeb) {
               return MaterialPageRoute<void>(
@@ -53,13 +71,17 @@ class MyApp extends StatelessWidget {
                     case LoginScreen.routeName:
                       return const LoginScreen();
                     case RoleSelectionScreen.routeName:
-                      return  const RoleSelectionScreen();
+                      return const RoleSelectionScreen();
                     case RegisterScreen.routeName:
                       return const RegisterScreen();
                     case ProfileWidget.routeName:
                       return const ProfileWidget();
                     case ForgotPasswordScreen.routeName:
                       return const ForgotPasswordScreen();
+                    case EditProfileScreen.routeName:
+                      return const EditProfileScreen();
+                    case CreateEvent.routeName:
+                      return const CreateEvent();
                     default:
                       return const LoginScreen();
                   }

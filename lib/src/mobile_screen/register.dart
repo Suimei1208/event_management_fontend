@@ -2,11 +2,11 @@
 import 'dart:convert';
 
 import 'package:event_management/config.dart';
+import 'package:event_management/src/service/logger_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:logging/logging.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -28,8 +28,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-
-  final Logger _logger = Logger('MyApp');
 
   Future<void> _registerWithEmailPassword(BuildContext context) async {
     try {
@@ -73,9 +71,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     if (response.statusCode == 200) {
-      _logger.info('Data sent successfully');
+      LoggerService.logger.w('Data sent successfully');
     } else {
-      _logger.severe('Failed to send data: ${response.body}');
+      LoggerService.logger.w('Failed to send data: ${response.body}');
     }
   }
 

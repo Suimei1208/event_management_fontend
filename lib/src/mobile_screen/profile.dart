@@ -1,4 +1,3 @@
-import 'package:event_management/src/mobile_screen/edit_profile.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart'; // Import UserService
 import 'package:event_management/src/settings/settings_view.dart';
@@ -193,17 +192,15 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     icon: Icons.account_circle_outlined,
                     text: S.of(context).editProfile,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const EditProfileScreen()),
-                      );
+                      Navigator.pushNamed(context, '/edit_profile');
                     },
                   ),
                   OptionsWidget(
                     icon: Icons.account_circle_outlined,
                     text: "Tao event",
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.pushNamed(context, '/create_event');
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
