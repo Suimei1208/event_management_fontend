@@ -1013,7 +1013,7 @@ class _CreateEventState extends State<CreateEvent> {
                           startDate: DateFormat('hh:mm a').parse(timeController.text.toString()),
                           endDate: DateFormat('dd/MM/yyyy').parse(endDateController.text.toString()),
                           banner: "123456789",
-                          status: "PENDING",
+                          status: "Upcoming",
                           idCreate: ""
                         );
                         LoggerService.logger.w(event.toJson());

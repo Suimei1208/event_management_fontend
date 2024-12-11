@@ -3,6 +3,7 @@ import 'package:event_management/src/mobile_screen/edit_profile.dart';
 import 'package:event_management/src/mobile_screen/forgot_password.dart';
 import 'package:event_management/src/mobile_screen/register.dart';
 import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
+import 'package:event_management/src/mobile_screen/user_event.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/mobile_screen/language.dart';
@@ -52,10 +53,8 @@ class MyApp extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) {
-                // Nếu người dùng đã đăng nhập, điều hướng đến màn hình chính của bạn
-                return const ProfileWidget(); // Thay bằng màn hình chính của bạn
+                return const UserEvents();
               } else {
-                // Nếu chưa đăng nhập, hiển thị màn hình đăng nhập
                 return const LoginScreen();
               }
             },
@@ -82,6 +81,8 @@ class MyApp extends StatelessWidget {
                       return const EditProfileScreen();
                     case CreateEvent.routeName:
                       return const CreateEvent();
+                    case UserEvents.routeName:
+                      return const UserEvents();
                     default:
                       return const LoginScreen();
                   }

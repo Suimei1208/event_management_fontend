@@ -28,13 +28,27 @@ class Event {
       'name': name,
       'idCreate': idCreate,
       'description': description,
-      'startDate': startDate.toUtc().toIso8601String(), // Chuyển đổi về UTC và định dạng ISO 8601
-      'endDate': endDate.toUtc().toIso8601String(),     // Chuyển đổi về UTC và định dạng ISO 8601
+      'startDate': startDate.toUtc().toIso8601String(), 
+      'endDate': endDate.toUtc().toIso8601String(),    
       'location': location,
       'targetAudience': targetAudience,
       'banner': banner,
       'status': status,
       'type': type,
     };
+  }
+  factory Event.fromJson(Map<String, dynamic> json) {
+    return Event(
+      name: json['name'] ?? 'Unknown Name',
+      idCreate: json['idCreate'] ?? 'Unknown ID',
+      description: json['description'] ?? 'No description',
+      startDate: DateTime.parse(json['startDate']),
+      endDate: DateTime.parse(json['endDate']),
+      location: json['location'] ?? 'Unknown Location',
+      targetAudience: json['targetAudience'] ?? 'General',
+      banner: json['banner'] ?? '',
+      status: json['status'] ?? 'Pending',
+      type: json['type'] ?? 'General',
+    );
   }
 }
