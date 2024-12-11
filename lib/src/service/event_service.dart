@@ -72,3 +72,38 @@ Future<void> createEvent(Event event, BuildContext context) async {
     );
   }
 }
+
+Future<List<Event>> fetchEvents() async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+    String? idToken = await user.getIdToken();
+    final response = await http.get(
+      Uri.parse('${Config.baseUrl}/event-service/get-event'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final List<dynamic> eventsData = responseData['data'] ?? [];
+
+      final List<Event> events = eventsData
+          .map((event) => Event.fromJson(event as Map<String, dynamic>))
+          .toList();
+
+      LoggerService.logger.i('Fetched $events events');
+
+      return events;
+    } else {
+      LoggerService.logger.w('Failed to fetch events: ${response.statusCode}');
+      return [];
+    }
+  } catch (e) {
+    LoggerService.logger.w('Error: $e');
+    return [];
+  }
+}
