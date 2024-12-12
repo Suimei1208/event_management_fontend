@@ -142,12 +142,12 @@ class _CreateEventState extends State<CreateEvent> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           title: Text(
-                    'Create Event',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontFamily: 'Inter Tight',
-                          letterSpacing: 0.0,
-                        ),
-                  ),
+            'Create Event',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontFamily: 'Inter Tight',
+                  letterSpacing: 0.0,
+                ),
+          ),
           backgroundColor: Theme.of(context).colorScheme.surface,
           automaticallyImplyLeading: false,
           leading: IconButton(
@@ -172,16 +172,15 @@ class _CreateEventState extends State<CreateEvent> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [                
+                children: [
                   Text(
                     'Fill in the details below to create your new event.',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontFamily: 'Inter',
-                          letterSpacing: 0.0,
-                          fontSize: 16
-                        ),
+                        fontFamily: 'Inter', letterSpacing: 0.0, fontSize: 16),
                   ),
-                  const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -193,12 +192,18 @@ class _CreateEventState extends State<CreateEvent> {
                           obscureText: false,
                           decoration: InputDecoration(
                             labelText: 'Event Name',
-                            labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            labelStyle: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
                                   fontFamily: 'Inter',
                                   letterSpacing: 0.0,
                                 ),
                             hintText: 'Enter event name...',
-                            hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            hintStyle: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
                                   fontFamily: 'Inter',
                                   letterSpacing: 0.0,
                                 ),
@@ -233,12 +238,14 @@ class _CreateEventState extends State<CreateEvent> {
                             filled: true,
                             fillColor: Theme.of(context).cardColor,
                             contentPadding:
-                                const EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
+                                const EdgeInsetsDirectional.fromSTEB(
+                                    24, 24, 20, 24),
                           ),
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontFamily: 'Inter',
-                                letterSpacing: 0.0,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    fontFamily: 'Inter',
+                                    letterSpacing: 0.0,
+                                  ),
                           validator: textController1Validator,
                         ),
                       ),
@@ -254,23 +261,30 @@ class _CreateEventState extends State<CreateEvent> {
                           ),
                         ),
                         child: Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              16, 16, 16, 16),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 'Event Type',
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontFamily: 'Inter',
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 30
-                                    ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                        fontFamily: 'Inter',
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 30),
                               ),
                               Wrap(
                                 spacing: 8,
-                                children: ['Seminar', 'Workshop', 'Conference', 'Competition']
+                                children: [
+                                  'Seminar',
+                                  'Workshop',
+                                  'Conference',
+                                  'Competition'
+                                ]
                                     .map((type) => ChoiceChip(
                                           label: Text(type),
                                           selected: choiceChipsValue == type,
@@ -292,60 +306,162 @@ class _CreateEventState extends State<CreateEvent> {
                       SizedBox(
                         width: double.infinity,
                         child: TextFormField(
-                          controller: _textController2, // Updated
-                          autofocus: false,
-                          obscureText: false,
-                          decoration: InputDecoration(
-                            labelText: 'Description',
-                            labelStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontFamily: 'Inter',
-                                  letterSpacing: 0.0,
+                            controller: _textController2, // Updated
+                            autofocus: false,
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              labelText: 'Description',
+                              labelStyle: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontFamily: 'Inter',
+                                    letterSpacing: 0.0,
+                                  ),
+                              hintText: 'Describe your event...',
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontFamily: 'Inter',
+                                    letterSpacing: 0.0,
+                                  ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).dividerColor,
+                                  width: 1.0,
                                 ),
-                            hintText: 'Describe your event...',
-                            hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontFamily: 'Inter',
-                                  letterSpacing: 0.0,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Color(0x00000000),
+                                  width: 1.0,
                                 ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Theme.of(context).dividerColor,
-                                width: 1.0,
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Color(0x00000000),
-                                width: 1.0,
+                              errorBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Color(0x00000000),
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Color(0x00000000),
-                                width: 1.0,
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Color(0x00000000),
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              filled: true,
+                              fillColor: Theme.of(context).cardColor,
+                              contentPadding:
+                                  const EdgeInsetsDirectional.fromSTEB(
+                                      24, 24, 20, 24),
                             ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Color(0x00000000),
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                            fillColor: Theme.of(context).cardColor,
-                            contentPadding:
-                                const EdgeInsetsDirectional.fromSTEB(24, 24, 20, 24),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      fontFamily: 'Inter',
+                                      letterSpacing: 0.0,
+                                    ),
+                            maxLines: 5,
+                            minLines: 3,
+                            validator: textController2Validator),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Theme.of(context).dividerColor,
+                            width: 1,
                           ),
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontFamily: 'Inter',
-                                letterSpacing: 0.0,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              16, 16, 16, 16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Event Objectives',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                        fontFamily: 'Inter',
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 30),
                               ),
-                          maxLines: 5,
-                          minLines: 3,
-                          validator: textController2Validator
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                width: double.infinity,
+                                child: TextFormField(
+                                    controller: _textController3, // Updated
+                                    autofocus: false,
+                                    obscureText: false,
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter event objectives...',
+                                      hintStyle: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontFamily: 'Inter',
+                                            letterSpacing: 0.0,
+                                          ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Theme.of(context).dividerColor,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Color(0x00000000),
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Color(0x00000000),
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      focusedErrorBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Color(0x00000000),
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      filled: true,
+                                      fillColor: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      contentPadding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              24, 24, 20, 24),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(
+                                          fontFamily: 'Inter',
+                                          letterSpacing: 0.0,
+                                        ),
+                                    minLines: 2,
+                                    maxLines: 4,
+                                    validator: textController3Validator),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -360,292 +476,242 @@ class _CreateEventState extends State<CreateEvent> {
                           ),
                         ),
                         child: Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              16, 16, 16, 16),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Event Objectives',
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                'Date & Time',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
                                       fontFamily: 'Inter',
                                       letterSpacing: 0.0,
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 30
+                                      fontSize: 30,
                                     ),
                               ),
                               const SizedBox(height: 12),
-                              SizedBox(
-                                width: double.infinity,
-                                child: TextFormField(
-                                  controller: _textController3, // Updated
-                                  autofocus: false,
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter event objectives...',
-                                    hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          fontFamily: 'Inter',
-                                          letterSpacing: 0.0,
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _selectDate(
+                                          context), // Gọi hàm chọn ngày
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color:
+                                                Theme.of(context).dividerColor,
+                                            width: 1,
+                                          ),
                                         ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Theme.of(context).dividerColor,
-                                        width: 1.0,
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12, 12, 12, 12),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Icon(
+                                                Icons.calendar_today,
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                size: 24,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: TextField(
+                                                  controller:
+                                                      dateController, // Controller chọn ngày
+                                                  readOnly: true,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    hintText: 'Select Date',
+                                                    border: InputBorder.none,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    focusedErrorBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    filled: true,
-                                    fillColor: Theme.of(context).scaffoldBackgroundColor,
-                                    contentPadding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            24, 24, 20, 24),
                                   ),
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                        fontFamily: 'Inter',
-                                        letterSpacing: 0.0,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _selectTime(
+                                          context), // Gọi hàm chọn giờ
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color:
+                                                Theme.of(context).dividerColor,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12, 12, 12, 12),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Icon(
+                                                Icons.access_time,
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                size: 24,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: TextField(
+                                                  controller:
+                                                      timeController, // Controller chọn giờ
+                                                  readOnly: true,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    hintText: 'Select Time',
+                                                    border: InputBorder.none,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                  minLines: 2,
-                                  maxLines: 4,
-                                  validator: textController3Validator
-                                ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              const SizedBox(height: 20),
+                              Text(
+                                'End Date & Time',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      fontFamily: 'Inter',
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 30,
+                                    ),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _selectEndDate(context),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color:
+                                                Theme.of(context).dividerColor,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12, 12, 12, 12),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Icon(
+                                                Icons.calendar_today,
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                size: 24,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: TextField(
+                                                  controller:
+                                                      endDateController, // Controller chọn ngày kết thúc
+                                                  readOnly: true,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    hintText: 'Select End Date',
+                                                    border: InputBorder.none,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () => _selectEndTime(context),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .scaffoldBackgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color:
+                                                Theme.of(context).dividerColor,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsetsDirectional
+                                              .fromSTEB(12, 12, 12, 12),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Icon(
+                                                Icons.access_time,
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                size: 24,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: TextField(
+                                                  controller:
+                                                      endTimeController, // Controller chọn giờ kết thúc
+                                                  readOnly: true,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    hintText: 'Select End Time',
+                                                    border: InputBorder.none,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 12),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Container(
-  width: double.infinity,
-  decoration: BoxDecoration(
-    color: Theme.of(context).cardColor,
-    borderRadius: BorderRadius.circular(12),
-    border: Border.all(
-      color: Theme.of(context).dividerColor,
-      width: 1,
-    ),
-  ),
-  child: Padding(
-    padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'Date & Time',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontFamily: 'Inter',
-                letterSpacing: 0.0,
-                fontWeight: FontWeight.w600,
-                fontSize: 30,
-              ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => _selectDate(context), // Gọi hàm chọn ngày
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Theme.of(context).dividerColor,
-                      width: 1,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          color: Theme.of(context).primaryColor,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            controller: dateController, // Controller chọn ngày
-                            readOnly: true,
-                            decoration: const InputDecoration(
-                              hintText: 'Select Date',
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => _selectTime(context), // Gọi hàm chọn giờ
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Theme.of(context).dividerColor,
-                      width: 1,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Icon(
-                          Icons.access_time,
-                          color: Theme.of(context).primaryColor,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            controller: timeController, // Controller chọn giờ
-                            readOnly: true,
-                            decoration: const InputDecoration(
-                              hintText: 'Select Time',
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        const SizedBox(height: 20),
-        Text(
-          'End Date & Time',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontFamily: 'Inter',
-                letterSpacing: 0.0,
-                fontWeight: FontWeight.w600,
-                fontSize: 30,
-              ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => _selectEndDate(context),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Theme.of(context).dividerColor,
-                      width: 1,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          color: Theme.of(context).primaryColor,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            controller: endDateController, // Controller chọn ngày kết thúc
-                            readOnly: true,
-                            decoration: const InputDecoration(
-                              hintText: 'Select End Date',
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => _selectEndTime(context),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Theme.of(context).dividerColor,
-                      width: 1,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(12, 12, 12, 12),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Icon(
-                          Icons.access_time,
-                          color: Theme.of(context).primaryColor,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            controller: endTimeController, // Controller chọn giờ kết thúc
-                            readOnly: true,
-                            decoration: const InputDecoration(
-                              hintText: 'Select End Time',
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-      ],
-    ),
-  ),
-),
 
                       const SizedBox(height: 20),
                       Container(
@@ -659,76 +725,84 @@ class _CreateEventState extends State<CreateEvent> {
                           ),
                         ),
                         child: Padding(
-                          padding:
-                              const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
+                          padding: const EdgeInsetsDirectional.fromSTEB(
+                              16, 16, 16, 16),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 'Location',
-                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      fontFamily: 'Inter',
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 30
-                                    ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                        fontFamily: 'Inter',
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 30),
                               ),
                               const SizedBox(height: 12),
                               SizedBox(
                                 width: double.infinity,
                                 child: TextFormField(
-                                  controller: _textController4, // Updated
-                                  autofocus: false,
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter event location...',
-                                    hintStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    controller: _textController4, // Updated
+                                    autofocus: false,
+                                    obscureText: false,
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter event location...',
+                                      hintStyle: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                            fontFamily: 'Inter',
+                                            letterSpacing: 0.0,
+                                          ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                          color: Theme.of(context).dividerColor,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Color(0x00000000),
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Color(0x00000000),
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      focusedErrorBorder: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                          color: Color(0x00000000),
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      filled: true,
+                                      fillColor: Theme.of(context)
+                                          .scaffoldBackgroundColor,
+                                      contentPadding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              24, 24, 20, 24),
+                                      suffixIcon: const Icon(
+                                        Icons.place,
+                                      ),
+                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(
                                           fontFamily: 'Inter',
                                           letterSpacing: 0.0,
                                         ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Theme.of(context).dividerColor,
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    errorBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    focusedErrorBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                        color: Color(0x00000000),
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    filled: true,
-                                    fillColor: Theme.of(context).scaffoldBackgroundColor,
-                                    contentPadding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            24, 24, 20, 24),
-                                    suffixIcon: const Icon(
-                                      Icons.place,
-                                    ),
-                                  ),
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                        fontFamily: 'Inter',
-                                        letterSpacing: 0.0,
-                                      ),
-                                  validator: textController4Validator
-                                ),
+                                    validator: textController4Validator),
                               ),
                               const SizedBox(height: 12),
                             ],
@@ -1000,34 +1074,38 @@ class _CreateEventState extends State<CreateEvent> {
                   ),
                   const SizedBox(height: 24),
                   SizedBox(
-                    width: double.infinity, 
+                    width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
                         LoggerService.logger.w('Button pressed ...');
                         Event event = Event(
-                          name: _textController1.text.toString(),
-                          description: _textController2.text.toString(),
-                          targetAudience: _textController3.text.toString(),
-                          location: _textController4.text.toString(),
-                          type: choiceChipsValue!.toString(),
-                          startDate: DateFormat('hh:mm a').parse(timeController.text.toString()),
-                          endDate: DateFormat('dd/MM/yyyy').parse(endDateController.text.toString()),
-                          banner: "123456789",
-                          status: "Upcoming",
-                          idCreate: ""
-                        );
+                            name: _textController1.text.toString(),
+                            description: _textController2.text.toString(),
+                            targetAudience: _textController3.text.toString(),
+                            location: _textController4.text.toString(),
+                            type: choiceChipsValue!.toString(),
+                            startDate: DateFormat('hh:mm a')
+                                .parse(timeController.text.toString()),
+                            endDate: DateFormat('dd/MM/yyyy')
+                                .parse(endDateController.text.toString()),
+                            banner: "123456789",
+                            status: "Upcoming",
+                            idCreate: "");
                         LoggerService.logger.w(event.toJson());
                         await createEvent(event, context);
                       },
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: Theme.of(context).colorScheme.onPrimary, 
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
                         backgroundColor: Theme.of(context).colorScheme.primary,
-                        textStyle: Theme.of(context).textTheme.labelLarge?.copyWith(
-                              fontFamily: 'Inter Tight',
-                              letterSpacing: 0.0,
-                            ),
+                        textStyle:
+                            Theme.of(context).textTheme.labelLarge?.copyWith(
+                                  fontFamily: 'Inter Tight',
+                                  letterSpacing: 0.0,
+                                ),
                         // padding: const EdgeInsets.symmetric(vertical: 16),
-                        maximumSize: const Size(double.infinity, double.infinity),
+                        maximumSize:
+                            const Size(double.infinity, double.infinity),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),

@@ -93,10 +93,7 @@ Future<List<Event>> fetchEvents() async {
 
       final List<Event> events = eventsData
           .map((event) => Event.fromJson(event as Map<String, dynamic>))
-          .toList();
-
-      LoggerService.logger.i('Fetched $events events');
-
+          .toList();   
       return events;
     } else {
       LoggerService.logger.w('Failed to fetch events: ${response.statusCode}');

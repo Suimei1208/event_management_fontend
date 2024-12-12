@@ -1,3 +1,5 @@
+import 'package:event_management/src/service/logger_service.dart';
+
 class Event {
   String name;
   String idCreate;
@@ -28,8 +30,8 @@ class Event {
       'name': name,
       'idCreate': idCreate,
       'description': description,
-      'startDate': startDate.toUtc().toIso8601String(), 
-      'endDate': endDate.toUtc().toIso8601String(),    
+      'startDate': startDate.toUtc().toIso8601String(),
+      'endDate': endDate.toUtc().toIso8601String(),
       'location': location,
       'targetAudience': targetAudience,
       'banner': banner,
@@ -37,7 +39,9 @@ class Event {
       'type': type,
     };
   }
+
   factory Event.fromJson(Map<String, dynamic> json) {
+    LoggerService.logger.i('Raw startDate from JSON: ${json['startDate']}');
     return Event(
       name: json['name'] ?? 'Unknown Name',
       idCreate: json['idCreate'] ?? 'Unknown ID',
@@ -50,5 +54,9 @@ class Event {
       status: json['status'] ?? 'Pending',
       type: json['type'] ?? 'General',
     );
+  }
+  @override
+  String toString() {
+    return 'Event(name: $name, startDate: $startDate, endDate: $endDate)';
   }
 }

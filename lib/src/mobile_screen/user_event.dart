@@ -29,12 +29,12 @@ class _UserEventsState extends State<UserEvents> {
 
   void _separateEvents(List<Event> events) {
     final now = DateTime.now();
+
     upcomingEvents =
         events.where((event) => event.startDate.isAfter(now)).toList();
+
     pastEvents =
         events.where((event) => event.startDate.isBefore(now)).toList();
-
-    LoggerService.logger.i('Upcoming Events: ${upcomingEvents.length}');
   }
 
   @override
@@ -162,6 +162,21 @@ class EventCard extends StatelessWidget {
     }
   }
 
+  Color _getStatusColorType(String type) {
+    switch (type) {
+      case 'Seminar':
+        return Colors.green.shade600;
+      case 'Workshop':
+        return Colors.blue.shade600;
+      case 'Conference':
+        return Colors.red.shade600;
+      case 'Competitions':
+        return Colors.purple.shade600;
+      default:
+        return Colors.grey;
+    }
+  }
+
   Color _getStatusTextColor(String status, BuildContext context) {
     switch (status) {
       case 'Upcoming':
@@ -263,6 +278,24 @@ class EventCard extends StatelessWidget {
                       event.location,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
+                    const SizedBox(width: 16),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4, vertical: 8),
+                        child: Text(
+                          event.type,
+                          style: TextStyle(
+                            color: _getStatusColorType(event.type),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ],
