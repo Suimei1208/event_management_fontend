@@ -18,23 +18,17 @@ class _UserEventsState extends State<UserEvents> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   late Future<List<Event>> _eventsFuture;
-  List<Event> upcomingEvents = [];
-  List<Event> pastEvents = [];
 
   @override
   void initState() {
     super.initState();
-    _eventsFuture = fetchEvents();
+    _loadEvents();
   }
 
-  void _separateEvents(List<Event> events) {
-    final now = DateTime.now();
-
-    upcomingEvents =
-        events.where((event) => event.startDate.isAfter(now)).toList();
-
-    pastEvents =
-        events.where((event) => event.startDate.isBefore(now)).toList();
+  Future<void> _loadEvents() async {
+    setState(() {
+      _eventsFuture = fetchEvents();
+    });
   }
 
   @override
@@ -78,10 +72,13 @@ class _UserEventsState extends State<UserEvents> {
                 return Center(child: Text('Error: ${snapshot.error}'));
               }
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                _separateEvents([]);
-              } else {
-                _separateEvents(snapshot.data!);
+                return const Center(child: Text('No events found.'));
               }
+
+              final events = snapshot.data!;
+
+              // Sort events by startDate (newest first)
+              events.sort((a, b) => b.startDate.compareTo(a.startDate));
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +90,7 @@ class _UserEventsState extends State<UserEvents> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Upcoming Events',
+                          'Events',
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         ElevatedButton(
@@ -117,19 +114,11 @@ class _UserEventsState extends State<UserEvents> {
                     child: ListView(
                       padding: EdgeInsets.zero,
                       children: [
-                        // Display Upcoming Events
-                        ...upcomingEvents
-                            .map((event) => EventCard(event: event)),
-
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 24),
-                          child: Text(
-                            'Past Events',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ),
-                        // Display Past Events
-                        ...pastEvents.map((event) => EventCard(event: event)),
+                        // Display all events, sorted by startDate
+                        ...events.map((event) => EventCard(
+                              event: event,
+                              loadEvents: _loadEvents,
+                            )),
                       ],
                     ),
                   ),
@@ -145,8 +134,9 @@ class _UserEventsState extends State<UserEvents> {
 
 class EventCard extends StatelessWidget {
   final Event event;
+  final VoidCallback loadEvents;
 
-  const EventCard({super.key, required this.event});
+  const EventCard({super.key, required this.event, required this.loadEvents});
 
   // Method to get status colors based on status
   Color _getStatusColor(String status) {
@@ -156,7 +146,7 @@ class EventCard extends StatelessWidget {
       case 'Canceled':
         return const Color(0xFFFFEBEE);
       case 'Completed':
-        return const Color(0xFFE0E0E0);
+        return Colors.grey;
       default:
         return Colors.grey;
     }
@@ -196,109 +186,128 @@ class EventCard extends StatelessWidget {
     final statusTextColor = _getStatusTextColor(event.status, context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Material(
-        color: Colors.transparent,
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          width: MediaQuery.sizeOf(context).width,
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: InkWell(
+        onTap: () {
+          LoggerService.logger.e("button press: ${event.id}");
+        },
+        child: Material(
+          color: Colors.transparent,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
+          child: Container(
+            width: MediaQuery.sizeOf(context).width,
+            decoration: BoxDecoration(
+              border: Border.all(width: 0.3),
+              color: Theme.of(context).cardColor,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           event.name,
+                          softWrap: true,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
+                        const SizedBox(height: 12),
                         Text(
                           DateFormat('MMMM d, yyyy • h:mm a')
                               .format(event.startDate),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                event.location,
+                                style: Theme.of(context).textTheme.bodySmall,
+                                softWrap: true,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: statusColor,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 8),
+                                child: Text(
+                                  event.type,
+                                  style: TextStyle(
+                                    color: _getStatusColorType(event.type),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                    Row(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: statusColor,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 4, vertical: 8),
-                            child: Text(
-                              event.status,
-                              style: TextStyle(
-                                color: statusTextColor,
-                                fontSize: 12,
-                              ),
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4, vertical: 8),
+                          child: Text(
+                            event.status,
+                            style: TextStyle(
+                              color: statusTextColor,
+                              fontSize: 15,
                             ),
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: Color(0xFFFF6F00),
-                            size: 16,
-                          ),
-                          onPressed: () {
-                            LoggerService.logger
-                                .i('Delete Event button pressed');
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on,
-                      color: Theme.of(context).textTheme.bodySmall?.color,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      event.location,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                    const SizedBox(width: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 8),
-                        child: Text(
-                          event.type,
-                          style: TextStyle(
-                            color: _getStatusColorType(event.type),
-                            fontSize: 12,
-                          ),
+                      const SizedBox(height: 20),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Color(0xFFFF6F00),
+                          size: 30,
                         ),
+                        onPressed: () {
+                          if (event.id != null) {
+                            DeleteEvent(event.id!, context)
+                                .then((_) => loadEvents());
+                          }
+                          LoggerService.logger.e(event.id);
+                        },
                       ),
-                    )
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

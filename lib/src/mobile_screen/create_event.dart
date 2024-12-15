@@ -2,6 +2,7 @@
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/widget/guest_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -54,53 +55,79 @@ class _CreateEventState extends State<CreateEvent> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null) {
+    if (pickedDate != null) {
       setState(() {
-        dateController.text = "${picked.day}/${picked.month}/${picked.year}";
+        dateController.text =
+            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
       });
     }
   }
 
   Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
+    final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (picked != null) {
+    if (pickedTime != null) {
       setState(() {
-        timeController.text = picked.format(context);
+        timeController.text =
+            "${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}:00";
       });
     }
   }
 
+  String _combineDateTime(String date, String time) {
+    if (date.isNotEmpty && time.isNotEmpty) {
+      final dateParts = date.split('-');
+      final timeParts = time.split(':');
+
+      DateTime dateTime = DateTime(
+        int.parse(dateParts[0]),
+        int.parse(dateParts[1]),
+        int.parse(dateParts[2]),
+        int.parse(timeParts[0]),
+        int.parse(timeParts[1]),
+      );
+
+      LoggerService.logger.i(dateTime.toString());
+      return dateTime.toString();
+    } else {
+      throw Exception('Invalid date or time');
+    }
+  }
+
   Future<void> _selectEndDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null) {
+    if (pickedDate != null) {
       setState(() {
-        endDateController.text = "${picked.day}/${picked.month}/${picked.year}";
+        // endDateController.text = "${picked.day}/${picked.month}/${picked.year}";
+        endDateController.text =
+            "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
       });
     }
   }
 
   Future<void> _selectEndTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
+    final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (picked != null) {
+    if (pickedTime != null) {
       setState(() {
-        endTimeController.text = picked.format(context);
+        // endTimeController.text = picked.format(context);
+        endTimeController.text =
+            "${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}:00";
       });
     }
   }
@@ -712,7 +739,6 @@ class _CreateEventState extends State<CreateEvent> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 20),
                       Container(
                         width: double.infinity,
@@ -809,267 +835,40 @@ class _CreateEventState extends State<CreateEvent> {
                           ),
                         ),
                       ),
-                      // const SizedBox(height: 20),
-                      // Container(
-                      //   width: double.infinity,
-                      //   decoration: BoxDecoration(
-                      //     color: Theme.of(context).cardColor,
-                      //     borderRadius: BorderRadius.circular(12),
-                      //     border: Border.all(
-                      //       color: Theme.of(context).dividerColor,
-                      //       width: 1,
-                      //     ),
-                      //   ),
-                      //   child: Padding(
-                      //     padding:
-                      //         const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
-                      //     child: Column(
-                      //       mainAxisSize: MainAxisSize.min,
-                      //       children: [
-                      //         Row(
-                      //           mainAxisSize: MainAxisSize.max,
-                      //           mainAxisAlignment:
-                      //               MainAxisAlignment.spaceBetween,
-                      //           children: [
-                      //             Text(
-                      //               'Speakers',
-                      //               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      //                     fontFamily: 'Inter',
-                      //                     letterSpacing: 0.0,
-                      //                     fontWeight: FontWeight.w600,
-                      //                     fontSize: 30
-                      //                   ),
-                      //             ),
-                      //             IconButton(
-                      //               icon: Icon(
-                      //                 Icons.add,
-                      //                 color: Theme.of(context).colorScheme.primary,
-                      //                 size: 24,
-                      //               ),
-                      //               onPressed: () {
-                      //                 print('IconButton pressed ...');
-                      //               },
-                      //             ),
-                      //           ],
-                      //         ),
-                      //         const SizedBox(height: 12),
-                      //         Container(
-                      //           width: double.infinity,
-                      //           decoration: BoxDecoration(
-                      //             color: Theme.of(context).scaffoldBackgroundColor,
-                      //             borderRadius: BorderRadius.circular(8),
-                      //             border: Border.all(
-                      //               color: Theme.of(context).dividerColor,
-                      //               width: 1,
-                      //             ),
-                      //           ),
-                      //           child: Padding(
-                      //             padding: const EdgeInsetsDirectional.fromSTEB(
-                      //                 12, 12, 12, 12),
-                      //             child: Column(
-                      //               mainAxisSize: MainAxisSize.min,
-                      //               children: [
-                      //                 Row(
-                      //                   mainAxisSize: MainAxisSize.max,
-                      //                   children: [
-                      //                     Container(
-                      //                       width: 40,
-                      //                       height: 40,
-                      //                       decoration: BoxDecoration(
-                      //                         color: Theme.of(context).colorScheme.secondary,
-                      //                         borderRadius:
-                      //                             BorderRadius.circular(20),
-                      //                       ),
-                      //                       child: Align(
-                      //                         alignment:
-                      //                             const AlignmentDirectional(0, 0),
-                      //                         child: Padding(
-                      //                           padding: const EdgeInsets.all(8),
-                      //                           child: Text(
-                      //                             'JS',
-                      //                             textAlign: TextAlign.center,
-                      //                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      //                                   fontFamily: 'Inter',
-                      //                                   color: Theme.of(context).primaryColor,
-                      //                                   letterSpacing: 0.0,
-                      //                                 ),
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                     ),
-                      //                     const SizedBox(width: 12),
-                      //                     Expanded(
-                      //                       child: Column(
-                      //                         mainAxisSize: MainAxisSize.min,
-                      //                         crossAxisAlignment:
-                      //                             CrossAxisAlignment.start,
-                      //                         children: [
-                      //                           Text(
-                      //                             'John Smith',
-                      //                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      //                                   fontFamily: 'Inter',
-                      //                                   letterSpacing: 0.0,
-                      //                                 ),
-                      //                           ),
-                      //                           Text(
-                      //                             'AI Research Lead',
-                      //                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      //                                   fontFamily: 'Inter',
-                      //                                   color: Theme.of(context).textTheme.bodySmall?.color,
-                      //                                   letterSpacing: 0.0,
-                      //                                 ),
-                      //                           ),
-                      //                         ],
-                      //                       ),
-                      //                     ),
-                      //                     Icon(
-                      //                       Icons.close,
-                      //                       color: Theme.of(context).colorScheme.error,
-                      //                       size: 20,
-                      //                     ),
-                      //                   ],
-                      //                 ),
-                      //                 const SizedBox(height: 12),
-                      //               ],
-                      //             ),
-                      //           ),
-                      //         ),
-                      //         const SizedBox(height: 12),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 20),
-                      // Container(
-                      //   width: double.infinity,
-                      //   decoration: BoxDecoration(
-                      //     color: Theme.of(context).cardColor,
-                      //     borderRadius: BorderRadius.circular(12),
-                      //     border: Border.all(
-                      //       color: Theme.of(context).dividerColor,
-                      //       width: 1,
-                      //     ),
-                      //   ),
-                      //   child: Padding(
-                      //     padding:
-                      //         const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
-                      //     child: Column(
-                      //       mainAxisSize: MainAxisSize.min,
-                      //       children: [
-                      //         Row(
-                      //           mainAxisSize: MainAxisSize.max,
-                      //           mainAxisAlignment:
-                      //               MainAxisAlignment.spaceBetween,
-                      //           children: [
-                      //             Text(
-                      //               'Special Guests',
-                      //               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      //                     fontFamily: 'Inter',
-                      //                     letterSpacing: 0.0,
-                      //                     fontWeight: FontWeight.w600,
-                      //                     fontSize: 30
-                      //                   ),
-
-                      //             ),
-                      //             IconButton(
-                      //               icon: Icon(
-                      //                 Icons.add,
-                      //                 color: Theme.of(context).colorScheme.primary,
-                      //                 size: 24,
-                      //               ),
-                      //               onPressed: () {
-                      //                 print('IconButton pressed ...');
-                      //               },
-                      //             ),
-                      //           ],
-                      //         ),
-                      //         const SizedBox(height: 12),
-                      //         Container(
-                      //           width: double.infinity,
-                      //           decoration: BoxDecoration(
-                      //             color: Theme.of(context).scaffoldBackgroundColor,
-                      //             borderRadius: BorderRadius.circular(8),
-                      //             border: Border.all(
-                      //               color: Theme.of(context).dividerColor,
-                      //               width: 1,
-                      //             ),
-                      //           ),
-                      //           child: Padding(
-                      //             padding: const EdgeInsetsDirectional.fromSTEB(
-                      //                 12, 12, 12, 12),
-                      //             child: Column(
-                      //               mainAxisSize: MainAxisSize.min,
-                      //               children: [
-                      //                 Row(
-                      //                   mainAxisSize: MainAxisSize.max,
-                      //                   children: [
-                      //                     Container(
-                      //                       width: 40,
-                      //                       height: 40,
-                      //                       decoration: BoxDecoration(
-                      //                         color: Theme.of(context).colorScheme.secondary,
-                      //                         borderRadius:
-                      //                             BorderRadius.circular(20),
-                      //                       ),
-                      //                       child: Align(
-                      //                         alignment:
-                      //                             const AlignmentDirectional(0, 0),
-                      //                         child: Padding(
-                      //                           padding: const EdgeInsets.all(8),
-                      //                           child: Text(
-                      //                             'MA',
-                      //                             textAlign: TextAlign.center,
-                      //                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      //                                   fontFamily: 'Inter',
-                      //                                   color: Theme.of(context).primaryColor,
-                      //                                   letterSpacing: 0.0,
-                      //                                 ),
-                      //                           ),
-                      //                         ),
-                      //                       ),
-                      //                     ),
-                      //                     const SizedBox(width: 12),
-                      //                     Expanded(
-                      //                       child: Column(
-                      //                         mainAxisSize: MainAxisSize.min,
-                      //                         crossAxisAlignment:
-                      //                             CrossAxisAlignment.start,
-                      //                         children: [
-                      //                           Text(
-                      //                             'Mary Adams',
-                      //                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      //                                   fontFamily: 'Inter',
-                      //                                   letterSpacing: 0.0,
-                      //                                 ),
-                      //                           ),
-                      //                           Text(
-                      //                             'Industry Expert',
-                      //                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      //                                   fontFamily: 'Inter',
-                      //                                   color: Theme.of(context).textTheme.bodySmall?.color,
-                      //                                   letterSpacing: 0.0,
-                      //                                 ),
-                      //                           ),
-                      //                         ],
-                      //                       ),
-                      //                     ),
-                      //                     Icon(
-                      //                       Icons.close,
-                      //                       color: Theme.of(context).colorScheme.error,
-                      //                       size: 20,
-                      //                     ),
-                      //                   ],
-                      //                 ),
-                      //                 const SizedBox(height: 12),
-                      //               ],
-                      //             ),
-                      //           ),
-                      //         ),
-                      //         const SizedBox(height: 12),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
+                      const GuestList(
+                        title: 'Speakers',
+                        members: [
+                          {
+                            'name': 'John Smith',
+                            'role': 'AI Research Lead',
+                            'avtUrl':
+                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw5bWbsoibZowWfSgqCIy6NYJavFqUSXhBvg&s'
+                          },
+                          {
+                            'name': 'Mary Adams',
+                            'role': 'Industry Expert',
+                            'avtUrl':
+                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw5bWbsoibZowWfSgqCIy6NYJavFqUSXhBvg&s'
+                          },
+                        ],
+                      ),
+                      const GuestList(
+                        title: 'Guest',
+                        members: [
+                          {
+                            'name': 'John Smith',
+                            'role': 'AI Research Lead',
+                            'avtUrl':
+                                'https://ih1.redbubble.net/image.5491904181.8861/raf,360x360,075,t,fafafa:ca443f4786.jpg'
+                          },
+                          {
+                            'name': 'Mary Adams',
+                            'role': 'Industry Expert',
+                            'avtUrl':
+                                'https://ih1.redbubble.net/image.5491904181.8861/raf,360x360,075,t,fafafa:ca443f4786.jpg'
+                          },
+                        ],
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -1079,15 +878,18 @@ class _CreateEventState extends State<CreateEvent> {
                       onPressed: () async {
                         LoggerService.logger.w('Button pressed ...');
                         Event event = Event(
+                            id: 0,
                             name: _textController1.text.toString(),
                             description: _textController2.text.toString(),
                             targetAudience: _textController3.text.toString(),
                             location: _textController4.text.toString(),
                             type: choiceChipsValue!.toString(),
-                            startDate: DateFormat('HH:mm')
-                                .parse(timeController.text.toString()),
-                            endDate: DateFormat('dd/MM/yyyy')
-                                .parse(endDateController.text.toString()),
+                            startDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
+                                .parse(_combineDateTime(
+                                    dateController.text, timeController.text)),
+                            endDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
+                                .parse(_combineDateTime(endDateController.text,
+                                    endTimeController.text)),
                             banner: "123456789",
                             status: "Upcoming",
                             idCreate: "");
