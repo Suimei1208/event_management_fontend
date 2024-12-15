@@ -1,6 +1,5 @@
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart'; // Import UserService
-import 'package:event_management/src/settings/settings_view.dart';
 import 'package:event_management/widget/options_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/generated/l10n.dart';
@@ -16,6 +15,7 @@ class ProfileWidget extends StatefulWidget {
 
 class _ProfileWidgetState extends State<ProfileWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  var role = '';
 
   @override
   void initState() {
@@ -69,6 +69,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
             if (snapshot.hasData) {
               final userData = snapshot.data!;
+              role = userData['role'];
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,13 +196,14 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       Navigator.pushNamed(context, '/edit_profile');
                     },
                   ),
-                  OptionsWidget(
-                    icon: Icons.account_circle_outlined,
-                    text: "Tao event",
-                    onTap: () {
-                      Navigator.pushNamed(context, '/create_event');
-                    },
-                  ),
+                  if (role == "organizer")
+                    OptionsWidget(
+                      icon: Icons.event_rounded,
+                      text: "Your events",
+                      onTap: () {
+                        Navigator.pushNamed(context, '/user-events');
+                      },
+                    ),
                   Padding(
                     padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
                     child: Text(
@@ -219,7 +221,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     icon: Icons.settings,
                     text: S.of(context).setting,
                     onTap: () {
-                      Navigator.pushNamed(context, SettingsView.routeName);
+                      // Navigator.pushNamed(context, SettingsView.routeName);
                     },
                   ),
                   OptionsWidget(

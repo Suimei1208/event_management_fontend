@@ -14,6 +14,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'settings/settings_controller.dart';
 import 'package:event_management/generated/l10n.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
       listenable: settingsController,
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
+          theme: ThemeData(textTheme: GoogleFonts.robotoSlabTextTheme()),
           restorationScopeId: 'app',
           locale: settingsController.locale,
           localizationsDelegates: const [
@@ -43,7 +45,7 @@ class MyApp extends StatelessWidget {
           ],
           onGenerateTitle: (BuildContext context) =>
               AppLocalizations.of(context)?.appTitle ?? 'Default Title',
-          theme: ThemeData(),
+          // theme: ThemeData(),
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
           home: StreamBuilder<User?>(
@@ -53,7 +55,7 @@ class MyApp extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) {
-                return const LoginScreen();
+                return const ProfileWidget();
               } else {
                 return const LoginScreen();
               }

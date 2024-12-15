@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:event_management/config.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/widget/dialog_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -93,7 +94,7 @@ Future<List<Event>> fetchEvents() async {
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = json.decode(response.body);
       final List<dynamic> eventsData = responseData['data'] ?? [];
-
+      // LoggerService.logger.e(eventsData);
       final List<Event> events = eventsData
           .map((event) => Event.fromJson(event as Map<String, dynamic>))
           .toList();
@@ -105,5 +106,95 @@ Future<List<Event>> fetchEvents() async {
   } catch (e) {
     LoggerService.logger.w('Error: $e');
     return [];
+  }
+}
+
+// ignore: non_constant_identifier_names
+Future<void> DeleteEvent(int idEvent, BuildContext context) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+
+    // Show confirmation dialog
+    bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Event'),
+          content: const Text('Are you sure you want to delete this event?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != null && confirmed) {
+      final response = await http.delete(
+        Uri.parse('${Config.baseUrl}/event-service/delete/$idEvent'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        if (responseData['success'] == true) {
+          // Show success dialog
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const DialogWidget(
+                message: 'Delete event successfully!',
+                title: 'Notification',
+              );
+            },
+          );
+        } else {
+          // Show failure dialog
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const DialogWidget(
+                message: 'Failed to delete event!',
+                title: 'Notification',
+              );
+            },
+          );
+          throw Exception('Failed to delete event');
+        }
+      } else {
+        // Show failure dialog for HTTP errors
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const DialogWidget(
+              message: 'Failed to delete event!',
+              title: 'Notification',
+            );
+          },
+        );
+        throw Exception('Failed to delete event');
+      }
+    }
+  } catch (e) {
+    LoggerService.logger.w('Error: $e');
+    throw Exception('Failed to delete event');
   }
 }

@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:event_management/config.dart';
+import 'package:event_management/src/service/logger_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -73,5 +74,54 @@ Future<void> updateUserProfile(
     }
   } catch (e) {
     rethrow;
+  }
+}
+
+Future<List<Map<String, dynamic>>> searchUser(String name) async {
+  final String apiUrl =
+      "${Config.baseUrl}/user-services/api/Users/SearchUser?name=$name";
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    String? idToken = await user?.getIdToken();
+    final response = await http.get(
+      Uri.parse(apiUrl),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+
+        if (jsonData['data'] == null) {
+          LoggerService.logger.e('No data available');
+          return [];
+        }
+
+        List<Map<String, dynamic>> listCustomUser =
+            List<Map<String, dynamic>>.from(
+          jsonData['data']?.map((item) => {
+                    'id': item['id'],
+                    'name': item['name'],
+                    'role': item['role'],
+                    'avtUrl': item['avtUrl'],
+                  }) ??
+              [],
+        );
+
+        return listCustomUser;
+      } else {
+        throw Exception(jsonData['message']);
+      }
+    } else {
+      LoggerService.logger.e(response.statusCode);
+      throw Exception(
+          "Failed to fetch users. Status code: ${response.statusCode}");
+    }
+  } catch (e) {
+    throw Exception("Error occurred: $e");
   }
 }
