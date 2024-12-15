@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) {
-                return const UserEvents();
+                return const LoginScreen();
               } else {
                 return const LoginScreen();
               }
@@ -66,7 +66,8 @@ class MyApp extends StatelessWidget {
                 builder: (BuildContext context) {
                   switch (routeSettings.name) {
                     case '/language':
-                      return LanguageSelectionPage(settingsController: settingsController);
+                      return LanguageSelectionPage(
+                          settingsController: settingsController);
                     case LoginScreen.routeName:
                       return const LoginScreen();
                     case RoleSelectionScreen.routeName:
