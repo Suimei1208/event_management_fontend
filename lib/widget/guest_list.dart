@@ -8,6 +8,7 @@ class GuestList extends StatefulWidget {
   const GuestList({super.key, required this.title, required this.members});
 
   @override
+  // ignore: library_private_types_in_public_api
   _GuestListState createState() => _GuestListState();
 }
 
