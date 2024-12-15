@@ -1084,7 +1084,7 @@ class _CreateEventState extends State<CreateEvent> {
                             targetAudience: _textController3.text.toString(),
                             location: _textController4.text.toString(),
                             type: choiceChipsValue!.toString(),
-                            startDate: DateFormat('hh:mm a')
+                            startDate: DateFormat('HH:mm')
                                 .parse(timeController.text.toString()),
                             endDate: DateFormat('dd/MM/yyyy')
                                 .parse(endDateController.text.toString()),

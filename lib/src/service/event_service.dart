@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'package:event_management/config.dart';
 import 'package:event_management/src/models/events.dart';
@@ -24,9 +26,13 @@ Future<void> createEvent(Event event, BuildContext context) async {
 
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to create event. Please try again.'),
+        ),
+      );
       if (responseData['success'] == true) {
         showDialog(
-          // ignore: use_build_context_synchronously
           context: context,
           barrierDismissible: false,
           builder: (BuildContext context) {
@@ -46,7 +52,6 @@ Future<void> createEvent(Event event, BuildContext context) async {
           },
         );
       } else {
-        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to create event. Please try again.'),
@@ -55,16 +60,14 @@ Future<void> createEvent(Event event, BuildContext context) async {
       }
     } else {
       LoggerService.logger.w('Failed to create event: ${response.statusCode}');
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to create event. Please try again.'),
+          content: Text('Failed to create event 2. Please try again.'),
         ),
       );
     }
   } catch (e) {
     LoggerService.logger.w('Error: $e');
-    // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('An error occurred. Please try again.'),
@@ -93,7 +96,7 @@ Future<List<Event>> fetchEvents() async {
 
       final List<Event> events = eventsData
           .map((event) => Event.fromJson(event as Map<String, dynamic>))
-          .toList();   
+          .toList();
       return events;
     } else {
       LoggerService.logger.w('Failed to fetch events: ${response.statusCode}');
