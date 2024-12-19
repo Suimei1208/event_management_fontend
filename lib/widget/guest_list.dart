@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+import 'package:event_management/src/mobile_screen/add_guest.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/service/logger_service.dart';
 
@@ -13,103 +15,6 @@ class GuestList extends StatefulWidget {
 }
 
 class _GuestListState extends State<GuestList> {
-  // final TextEditingController _searchController = TextEditingController();
-  // final List<Map<String, dynamic>> _searchResults = [];
-  // final bool _isLoading = false;
-
-  // void _showSearchOverlay(BuildContext context) {
-  //   final overlay = Overlay.of(context);
-  //   late final OverlayEntry overlayEntry;
-
-  //   overlayEntry = OverlayEntry(
-  //     builder: (context) {
-  //       return Stack(
-  //         children: [
-  //           Positioned.fill(
-  //             child: Container(
-  //               color: Colors.black.withOpacity(0.5), // Làm tối nền
-  //             ),
-  //           ),
-  //           Center(
-  //             child: Material(
-  //               color: Colors.transparent,
-  //               child: Card(
-  //                 elevation: 5,
-  //                 child: Padding(
-  //                   padding: const EdgeInsets.all(16),
-  //                   child: Column(
-  //                     mainAxisSize: MainAxisSize.min,
-  //                     children: [
-  //                       TextField(
-  //                         controller: _searchController,
-  //                         decoration: const InputDecoration(
-  //                           labelText: 'Search Name',
-  //                           border: OutlineInputBorder(),
-  //                         ),
-  //                         onChanged: (value) {
-  //                           LoggerService.logger.i(value);
-  //                           setState(() {
-  //                             _isLoading = true;
-
-  //                             searchUser(value).then((users) {
-  //                               setState(() {
-  //                                 _searchResults = users;
-  //                                 _isLoading = false;
-  //                               });
-  //                             }).catchError((e) {
-  //                               setState(() {
-  //                                 _searchResults = [];
-  //                                 _isLoading = false;
-  //                               });
-  //                             });
-  //                           });
-  //                         },
-  //                       ),
-  //                       const SizedBox(height: 20),
-  //                       _isLoading
-  //                           ? const CircularProgressIndicator()
-  //                           : _searchResults.isEmpty
-  //                               ? const Text("No results found.")
-  //                               : ListView.builder(
-  //                                   shrinkWrap: true,
-  //                                   itemCount: _searchResults.length,
-  //                                   itemBuilder: (context, index) {
-  //                                     final user = _searchResults[index];
-  //                                     return ListTile(
-  //                                       leading: CircleAvatar(
-  //                                         radius: 20,
-  //                                         backgroundImage:
-  //                                             NetworkImage(user['avtUrl']!),
-  //                                       ),
-  //                                       title: Text(user['name']!),
-  //                                       subtitle: Text(user['role']!),
-  //                                       onTap: () {
-  //                                         print(
-  //                                             'Selected user: ${user['name']}');
-  //                                       },
-  //                                     );
-  //                                   },
-  //                                 ),
-  //                       ElevatedButton(
-  //                         onPressed: () {
-  //                           overlayEntry.remove();
-  //                         },
-  //                         child: const Text('OK'),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-
-  //   overlay.insert(overlayEntry);
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -148,7 +53,12 @@ class _GuestListState extends State<GuestList> {
                         size: 24,
                       ),
                       onPressed: () {
-                        // _showSearchOverlay(context); // Hiển thị overlay
+                        LoggerService.logger.e('Add member button pressed');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const AddMembersPage()),
+                        );
                       },
                     ),
                   ],

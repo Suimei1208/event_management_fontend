@@ -80,10 +80,11 @@ Future<void> updateUserProfile(
 Future<List<Map<String, dynamic>>> searchUser(String name) async {
   final String apiUrl =
       "${Config.baseUrl}/user-services/api/Users/SearchUser?name=$name";
+
   try {
     User? user = FirebaseAuth.instance.currentUser;
-
     String? idToken = await user?.getIdToken();
+
     final response = await http.get(
       Uri.parse(apiUrl),
       headers: {
@@ -93,35 +94,25 @@ Future<List<Map<String, dynamic>>> searchUser(String name) async {
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
 
-        if (jsonData['data'] == null) {
-          LoggerService.logger.e('No data available');
-          return [];
-        }
-
-        List<Map<String, dynamic>> listCustomUser =
-            List<Map<String, dynamic>>.from(
-          jsonData['data']?.map((item) => {
-                    'id': item['id'],
-                    'name': item['name'],
-                    'role': item['role'],
-                    'avtUrl': item['avtUrl'],
-                  }) ??
-              [],
-        );
-
-        return listCustomUser;
-      } else {
-        throw Exception(jsonData['message']);
+      if (jsonData['data'] == null) {
+        LoggerService.logger.e('No data available');
+        return [];
       }
+
+      return List<Map<String, dynamic>>.from(
+        jsonData['data'].map((item) => {
+              'id': item['id'] ?? "",
+              'name': item['name'] ?? "Unknown",
+              'role': item['role'] ?? "No role",
+              'avtUrl': item['avtUrl'] ?? "",
+            }),
+      );
     } else {
-      LoggerService.logger.e(response.statusCode);
-      throw Exception(
-          "Failed to fetch users. Status code: ${response.statusCode}");
+      throw Exception(jsonDecode(response.body)['message']);
     }
   } catch (e) {
+    LoggerService.logger.e("Error occurred: $e");
     throw Exception("Error occurred: $e");
   }
 }

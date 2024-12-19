@@ -29,7 +29,7 @@ Future<void> createEvent(Event event, BuildContext context) async {
       final responseData = json.decode(response.body);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to create event. Please try again.'),
+          content: Text('Success to create event.'),
         ),
       );
       if (responseData['success'] == true) {

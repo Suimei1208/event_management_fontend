@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) {
-                return const ProfileWidget();
+                return const LoginScreen();
               } else {
                 return const LoginScreen();
               }
