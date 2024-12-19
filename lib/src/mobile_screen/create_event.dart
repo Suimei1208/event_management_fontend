@@ -2,6 +2,7 @@
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/widget/guest_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -17,6 +18,8 @@ class CreateEvent extends StatefulWidget {
 
 class _CreateEventState extends State<CreateEvent> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  List<Map<String, dynamic>> guest = [];
+  List<Map<String, dynamic>> speaker = [];
   String? choiceChipsValue;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
@@ -835,39 +838,13 @@ class _CreateEventState extends State<CreateEvent> {
                           ),
                         ),
                       ),
-                      const GuestList(
+                      GuestList(
                         title: 'Speakers',
-                        members: [
-                          {
-                            'name': 'John Smith',
-                            'role': 'AI Research Lead',
-                            'avtUrl':
-                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw5bWbsoibZowWfSgqCIy6NYJavFqUSXhBvg&s'
-                          },
-                          {
-                            'name': 'Mary Adams',
-                            'role': 'Industry Expert',
-                            'avtUrl':
-                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSw5bWbsoibZowWfSgqCIy6NYJavFqUSXhBvg&s'
-                          },
-                        ],
+                        members: speaker,
                       ),
-                      const GuestList(
+                      GuestList(
                         title: 'Guest',
-                        members: [
-                          {
-                            'name': 'John Smith',
-                            'role': 'AI Research Lead',
-                            'avtUrl':
-                                'https://ih1.redbubble.net/image.5491904181.8861/raf,360x360,075,t,fafafa:ca443f4786.jpg'
-                          },
-                          {
-                            'name': 'Mary Adams',
-                            'role': 'Industry Expert',
-                            'avtUrl':
-                                'https://ih1.redbubble.net/image.5491904181.8861/raf,360x360,075,t,fafafa:ca443f4786.jpg'
-                          },
-                        ],
+                        members: guest,
                       ),
                     ],
                   ),
@@ -895,6 +872,20 @@ class _CreateEventState extends State<CreateEvent> {
                             idCreate: "");
                         LoggerService.logger.w(event.toJson());
                         await createEvent(event, context);
+                        getIdEvent(event.name).then((id) async {
+                          LoggerService.logger.w('Event ID: $id');
+
+                          // Kiểm tra và thêm người tham gia
+                          if (speaker.isNotEmpty) {
+                            await addParticipant(
+                                speaker, int.parse(id), "Speaker");
+                          }
+                          if (guest.isNotEmpty) {
+                            await addParticipant(guest, int.parse(id), "Guest");
+                          }
+                        }).catchError((error) {
+                          LoggerService.logger.w('Error: $error');
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor:

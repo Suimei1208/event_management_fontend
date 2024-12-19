@@ -39,6 +39,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await userCredential.user
           ?.updateDisplayName(_usernameController.text.trim());
 
+      const String avtarUrl =
+          'https://s3.getstickerpack.com/storage/uploads/sticker-pack/honkai-star-rail-hsr-then-wake-to-weep/sticker_2.png?d0ec19664277d77e2c85423a8d8f781d&d=200x200';
+      await userCredential.user?.updatePhotoURL(avtarUrl);
+
       final idToken = await userCredential.user?.getIdToken();
 
       final Map<String, String> data = {

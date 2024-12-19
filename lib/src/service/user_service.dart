@@ -52,6 +52,10 @@ Future<void> updateUserProfile(
     if (user != null) {
       String? idToken = await user.getIdToken();
 
+      const String avtarUrl =
+          'https://s3.getstickerpack.com/storage/uploads/sticker-pack/honkai-star-rail-hsr-then-wake-to-weep/sticker_2.png?d0ec19664277d77e2c85423a8d8f781d&d=200x200';
+      await user.updatePhotoURL(avtarUrl);
+
       final response = await http.put(
         Uri.parse(
             '${Config.baseUrl}/user-services/api/Users/UpdateProfile?name=$newName&phone=$newPhone'),
