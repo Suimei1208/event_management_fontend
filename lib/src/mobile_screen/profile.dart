@@ -221,7 +221,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     icon: Icons.settings,
                     text: S.of(context).setting,
                     onTap: () {
-                      // Navigator.pushNamed(context, SettingsView.routeName);
+                      Navigator.pushNamed(context, '/create_event');
                     },
                   ),
                   OptionsWidget(
