@@ -198,3 +198,29 @@ Future<void> DeleteEvent(int idEvent, BuildContext context) async {
     throw Exception('Failed to delete event');
   }
 }
+
+Future<String> getIdEvent(String name) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+    String? idToken = await user.getIdToken();
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/getid?idCreate=${user.uid}&name=$name'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      return responseData['data'];
+    } else {
+      throw Exception('Failed to get event id');
+    }
+  } catch (e) {
+    LoggerService.logger.w('Error: $e');
+    throw Exception('Failed to get event id');
+  }
+}

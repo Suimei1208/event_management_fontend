@@ -1,6 +1,7 @@
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart'; // Import UserService
 import 'package:event_management/widget/options_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/generated/l10n.dart';
 
@@ -16,6 +17,7 @@ class ProfileWidget extends StatefulWidget {
 class _ProfileWidgetState extends State<ProfileWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   var role = '';
+  User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -112,7 +114,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(50),
                                   child: Image.network(
-                                    'https://images.unsplash.com/photo-1531123414780-f74242c2b052?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NDV8fHByb2ZpbGV8ZW58MHx8MHx8&auto=format&fit=crop&w=900&q=60',
+                                    currentUser?.photoURL ??
+                                        'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png',
                                     width: 60,
                                     height: 60,
                                     fit: BoxFit.cover,

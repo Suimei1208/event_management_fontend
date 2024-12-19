@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print, use_build_context_synchronously
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/service/user_service.dart';
 
@@ -17,6 +18,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  User? currentUser = FirebaseAuth.instance.currentUser;
 
   bool _isLoading = true;
   @override
@@ -77,11 +79,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           Center(
                             child: Stack(
                               children: [
-                                const CircleAvatar(
+                                CircleAvatar(
                                   radius: 60,
-                                  backgroundImage: NetworkImage(
-                                    'https://images.unsplash.com/photo-1570840934326-9d0190428ff4?w=500&h=500',
-                                  ),
+                                  backgroundImage: currentUser!.photoURL != null
+                                      ? NetworkImage(currentUser!.photoURL!)
+                                      : null,
                                 ),
                                 Positioned(
                                   bottom: 0,
