@@ -84,8 +84,6 @@ class MyApp extends StatelessWidget {
                       return const EditProfileScreen();
                     case CreateEvent.routeName:
                       return const CreateEvent();
-                    case RegisterScreen.routeName:
-                      return const RegisterScreen();
                     case UserEvents.routeName:
                       return const UserEvents();
                     default:

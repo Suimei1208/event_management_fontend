@@ -18,8 +18,8 @@ class CreateEvent extends StatefulWidget {
 
 class _CreateEventState extends State<CreateEvent> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  List<Map<String, dynamic>> Guest = [];
-  List<Map<String, dynamic>> Speaker = [];
+  List<Map<String, dynamic>> guest = [];
+  List<Map<String, dynamic>> speaker = [];
   String? choiceChipsValue;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
@@ -840,11 +840,11 @@ class _CreateEventState extends State<CreateEvent> {
                       ),
                       GuestList(
                         title: 'Speakers',
-                        members: Speaker,
+                        members: speaker,
                       ),
                       GuestList(
                         title: 'Guest',
-                        members: Guest,
+                        members: guest,
                       ),
                     ],
                   ),
@@ -876,12 +876,12 @@ class _CreateEventState extends State<CreateEvent> {
                           LoggerService.logger.w('Event ID: $id');
 
                           // Kiểm tra và thêm người tham gia
-                          if (Speaker.isNotEmpty) {
+                          if (speaker.isNotEmpty) {
                             await addParticipant(
-                                Speaker, int.parse(id), "Speaker");
+                                speaker, int.parse(id), "Speaker");
                           }
-                          if (Guest.isNotEmpty) {
-                            await addParticipant(Guest, int.parse(id), "Guest");
+                          if (guest.isNotEmpty) {
+                            await addParticipant(guest, int.parse(id), "Guest");
                           }
                         }).catchError((error) {
                           LoggerService.logger.w('Error: $error');
