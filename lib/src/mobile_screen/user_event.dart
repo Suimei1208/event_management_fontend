@@ -1,4 +1,5 @@
 import 'package:event_management/src/mobile_screen/create_event.dart';
+import 'package:event_management/src/mobile_screen/update_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -29,6 +30,11 @@ class _UserEventsState extends State<UserEvents> {
     setState(() {
       _eventsFuture = fetchEvents();
     });
+  }
+
+  Future<void> _navigateToCreateEvent(BuildContext context) async {
+    await Navigator.pushNamed(context, CreateEvent.routeName);
+    _loadEvents(); // Reload events after returning from the create event page
   }
 
   @override
@@ -72,7 +78,27 @@ class _UserEventsState extends State<UserEvents> {
                 return Center(child: Text('Error: ${snapshot.error}'));
               }
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(child: Text('No events found.'));
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('No events found.'),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: () => _navigateToCreateEvent(context),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor:
+                              Theme.of(context).colorScheme.onPrimary,
+                          backgroundColor: Theme.of(context).primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text('Create Event'),
+                      ),
+                    ],
+                  ),
+                );
               }
 
               final events = snapshot.data!;
@@ -94,9 +120,7 @@ class _UserEventsState extends State<UserEvents> {
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, CreateEvent.routeName);
-                          },
+                          onPressed: () => _navigateToCreateEvent(context),
                           style: ElevatedButton.styleFrom(
                             foregroundColor:
                                 Theme.of(context).colorScheme.onPrimary,
@@ -190,6 +214,13 @@ class EventCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           LoggerService.logger.e("button press: ${event.id}");
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UpdateEvent(eventId: event.id!),
+            ),
+          );
+          LoggerService.logger.e("Pass EvenId: ${event.id}");
         },
         child: Material(
           color: Colors.transparent,

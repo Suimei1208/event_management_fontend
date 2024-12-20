@@ -28,7 +28,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               RoleCard(
                 icon: Icons.school,
                 title: 'Student',
-                description: 'Access course materials, submit assignments, and track your academic progress.',
+                description:
+                    'Access course materials, submit assignments, and track your academic progress.',
                 buttonText: 'Continue as Student',
                 onPressed: () {
                   selectRole(context, 'student');
@@ -38,7 +39,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               RoleCard(
                 icon: Icons.person,
                 title: 'Lecturer',
-                description: 'Manage courses, create assignments, and engage with your students.',
+                description:
+                    'Manage courses, create assignments, and engage with your students.',
                 buttonText: 'Continue as Lecturer',
                 onPressed: () {
                   selectRole(context, 'lecturer');
@@ -48,7 +50,8 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
               RoleCard(
                 icon: Icons.event,
                 title: 'Organizer',
-                description: 'Plan events, manage registrations, and coordinate with participants.',
+                description:
+                    'Plan events, manage registrations, and coordinate with participants.',
                 buttonText: 'Continue as Organizer',
                 onPressed: () {
                   selectRole(context, 'organizer');
@@ -69,7 +72,8 @@ class RoleCard extends StatelessWidget {
   final String buttonText;
   final VoidCallback onPressed;
 
-  const RoleCard({super.key, 
+  const RoleCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.description,
@@ -111,9 +115,14 @@ class RoleCard extends StatelessWidget {
               onPressed: onPressed,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
               ),
-              child: Text(buttonText, style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),),
+              child: Text(
+                buttonText,
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+              ),
             ),
           ],
         ),
