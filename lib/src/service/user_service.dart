@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, no_leading_underscores_for_local_identifiers
 
 import 'dart:convert';
 
@@ -44,18 +44,14 @@ Future<Map<String, dynamic>> getUserDetails() async {
   }
 }
 
-Future<void> updateUserProfile(
-    BuildContext context, String newName, String newPhone) async {
+Future<void> updateUserProfile(BuildContext context, String newName,
+    String newPhone, String _uploadedImageUrl) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
       String? idToken = await user.getIdToken();
-
-      const String avtarUrl =
-          'https://s3.getstickerpack.com/storage/uploads/sticker-pack/honkai-star-rail-hsr-then-wake-to-weep/sticker_2.png?d0ec19664277d77e2c85423a8d8f781d&d=200x200';
-      await user.updatePhotoURL(avtarUrl);
-
+      await user.updatePhotoURL(_uploadedImageUrl);
       final response = await http.put(
         Uri.parse(
             '${Config.baseUrl}/user-services/api/Users/UpdateProfile?name=$newName&phone=$newPhone'),

@@ -1,5 +1,6 @@
 import 'package:event_management/src/service/auth_service.dart';
-import 'package:event_management/src/service/user_service.dart'; // Import UserService
+import 'package:event_management/src/service/user_service.dart';
+
 import 'package:event_management/widget/options_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -109,18 +110,26 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                   width: 2,
                                 ),
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(2),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(50),
-                                  child: Image.network(
-                                    currentUser?.photoURL ??
-                                        'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png',
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                              child: StreamBuilder<User?>(
+                                stream: FirebaseAuth.instance.userChanges(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.active) {
+                                    final user = snapshot.data;
+                                    final photoURL = user?.photoURL;
+                                    return CircleAvatar(
+                                      radius: 60,
+                                      backgroundImage: (photoURL != null)
+                                          ? NetworkImage(photoURL)
+                                          : null,
+                                      child: (photoURL == null)
+                                          ? const Icon(Icons.person, size: 60)
+                                          : null,
+                                    );
+                                  }
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                },
                               ),
                             ),
                             Padding(
@@ -224,7 +233,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     icon: Icons.settings,
                     text: S.of(context).setting,
                     onTap: () {
-                      Navigator.pushNamed(context, '/create_event');
+                      Navigator.pushNamed(context, '/user-events');
                     },
                   ),
                   OptionsWidget(

@@ -1,4 +1,3 @@
-
 class Event {
   int? id;
   String name;

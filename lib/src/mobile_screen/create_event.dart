@@ -24,7 +24,6 @@ class _CreateEventState extends State<CreateEvent> {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
 
-  // Declare TextEditingControllers
   final TextEditingController _textController1 = TextEditingController();
   final TextEditingController _textController2 = TextEditingController();
   final TextEditingController _textController3 = TextEditingController();
@@ -45,7 +44,6 @@ class _CreateEventState extends State<CreateEvent> {
 
   @override
   void dispose() {
-    // Dispose controllers
     _textController1.dispose();
     _textController2.dispose();
     _textController3.dispose();
@@ -114,7 +112,6 @@ class _CreateEventState extends State<CreateEvent> {
     );
     if (pickedDate != null) {
       setState(() {
-        // endDateController.text = "${picked.day}/${picked.month}/${picked.year}";
         endDateController.text =
             "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
       });
@@ -128,7 +125,6 @@ class _CreateEventState extends State<CreateEvent> {
     );
     if (pickedTime != null) {
       setState(() {
-        // endTimeController.text = picked.format(context);
         endTimeController.text =
             "${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}:00";
       });
@@ -217,7 +213,7 @@ class _CreateEventState extends State<CreateEvent> {
                       SizedBox(
                         width: double.infinity,
                         child: TextFormField(
-                          controller: _textController1, // Updated
+                          controller: _textController1,
                           autofocus: false,
                           obscureText: false,
                           decoration: InputDecoration(
@@ -336,7 +332,7 @@ class _CreateEventState extends State<CreateEvent> {
                       SizedBox(
                         width: double.infinity,
                         child: TextFormField(
-                            controller: _textController2, // Updated
+                            controller: _textController2,
                             autofocus: false,
                             obscureText: false,
                             decoration: InputDecoration(
@@ -431,7 +427,7 @@ class _CreateEventState extends State<CreateEvent> {
                               SizedBox(
                                 width: double.infinity,
                                 child: TextFormField(
-                                    controller: _textController3, // Updated
+                                    controller: _textController3,
                                     autofocus: false,
                                     obscureText: false,
                                     decoration: InputDecoration(
@@ -529,8 +525,7 @@ class _CreateEventState extends State<CreateEvent> {
                                 children: [
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () => _selectDate(
-                                          context), // Gọi hàm chọn ngày
+                                      onTap: () => _selectDate(context),
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: Theme.of(context)
@@ -558,8 +553,7 @@ class _CreateEventState extends State<CreateEvent> {
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: TextField(
-                                                  controller:
-                                                      dateController, // Controller chọn ngày
+                                                  controller: dateController,
                                                   readOnly: true,
                                                   decoration:
                                                       const InputDecoration(
@@ -577,8 +571,7 @@ class _CreateEventState extends State<CreateEvent> {
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: GestureDetector(
-                                      onTap: () => _selectTime(
-                                          context), // Gọi hàm chọn giờ
+                                      onTap: () => _selectTime(context),
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: Theme.of(context)
@@ -606,8 +599,7 @@ class _CreateEventState extends State<CreateEvent> {
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: TextField(
-                                                  controller:
-                                                      timeController, // Controller chọn giờ
+                                                  controller: timeController,
                                                   readOnly: true,
                                                   decoration:
                                                       const InputDecoration(
@@ -672,8 +664,7 @@ class _CreateEventState extends State<CreateEvent> {
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: TextField(
-                                                  controller:
-                                                      endDateController, // Controller chọn ngày kết thúc
+                                                  controller: endDateController,
                                                   readOnly: true,
                                                   decoration:
                                                       const InputDecoration(
@@ -719,8 +710,7 @@ class _CreateEventState extends State<CreateEvent> {
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: TextField(
-                                                  controller:
-                                                      endTimeController, // Controller chọn giờ kết thúc
+                                                  controller: endTimeController,
                                                   readOnly: true,
                                                   decoration:
                                                       const InputDecoration(
@@ -774,7 +764,7 @@ class _CreateEventState extends State<CreateEvent> {
                               SizedBox(
                                 width: double.infinity,
                                 child: TextFormField(
-                                    controller: _textController4, // Updated
+                                    controller: _textController4,
                                     autofocus: false,
                                     obscureText: false,
                                     decoration: InputDecoration(
@@ -875,7 +865,6 @@ class _CreateEventState extends State<CreateEvent> {
                         getIdEvent(event.name).then((id) async {
                           LoggerService.logger.w('Event ID: $id');
 
-                          // Kiểm tra và thêm người tham gia
                           if (speaker.isNotEmpty) {
                             await addParticipant(
                                 speaker, int.parse(id), "Speaker");
@@ -896,7 +885,6 @@ class _CreateEventState extends State<CreateEvent> {
                                   fontFamily: 'Inter Tight',
                                   letterSpacing: 0.0,
                                 ),
-                        // padding: const EdgeInsets.symmetric(vertical: 16),
                         maximumSize:
                             const Size(double.infinity, double.infinity),
                         shape: RoundedRectangleBorder(
