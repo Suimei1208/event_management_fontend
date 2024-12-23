@@ -5,7 +5,7 @@ class EventListScreen extends StatefulWidget {
   const EventListScreen({super.key});
 
   // ignore: non_constant_identifier_names
-  final Route = "/register_events";
+  static const routeName = "/register_events";
 
   @override
   State<EventListScreen> createState() => _EventListScreenState();
