@@ -224,3 +224,144 @@ Future<String> getIdEvent(String name) async {
     throw Exception('Failed to get event id');
   }
 }
+
+Future<void> updateEvent(Event event, BuildContext context) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+    String? idToken = await user.getIdToken();
+
+    final response = await http.put(
+      Uri.parse('${Config.baseUrl}/event-service/${event.id}'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(event.toJson()),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Event updated successfully!')),
+        );
+        LoggerService.logger.i('Event updated successfully');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update event.')),
+        );
+        LoggerService.logger
+            .w('Failed to update event: ${responseData['message']}');
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to update event.')),
+      );
+      LoggerService.logger.w('HTTP error: ${response.statusCode}');
+    }
+  } catch (error) {
+    LoggerService.logger.w('Error: $error');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('An error occurred. Please try again.')),
+    );
+  }
+}
+
+Future<EventWithParticipants> fetchEventWithParticipantsById(int id) async {
+  try {
+    // Get the currently logged-in user
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    // Get the user's ID token for authentication
+    String? idToken = await user.getIdToken();
+
+    // Make an HTTP GET request to fetch event details by ID
+    final response = await http.get(
+      Uri.parse('${Config.baseUrl}/event-service/event/$id'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    // Check if the request was successful
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      // Parse the event data from the response
+      if (responseData['success'] == true) {
+        return EventWithParticipants.fromJson(responseData['data']);
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Failed to fetch event data');
+      }
+    } else {
+      // Log and throw an error if the HTTP request fails
+      LoggerService.logger.w(
+          'Failed to fetch event by ID: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to fetch event by ID');
+    }
+  } catch (e) {
+    LoggerService.logger.w('Error: $e');
+    throw Exception('Failed to fetch event by ID');
+  }
+}
+
+Future<List<Event>> fetchEventById(String id) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    late final String role;
+
+    final responseRole = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
+    );
+
+    if (responseRole.statusCode == 200) {
+      final responseData = json.decode(responseRole.body);
+      if (responseData['success'] == true && responseData['data'] != null) {
+        role = responseData['data']['role'];
+      } else {
+        throw Exception('Failed to fetch user role');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to fetch user role: ${responseRole.statusCode} ${responseRole.body}');
+      throw Exception('Failed to fetch user role');
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/get-register-event?uid=$id&role=$role'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      final List<dynamic> eventsData = responseData['data'] ?? [];
+      final List<Event> events = eventsData
+          .map((event) => Event.fromJson(event as Map<String, dynamic>))
+          .toList();
+      return events;
+    } else {
+      LoggerService.logger.w(
+          'Failed to fetch event by ID: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to fetch event by ID');
+    }
+  } catch (e) {
+    LoggerService.logger.w('Error: $e');
+    throw Exception('Failed to fetch event by ID');
+  }
+}
