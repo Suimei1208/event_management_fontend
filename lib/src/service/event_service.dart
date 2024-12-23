@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:event_management/config.dart';
+import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/widget/dialog_widget.dart';
@@ -312,6 +313,7 @@ Future<EventWithParticipants> fetchEventWithParticipantsById(int id) async {
   }
 }
 
+
 Future<List<Event>> fetchEventById(String id) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
@@ -365,3 +367,4 @@ Future<List<Event>> fetchEventById(String id) async {
     throw Exception('Failed to fetch event by ID');
   }
 }
+

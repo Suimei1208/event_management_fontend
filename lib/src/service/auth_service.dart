@@ -193,7 +193,7 @@ Future<void> selectRole(BuildContext context, String role) async {
         Uri.parse(
             '${Config.baseUrl}/user-services/api/Users/UpdateRole?role=$role'),
         headers: {
-          'Authorization': '$idToken',
+          'Authorization': 'Bearer $idToken',
         },
       );
 

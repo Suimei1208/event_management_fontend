@@ -88,8 +88,10 @@ class MyApp extends StatelessWidget {
                       return const CreateEvent();
                     case UserEvents.routeName:
                       return const UserEvents();
+
                     case HomeScreen.routeName:
                       return const HomeScreen();
+
                     case EventListScreen.routeName:
                       return const EventListScreen();
                     default:
