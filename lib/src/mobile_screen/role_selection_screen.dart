@@ -32,7 +32,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                     'Access course materials, submit assignments, and track your academic progress.',
                 buttonText: 'Continue as Student',
                 onPressed: () {
-                  selectRole(context, 'student');
+                  selectRole(context, 'Student');
                 },
               ),
               const SizedBox(height: 20),
@@ -43,7 +43,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                     'Manage courses, create assignments, and engage with your students.',
                 buttonText: 'Continue as Lecturer',
                 onPressed: () {
-                  selectRole(context, 'lecturer');
+                  selectRole(context, 'Lecturer');
                 },
               ),
               const SizedBox(height: 20),
@@ -54,7 +54,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                     'Plan events, manage registrations, and coordinate with participants.',
                 buttonText: 'Continue as Organizer',
                 onPressed: () {
-                  selectRole(context, 'organizer');
+                  selectRole(context, 'Organizer');
                 },
               ),
             ],

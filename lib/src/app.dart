@@ -1,6 +1,7 @@
 import 'package:event_management/src/mobile_screen/create_event.dart';
 import 'package:event_management/src/mobile_screen/edit_profile.dart';
 import 'package:event_management/src/mobile_screen/forgot_password.dart';
+import 'package:event_management/src/mobile_screen/home_screen.dart';
 import 'package:event_management/src/mobile_screen/register.dart';
 import 'package:event_management/src/mobile_screen/register_events.dart';
 import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) {
-                return const ProfileWidget();
+                return const HomeScreen();
               } else {
                 return const LoginScreen();
               }
@@ -87,6 +88,10 @@ class MyApp extends StatelessWidget {
                       return const CreateEvent();
                     case UserEvents.routeName:
                       return const UserEvents();
+
+                    case HomeScreen.routeName:
+                      return const HomeScreen();
+
                     case EventListScreen.routeName:
                       return const EventListScreen();
                     default:

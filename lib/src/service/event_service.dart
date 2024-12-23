@@ -312,3 +312,59 @@ Future<EventWithParticipants> fetchEventWithParticipantsById(int id) async {
     throw Exception('Failed to fetch event by ID');
   }
 }
+
+
+Future<List<Event>> fetchEventById(String id) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    late final String role;
+
+    final responseRole = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
+    );
+
+    if (responseRole.statusCode == 200) {
+      final responseData = json.decode(responseRole.body);
+      if (responseData['success'] == true && responseData['data'] != null) {
+        role = responseData['data']['role'];
+      } else {
+        throw Exception('Failed to fetch user role');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to fetch user role: ${responseRole.statusCode} ${responseRole.body}');
+      throw Exception('Failed to fetch user role');
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/get-register-event?uid=$id&role=$role'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      final List<dynamic> eventsData = responseData['data'] ?? [];
+      final List<Event> events = eventsData
+          .map((event) => Event.fromJson(event as Map<String, dynamic>))
+          .toList();
+      return events;
+    } else {
+      LoggerService.logger.w(
+          'Failed to fetch event by ID: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to fetch event by ID');
+    }
+  } catch (e) {
+    LoggerService.logger.w('Error: $e');
+    throw Exception('Failed to fetch event by ID');
+  }
+}
+
