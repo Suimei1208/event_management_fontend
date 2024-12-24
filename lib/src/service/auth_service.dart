@@ -93,7 +93,7 @@ Future<void> signInWithGoogle(BuildContext context) async {
             if (role == "None") {
               Navigator.pushReplacementNamed(context, '/role');
             } else {
-              Navigator.pushReplacementNamed(context, '/profile');
+              Navigator.pushReplacementNamed(context, '/home');
             }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -166,7 +166,7 @@ Future<void> signInWithEmailPassword(
           if (role == "None") {
             Navigator.pushNamed(context, '/role');
           } else {
-            Navigator.pushNamed(context, '/profile');
+            Navigator.pushNamed(context, '/home');
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -198,7 +198,7 @@ Future<void> selectRole(BuildContext context, String role) async {
       );
 
       if (response.statusCode == 200) {
-        Navigator.pushNamed(context, '/profile');
+        Navigator.pushNamed(context, '/home');
       } else {
         return;
       }

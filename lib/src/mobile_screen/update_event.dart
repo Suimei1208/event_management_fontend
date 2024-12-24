@@ -1,10 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print, use_build_context_synchronously
+import 'package:event_management/src/mobile_screen/add_guest.dart';
+import 'package:event_management/src/mobile_screen/schedules.dart';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/participants.dart';
-import 'package:event_management/widget/guest_list.dart';
+import 'package:event_management/src/service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -44,6 +46,147 @@ class _UpdateEventState extends State<UpdateEvent> {
   final TextEditingController endTimeController =
       TextEditingController(); // End Time
 
+  Widget _buildParticipantsList(List<Map<String, dynamic>> participants,
+      String title, BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: Theme.of(context).dividerColor,
+              width: 1,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 30,
+                          ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.add,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 24,
+                      ),
+                      onPressed: () async {
+                        final selectedUsers = await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => AddMembersPage(name: title),
+                          ),
+                        );
+                        if (selectedUsers != null) {
+                          setState(() {
+                            participants.addAll(selectedUsers);
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                if (participants.isEmpty)
+                  const Center(
+                    child: Text('No participants added yet.'),
+                  )
+                else
+                  ...participants.map((participant) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Theme.of(context).dividerColor,
+                            width: 1,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 20,
+                                backgroundImage: participant['photoUrl'] !=
+                                            null &&
+                                        participant['photoUrl'].isNotEmpty
+                                    ? NetworkImage(participant['photoUrl'])
+                                    : const NetworkImage(
+                                        'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      participant['name']!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.copyWith(
+                                            fontFamily: 'Inter',
+                                          ),
+                                    ),
+                                    Text(
+                                      participant['role']!,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            fontFamily: 'Inter',
+                                            color: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.color,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.close,
+                                  color: Theme.of(context).colorScheme.error,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  LoggerService.logger
+                                      .e('Remove member button pressed');
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -65,11 +208,32 @@ class _UpdateEventState extends State<UpdateEvent> {
 
   Future<void> _loadEventData() async {
     try {
-      // Fetch event data by ID
       EventWithParticipants event =
           await fetchEventWithParticipantsById(widget.eventId);
+      List<Map<String, dynamic>> guestList = [];
+      List<Map<String, dynamic>> speakerList = [];
 
-      // Populate the fields with the event data
+      for (var participant in event.participants) {
+        final userData = await getUserData(participant.userId);
+
+        if (participant.role == 'Guest') {
+          guestList.add({
+            'userId': participant.userId,
+            'role': userData['role'],
+            'id': participant.id,
+            'name': userData['name'],
+            'photoUrl': userData['photoUrl'],
+          });
+        } else if (participant.role == 'Speaker') {
+          speakerList.add({
+            'userId': participant.userId,
+            'role': userData['role'],
+            'name': userData['name'],
+            'photoUrl': userData['photoUrl'],
+          });
+        }
+      }
+
       setState(() {
         _textController1.text = event.name;
         _textController2.text = event.description;
@@ -80,25 +244,8 @@ class _UpdateEventState extends State<UpdateEvent> {
         timeController.text = DateFormat('HH:mm').format(event.startDate);
         endDateController.text = DateFormat('yyyy-MM-dd').format(event.endDate);
         endTimeController.text = DateFormat('HH:mm').format(event.endDate);
-
-        // Load participants into guest and speaker lists
-        guest = event.participants
-            .where((participant) => participant.role == 'Guest')
-            .map((participant) => {
-                  'name': participant
-                      .userId, // Replace with actual name if available
-                  'role': participant.role,
-                })
-            .toList();
-
-        speaker = event.participants
-            .where((participant) => participant.role == 'Speaker')
-            .map((participant) => {
-                  'name': participant
-                      .userId, // Replace with actual name if available
-                  'role': participant.role,
-                })
-            .toList();
+        guest = guestList;
+        speaker = speakerList;
       });
     } catch (error) {
       LoggerService.logger.e('Failed to load event data: $error');
@@ -111,23 +258,39 @@ class _UpdateEventState extends State<UpdateEvent> {
 
   Future<void> _updateEvent() async {
     try {
+      if (speaker.isNotEmpty) {
+        await addParticipant(speaker, widget.eventId, "Speaker");
+      }
+      if (guest.isNotEmpty) {
+        await addParticipant(guest, widget.eventId, "Guest");
+      }
+
+      String name = _textController1.text;
+      String description = _textController2.text;
+      String targetAudience = _textController3.text;
+      String location = _textController4.text;
+      String startDateTime =
+          _combineDateTime(dateController.text, timeController.text);
+      String endDateTime =
+          _combineDateTime(endDateController.text, endTimeController.text);
+
       final updatedEvent = Event(
         id: widget.eventId,
-        name: _textController1.text,
-        description: _textController2.text,
-        targetAudience: _textController3.text,
-        location: _textController4.text,
+        name: name,
+        description: description,
+        targetAudience: targetAudience,
+        location: location,
         type: choiceChipsValue!,
-        startDate: DateFormat('yyyy-MM-dd HH:mm:ss')
-            .parse("${dateController.text} ${timeController.text}"),
-        endDate: DateFormat('yyyy-MM-dd HH:mm:ss')
-            .parse("${endDateController.text} ${endTimeController.text}"),
+        startDate: DateTime.parse(startDateTime),
+        endDate: DateTime.parse(endDateTime),
         banner: '123456789',
         status: 'Upcoming',
         idCreate: '',
       );
 
       await updateEvent(updatedEvent, context);
+
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Event updated successfully!')),
       );
@@ -137,6 +300,25 @@ class _UpdateEventState extends State<UpdateEvent> {
         const SnackBar(
             content: Text('Failed to update event. Please try again.')),
       );
+    }
+  }
+
+  String _combineDateTime(String date, String time) {
+    if (date.isNotEmpty && time.isNotEmpty) {
+      final dateParts = date.split('-');
+      final timeParts = time.split(':');
+
+      DateTime dateTime = DateTime(
+        int.parse(dateParts[0]),
+        int.parse(dateParts[1]),
+        int.parse(dateParts[2]),
+        int.parse(timeParts[0]),
+        int.parse(timeParts[1]),
+      );
+
+      return dateTime.toString();
+    } else {
+      throw Exception('Invalid date or time');
     }
   }
 
@@ -165,26 +347,6 @@ class _UpdateEventState extends State<UpdateEvent> {
         timeController.text =
             "${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}:00";
       });
-    }
-  }
-
-  String _combineDateTime(String date, String time) {
-    if (date.isNotEmpty && time.isNotEmpty) {
-      final dateParts = date.split('-');
-      final timeParts = time.split(':');
-
-      DateTime dateTime = DateTime(
-        int.parse(dateParts[0]),
-        int.parse(dateParts[1]),
-        int.parse(dateParts[2]),
-        int.parse(timeParts[0]),
-        int.parse(timeParts[1]),
-      );
-
-      LoggerService.logger.i(dateTime.toString());
-      return dateTime.toString();
-    } else {
-      throw Exception('Invalid date or time');
     }
   }
 
@@ -290,22 +452,140 @@ class _UpdateEventState extends State<UpdateEvent> {
                         fontFamily: 'Inter', letterSpacing: 0.0, fontSize: 16),
                   ),
                   const SizedBox(height: 10),
-                  Column(
-                    children: [
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: double.infinity,
-                            child: TextFormField(
-                              controller: _textController1,
+                  Column(children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: TextFormField(
+                            controller: _textController1,
+                            autofocus: false,
+                            obscureText: false,
+                            decoration: InputDecoration(
+                              labelText: 'Event Name',
+                              labelStyle: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontFamily: 'Inter',
+                                    letterSpacing: 0.0,
+                                  ),
+                              hintText: 'Enter event name...',
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontFamily: 'Inter',
+                                    letterSpacing: 0.0,
+                                  ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).dividerColor,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Color(0x00000000),
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Color(0x00000000),
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  color: Color(0x00000000),
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: Theme.of(context).cardColor,
+                              contentPadding:
+                                  const EdgeInsetsDirectional.fromSTEB(
+                                      24, 24, 20, 24),
+                            ),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      fontFamily: 'Inter',
+                                      letterSpacing: 0.0,
+                                    ),
+                            validator: textController1Validator,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context).dividerColor,
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                16, 16, 16, 16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Event Type',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                          fontFamily: 'Inter',
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 30),
+                                ),
+                                Wrap(
+                                  spacing: 8,
+                                  children: [
+                                    'Seminar',
+                                    'Workshop',
+                                    'Conference',
+                                    'Competition'
+                                  ]
+                                      .map((type) => ChoiceChip(
+                                            label: Text(type),
+                                            selected: choiceChipsValue == type,
+                                            onSelected: (selected) {
+                                              setState(() {
+                                                choiceChipsValue =
+                                                    selected ? type : null;
+                                              });
+                                            },
+                                          ))
+                                      .toList(),
+                                ),
+                                const SizedBox(height: 12),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: TextFormField(
+                              controller: _textController2,
                               autofocus: false,
                               obscureText: false,
                               decoration: InputDecoration(
-                                labelText: 'Event Name',
+                                labelText: 'Description',
                                 labelStyle: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -313,7 +593,7 @@ class _UpdateEventState extends State<UpdateEvent> {
                                       fontFamily: 'Inter',
                                       letterSpacing: 0.0,
                                     ),
-                                hintText: 'Enter event name...',
+                                hintText: 'Describe your event...',
                                 hintStyle: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -362,665 +642,575 @@ class _UpdateEventState extends State<UpdateEvent> {
                                     fontFamily: 'Inter',
                                     letterSpacing: 0.0,
                                   ),
-                              validator: textController1Validator,
+                              maxLines: 5,
+                              minLines: 3,
+                              validator: textController2Validator),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context).dividerColor,
+                              width: 1,
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor,
-                                width: 1,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  16, 16, 16, 16),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Event Type',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                16, 16, 16, 16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Event Objectives',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                          fontFamily: 'Inter',
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 30),
+                                ),
+                                const SizedBox(height: 12),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: TextFormField(
+                                      controller: _textController3,
+                                      autofocus: false,
+                                      obscureText: false,
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter event objectives...',
+                                        hintStyle: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              fontFamily: 'Inter',
+                                              letterSpacing: 0.0,
+                                            ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color:
+                                                Theme.of(context).dividerColor,
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0x00000000),
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        errorBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0x00000000),
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        focusedErrorBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0x00000000),
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        filled: true,
+                                        fillColor: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        contentPadding:
+                                            const EdgeInsetsDirectional
+                                                .fromSTEB(24, 24, 20, 24),
+                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.copyWith(
                                             fontFamily: 'Inter',
                                             letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 30),
-                                  ),
-                                  Wrap(
-                                    spacing: 8,
-                                    children: [
-                                      'Seminar',
-                                      'Workshop',
-                                      'Conference',
-                                      'Competition'
-                                    ]
-                                        .map((type) => ChoiceChip(
-                                              label: Text(type),
-                                              selected:
-                                                  choiceChipsValue == type,
-                                              onSelected: (selected) {
-                                                setState(() {
-                                                  choiceChipsValue =
-                                                      selected ? type : null;
-                                                });
-                                              },
-                                            ))
-                                        .toList(),
-                                  ),
-                                  const SizedBox(height: 12),
-                                ],
-                              ),
+                                          ),
+                                      minLines: 2,
+                                      maxLines: 4,
+                                      validator: textController3Validator),
+                                ),
+                                const SizedBox(height: 12),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 20),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context).dividerColor,
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                16, 16, 16, 16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Date & Time',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                        fontFamily: 'Inter',
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 30,
+                                      ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () => _selectDate(context),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .dividerColor,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(12, 12, 12, 12),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Icon(
+                                                  Icons.calendar_today,
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  size: 24,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller: dateController,
+                                                    readOnly: true,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText: 'Select Date',
+                                                      border: InputBorder.none,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () => _selectTime(context),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .dividerColor,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(12, 12, 12, 12),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Icon(
+                                                  Icons.access_time,
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  size: 24,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller: timeController,
+                                                    readOnly: true,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText: 'Select Time',
+                                                      border: InputBorder.none,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                const SizedBox(height: 20),
+                                Text(
+                                  'End Date & Time',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                        fontFamily: 'Inter',
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 30,
+                                      ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () => _selectEndDate(context),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .dividerColor,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(12, 12, 12, 12),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Icon(
+                                                  Icons.calendar_today,
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  size: 24,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller:
+                                                        endDateController,
+                                                    readOnly: true,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText:
+                                                          'Select End Date',
+                                                      border: InputBorder.none,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () => _selectEndTime(context),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context)
+                                                .scaffoldBackgroundColor,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: Theme.of(context)
+                                                  .dividerColor,
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsetsDirectional
+                                                .fromSTEB(12, 12, 12, 12),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Icon(
+                                                  Icons.access_time,
+                                                  color: Theme.of(context)
+                                                      .primaryColor,
+                                                  size: 24,
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Expanded(
+                                                  child: TextField(
+                                                    controller:
+                                                        endTimeController,
+                                                    readOnly: true,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      hintText:
+                                                          'Select End Time',
+                                                      border: InputBorder.none,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context).dividerColor,
+                              width: 1,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                16, 16, 16, 16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Location',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                          fontFamily: 'Inter',
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 30),
+                                ),
+                                const SizedBox(height: 12),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: TextFormField(
+                                      controller: _textController4,
+                                      autofocus: false,
+                                      obscureText: false,
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter event location...',
+                                        hintStyle: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              fontFamily: 'Inter',
+                                              letterSpacing: 0.0,
+                                            ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color:
+                                                Theme.of(context).dividerColor,
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0x00000000),
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        errorBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0x00000000),
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        focusedErrorBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0x00000000),
+                                            width: 1.0,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        filled: true,
+                                        fillColor: Theme.of(context)
+                                            .scaffoldBackgroundColor,
+                                        contentPadding:
+                                            const EdgeInsetsDirectional
+                                                .fromSTEB(24, 24, 20, 24),
+                                        suffixIcon: const Icon(
+                                          Icons.place,
+                                        ),
+                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge
+                                          ?.copyWith(
+                                            fontFamily: 'Inter',
+                                            letterSpacing: 0.0,
+                                          ),
+                                      validator: textController4Validator),
+                                ),
+                                const SizedBox(height: 12),
+                              ],
+                            ),
+                          ),
+                        ),
+                        _buildParticipantsList(speaker, 'Speaker', context),
+                        _buildParticipantsList(guest, 'Guest', context),
+                      ],
+                    ),
+                  ]),
+                  Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(16, 16, 16, 16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Event Objectives',
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      fontFamily: 'Inter',
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 30,
+                                    ),
+                          ),
+                          const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,
                             child: TextFormField(
-                                controller: _textController2,
-                                autofocus: false,
-                                obscureText: false,
-                                decoration: InputDecoration(
-                                  labelText: 'Description',
-                                  labelStyle: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                        fontFamily: 'Inter',
-                                        letterSpacing: 0.0,
-                                      ),
-                                  hintText: 'Describe your event...',
-                                  hintStyle: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                        fontFamily: 'Inter',
-                                        letterSpacing: 0.0,
-                                      ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).dividerColor,
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  filled: true,
-                                  fillColor: Theme.of(context).cardColor,
-                                  contentPadding:
-                                      const EdgeInsetsDirectional.fromSTEB(
-                                          24, 24, 20, 24),
-                                ),
-                                style: Theme.of(context)
+                              controller: _textController3,
+                              autofocus: false,
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                hintText: 'Enter event objectives...',
+                                hintStyle: Theme.of(context)
                                     .textTheme
-                                    .bodyLarge
+                                    .titleMedium
                                     ?.copyWith(
                                       fontFamily: 'Inter',
                                       letterSpacing: 0.0,
                                     ),
-                                maxLines: 5,
-                                minLines: 3,
-                                validator: textController2Validator),
-                          ),
-                          const SizedBox(height: 20),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor,
-                                width: 1,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  16, 16, 16, 16),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Event Objectives',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                            fontFamily: 'Inter',
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 30),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).dividerColor,
+                                    width: 1.0,
                                   ),
-                                  const SizedBox(height: 12),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: TextFormField(
-                                        controller: _textController3,
-                                        autofocus: false,
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          hintText: 'Enter event objectives...',
-                                          hintStyle: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium
-                                              ?.copyWith(
-                                                fontFamily: 'Inter',
-                                                letterSpacing: 0.0,
-                                              ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Theme.of(context)
-                                                  .dividerColor,
-                                              width: 1.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Color(0x00000000),
-                                              width: 1.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          errorBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Color(0x00000000),
-                                              width: 1.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          focusedErrorBorder:
-                                              OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Color(0x00000000),
-                                              width: 1.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          filled: true,
-                                          fillColor: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          contentPadding:
-                                              const EdgeInsetsDirectional
-                                                  .fromSTEB(24, 24, 20, 24),
-                                        ),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.copyWith(
-                                              fontFamily: 'Inter',
-                                              letterSpacing: 0.0,
-                                            ),
-                                        minLines: 2,
-                                        maxLines: 4,
-                                        validator: textController3Validator),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Color(0x00000000),
+                                    width: 1.0,
                                   ),
-                                  const SizedBox(height: 12),
-                                ],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Color(0x00000000),
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                    color: Color(0x00000000),
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                filled: true,
+                                fillColor:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                contentPadding:
+                                    const EdgeInsetsDirectional.fromSTEB(
+                                        24, 24, 20, 24),
                               ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge
+                                  ?.copyWith(
+                                    fontFamily: 'Inter',
+                                    letterSpacing: 0.0,
+                                  ),
+                              minLines: 2,
+                              maxLines: 4,
+                              validator: (value) {
+                                return null;
+                              },
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor,
-                                width: 1,
+                          const SizedBox(height: 12),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SchedulesWidget(
+                                          eventId: widget.eventId,
+                                        )),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 24),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).primaryColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Setting Schedules',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
                             ),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  16, 16, 16, 16),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Date & Time',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontFamily: 'Inter',
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 30,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () => _selectDate(context),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: Theme.of(context)
-                                                    .dividerColor,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(12, 12, 12, 12),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  Icon(
-                                                    Icons.calendar_today,
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
-                                                    size: 24,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: TextField(
-                                                      controller:
-                                                          dateController,
-                                                      readOnly: true,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText: 'Select Date',
-                                                        border:
-                                                            InputBorder.none,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () => _selectTime(context),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: Theme.of(context)
-                                                    .dividerColor,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(12, 12, 12, 12),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  Icon(
-                                                    Icons.access_time,
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
-                                                    size: 24,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: TextField(
-                                                      controller:
-                                                          timeController,
-                                                      readOnly: true,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText: 'Select Time',
-                                                        border:
-                                                            InputBorder.none,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 12),
-                                  const SizedBox(height: 20),
-                                  Text(
-                                    'End Date & Time',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          fontFamily: 'Inter',
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 30,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () => _selectEndDate(context),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: Theme.of(context)
-                                                    .dividerColor,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(12, 12, 12, 12),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  Icon(
-                                                    Icons.calendar_today,
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
-                                                    size: 24,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: TextField(
-                                                      controller:
-                                                          endDateController,
-                                                      readOnly: true,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText:
-                                                            'Select End Date',
-                                                        border:
-                                                            InputBorder.none,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () => _selectEndTime(context),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context)
-                                                  .scaffoldBackgroundColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: Theme.of(context)
-                                                    .dividerColor,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsetsDirectional
-                                                      .fromSTEB(12, 12, 12, 12),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.max,
-                                                children: [
-                                                  Icon(
-                                                    Icons.access_time,
-                                                    color: Theme.of(context)
-                                                        .primaryColor,
-                                                    size: 24,
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: TextField(
-                                                      controller:
-                                                          endTimeController,
-                                                      readOnly: true,
-                                                      decoration:
-                                                          const InputDecoration(
-                                                        hintText:
-                                                            'Select End Time',
-                                                        border:
-                                                            InputBorder.none,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 12),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor,
-                                width: 1,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  16, 16, 16, 16),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'Location',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                            fontFamily: 'Inter',
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 30),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  SizedBox(
-                                    width: double.infinity,
-                                    child: TextFormField(
-                                        controller: _textController4,
-                                        autofocus: false,
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          hintText: 'Enter event location...',
-                                          hintStyle: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium
-                                              ?.copyWith(
-                                                fontFamily: 'Inter',
-                                                letterSpacing: 0.0,
-                                              ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
-                                              color: Theme.of(context)
-                                                  .dividerColor,
-                                              width: 1.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Color(0x00000000),
-                                              width: 1.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          errorBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Color(0x00000000),
-                                              width: 1.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          focusedErrorBorder:
-                                              OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Color(0x00000000),
-                                              width: 1.0,
-                                            ),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          filled: true,
-                                          fillColor: Theme.of(context)
-                                              .scaffoldBackgroundColor,
-                                          contentPadding:
-                                              const EdgeInsetsDirectional
-                                                  .fromSTEB(24, 24, 20, 24),
-                                          suffixIcon: const Icon(
-                                            Icons.place,
-                                          ),
-                                        ),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyLarge
-                                            ?.copyWith(
-                                              fontFamily: 'Inter',
-                                              letterSpacing: 0.0,
-                                            ),
-                                        validator: textController4Validator),
-                                  ),
-                                  const SizedBox(height: 12),
-                                ],
-                              ),
-                            ),
-                          ),
-                          GuestList(
-                            title: 'Speakers',
-                            members: speaker,
-                          ),
-                          GuestList(
-                            title: 'Guest',
-                            members: guest,
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            LoggerService.logger.w('Button pressed ...');
-                            Event event = Event(
-                                id: 0,
-                                name: _textController1.text.toString(),
-                                description: _textController2.text.toString(),
-                                targetAudience:
-                                    _textController3.text.toString(),
-                                location: _textController4.text.toString(),
-                                type: choiceChipsValue!.toString(),
-                                startDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
-                                    .parse(_combineDateTime(dateController.text,
-                                        timeController.text)),
-                                endDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
-                                    .parse(_combineDateTime(
-                                        endDateController.text,
-                                        endTimeController.text)),
-                                banner: "123456789",
-                                status: "Upcoming",
-                                idCreate: "");
-                            LoggerService.logger.w(event.toJson());
-                            await createEvent(event, context);
-                            getIdEvent(event.name).then((id) async {
-                              LoggerService.logger.w('Event ID: $id');
-
-                              if (speaker.isNotEmpty) {
-                                await addParticipant(
-                                    speaker, int.parse(id), "Speaker");
-                              }
-                              if (guest.isNotEmpty) {
-                                await addParticipant(
-                                    guest, int.parse(id), "Guest");
-                              }
-                            }).catchError((error) {
-                              LoggerService.logger.w('Error: $error');
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.primary,
-                            textStyle: Theme.of(context)
-                                .textTheme
-                                .labelLarge
-                                ?.copyWith(
-                                  fontFamily: 'Inter Tight',
-                                  letterSpacing: 0.0,
-                                ),
-                            maximumSize:
-                                const Size(double.infinity, double.infinity),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: const Text('Create Event'),
-                        ),
-                      ),
-                    ],
-                  ),
+                      )),
                   const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,

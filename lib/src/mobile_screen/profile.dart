@@ -39,25 +39,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       child: Scaffold(
         key: scaffoldKey,
         appBar: AppBar(
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_rounded,
-              size: 30,
-            ),
-            onPressed: () {},
-          ),
-          title: const Text(
-            'Profile',
-            style: TextStyle(
-              fontFamily: 'Inter',
-              letterSpacing: 0.0,
-            ),
-          ),
-          centerTitle: false,
           elevation: 0,
-          backgroundColor:
-              brightness == Brightness.dark ? Colors.black : Colors.grey[200],
+          centerTitle: false,
+          title: const Text("Profile"),
         ),
         body: FutureBuilder<Map<String, dynamic>>(
           future: getUserDetails(),
