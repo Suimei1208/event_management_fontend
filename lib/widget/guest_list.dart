@@ -69,8 +69,7 @@ class _GuestListState extends State<GuestList> {
                         );
                         if (selectedUsers != null) {
                           setState(() {
-                            members.addAll(
-                                selectedUsers); // Cập nhật danh sách thành viên
+                            members.addAll(selectedUsers);
                           });
                         }
                       },
@@ -79,9 +78,7 @@ class _GuestListState extends State<GuestList> {
                 ),
                 const SizedBox(height: 12),
                 if (members.isEmpty)
-                  const Center(
-                      child: Text(
-                          'No members added yet.')) // Thông báo nếu không có thành viên
+                  const Center(child: Text('No members added yet.'))
                 else
                   ...members.map((member) => Padding(
                         padding: const EdgeInsets.all(8.0),

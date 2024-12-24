@@ -12,7 +12,8 @@ class CommunityForumScreen extends StatelessWidget {
       'type': 'Question',
       'replies': '8',
       'likes': '23',
-      'imageUrl': 'https://images.unsplash.com/photo-1592496000931-e50d83df1286?w=500&h=500',
+      'imageUrl':
+          'https://images.unsplash.com/photo-1592496000931-e50d83df1286?w=500&h=500',
     },
     {
       'id': '2',
@@ -20,7 +21,8 @@ class CommunityForumScreen extends StatelessWidget {
       'type': 'Discussion',
       'replies': '12',
       'likes': '45',
-      'imageUrl': 'https://images.unsplash.com/photo-1622570230313-3332b620271c?w=500&h=500',
+      'imageUrl':
+          'https://images.unsplash.com/photo-1622570230313-3332b620271c?w=500&h=500',
     },
     {
       'id': '3',
@@ -28,7 +30,8 @@ class CommunityForumScreen extends StatelessWidget {
       'type': 'Event',
       'replies': '15',
       'likes': '67',
-      'imageUrl': 'https://images.unsplash.com/photo-1573484952901-03991c2ece8f?w=500&h=500',
+      'imageUrl':
+          'https://images.unsplash.com/photo-1573484952901-03991c2ece8f?w=500&h=500',
     },
   ];
 
@@ -51,9 +54,7 @@ class CommunityForumScreen extends StatelessWidget {
                 Icons.search,
                 size: 24.0,
               ),
-              onPressed: () {
-
-              },
+              onPressed: () {},
             ),
           ],
           centerTitle: false,
@@ -83,7 +84,10 @@ class CommunityForumScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Start a Discussion',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
                                   fontFamily: 'Inter Tight',
                                   color: Colors.white,
                                   letterSpacing: 0.0,
@@ -92,7 +96,10 @@ class CommunityForumScreen extends StatelessWidget {
                           const SizedBox(height: 12.0),
                           Text(
                             'Share your thoughts with the community',
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
                                   fontFamily: 'Inter',
                                   color: Colors.white,
                                   letterSpacing: 0.0,
@@ -100,10 +107,10 @@ class CommunityForumScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 12.0),
                           ElevatedButton(
-                            onPressed: () {
-                            },
+                            onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              minimumSize: Size(MediaQuery.of(context).size.width, 50.0),
+                              minimumSize:
+                                  Size(MediaQuery.of(context).size.width, 50.0),
                               elevation: 2.0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25.0),
@@ -111,9 +118,13 @@ class CommunityForumScreen extends StatelessWidget {
                             ),
                             child: Text(
                               'Create New Post',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
                                     fontFamily: 'Inter Tight',
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                     letterSpacing: 0.0,
                                   ),
                             ),
@@ -137,13 +148,17 @@ class CommunityForumScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16.0),
                     ),
                     child: Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(20.0, 20.0, 20.0, 20.0),
+                      padding: const EdgeInsetsDirectional.fromSTEB(
+                          20.0, 20.0, 20.0, 20.0),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
                             'Popular Topics',
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
+                                ?.copyWith(
                                   fontFamily: 'Inter Tight',
                                   letterSpacing: 0.0,
                                 ),
@@ -208,8 +223,7 @@ class CommunityForumScreen extends StatelessWidget {
                                 likes: item['likes'],
                                 typeColor: getTypeColor(item['type']),
                                 textColor: getTypeTextColor(item['type']),
-                                navigator: (BuildContext context){
-                                },
+                                navigator: (BuildContext context) {},
                               ),
                               const SizedBox(height: 16.0),
                             ],
@@ -279,7 +293,7 @@ class DiscussionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         navigator(context);
       },
       child: Material(
@@ -295,7 +309,8 @@ class DiscussionCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(16.0),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             child: Column(
               children: [
                 Row(
@@ -312,11 +327,14 @@ class DiscussionCard extends StatelessWidget {
                         children: [
                           Text(
                             title,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
                                   fontFamily: 'Inter',
                                   fontWeight: FontWeight.bold,
-                            ),
-                          ),                   
+                                ),
+                          ),
                         ],
                       ),
                     ),
@@ -337,17 +355,21 @@ class DiscussionCard extends StatelessWidget {
                       backgroundColor: typeColor,
                     ),
                     const SizedBox(width: 8.0),
-                    Row(children: [
-                      const Icon(Icons.chat_bubble_outline),
-                      const SizedBox(width: 8.0),
-                      Text("$replies replies")
-                    ],),
+                    Row(
+                      children: [
+                        const Icon(Icons.chat_bubble_outline),
+                        const SizedBox(width: 8.0),
+                        Text("$replies replies")
+                      ],
+                    ),
                     const SizedBox(width: 16.0),
-                    Row(children: [
-                      const Icon(Icons.favorite_border),
-                      const SizedBox(width: 8.0),
-                      Text("$likes likes")
-                    ],),
+                    Row(
+                      children: [
+                        const Icon(Icons.favorite_border),
+                        const SizedBox(width: 8.0),
+                        Text("$likes likes")
+                      ],
+                    ),
                   ],
                 ),
               ],
@@ -385,4 +407,3 @@ class TopicChip extends StatelessWidget {
     );
   }
 }
-

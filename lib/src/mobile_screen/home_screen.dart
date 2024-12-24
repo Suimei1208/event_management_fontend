@@ -1,10 +1,13 @@
+// ignore_for_file: unnecessary_null_comparison
+
+import 'package:event_management/src/mobile_screen/user_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
-// import 'package:event_management/src/service/logger_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:event_management/src/mobile_screen/profile.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';
@@ -22,27 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late List<Event> events = [];
   int _currentIndex = 0;
 
-  void _onItemTapped(int index) {
-    String routeName1 = '/home';
-    switch (index) {
-      case 0:
-        routeName1 = '/home';
-        break;
-      case 1:
-        // routeName = '/events'; // Trang Events
-        break;
-      case 2:
-        routeName1 = '/forum'; // Trang Forum
-        break;
-      case 3:
-        routeName1 = '/profile'; // Trang Profile
-        break;
-      default:
-        routeName1 = '/home';
-    }
-    Navigator.pushReplacementNamed(context, routeName1);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -56,11 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       events = listEvents;
     });
-    // LoggerService.logger.e(events.length);
+  }
 
-    // for (var event in events) {
-    //   LoggerService.logger.e(event);
-    // }
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
@@ -73,48 +56,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final Duration timeUntilNextEvent =
         nextEvent != null ? nextEvent.startDate.difference(now) : Duration.zero;
 
-    return Scaffold(
-      // backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        // backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-        title: const Text(
-          "Welcome Back",
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Row(
-              children: [
-                Text(
-                  userName,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                CircleAvatar(
-                  backgroundImage: NetworkImage(userProfileUrl),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
+    final List<Widget> screens = [
+      // Home Screen
+      SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Text(userName,
-              //     style: const TextStyle(
-              //         fontSize: 20,
-              //         fontWeight: FontWeight.bold,
-              //         color: Colors.blue)),
-              // const SizedBox(height: 20),
               Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
@@ -167,6 +116,61 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+      const UserEvents(),
+      const ProfileWidget(),
+      const ProfileWidget(),
+    ];
+
+    return Scaffold(
+      appBar: _currentIndex == 0
+          ? AppBar(
+              elevation: 0,
+              centerTitle: false,
+              title: const Text("Welcome Back"),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 16.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        userName,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      StreamBuilder<User?>(
+                        stream: FirebaseAuth.instance.userChanges(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.active) {
+                            final user = snapshot.data;
+                            final photoURL = user?.photoURL;
+                            return CircleAvatar(
+                              radius: 20,
+                              backgroundImage: (photoURL != null)
+                                  ? NetworkImage(photoURL)
+                                  : null,
+                              child: (photoURL == null)
+                                  ? const Icon(Icons.person, size: 20)
+                                  : null,
+                            );
+                          }
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )
+          : null,
+      body: IndexedStack(
+        index: _currentIndex,
+        children: screens,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
@@ -175,12 +179,16 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-          _onItemTapped(index);
-        },
+        onTap: _onItemTapped,
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[900]
+            : Colors.white,
+        selectedItemColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.tealAccent
+            : Colors.blue,
+        unselectedItemColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey
+            : Colors.black54,
       ),
     );
   }

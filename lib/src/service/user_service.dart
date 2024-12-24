@@ -96,7 +96,6 @@ Future<List<Map<String, dynamic>>> searchUser(String name) async {
       final jsonData = jsonDecode(response.body);
 
       if (jsonData['data'] == null) {
-        LoggerService.logger.e('No data available');
         return [];
       }
 
@@ -114,5 +113,52 @@ Future<List<Map<String, dynamic>>> searchUser(String name) async {
   } catch (e) {
     LoggerService.logger.e("Error occurred: $e");
     throw Exception("Error occurred: $e");
+  }
+}
+
+Future<Map<String, dynamic>> getUserData(String userId) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/user-services/api/Users/GetUserById?userId=$userId'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      if (responseData['success'] == true) {
+        final Map<String, dynamic> user = responseData['data'];
+
+        return {
+          'name': user['name'] ?? 'Unknown',
+          'role': user['role'] ?? 'Unknown',
+          'photoUrl': user['avtUrl'] ??
+              'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png',
+        };
+      } else {
+        throw Exception(responseData['message'] ?? 'Failed to fetch user data');
+      }
+    } else {
+      LoggerService.logger
+          .e('HTTP error: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to fetch user data');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Error fetching user data: $e');
+    return {
+      'name': 'Unknown',
+      'role': 'Unknown',
+      'photoUrl': 'default-avatar-url',
+    };
   }
 }

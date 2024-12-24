@@ -46,3 +46,29 @@ Future<void> addParticipant(
     LoggerService.logger.w('Failed to add participant: $e');
   }
 }
+
+Future<List<Map<String, dynamic>>> fetchParticipants(int eventId) async {
+  try {
+    final response = await http.get(
+      Uri.parse('${Config.baseUrl}/event-service/$eventId'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // Parse the response body to get participants
+      final responseData = json.decode(response.body);
+      List<Map<String, dynamic>> participants =
+          List<Map<String, dynamic>>.from(responseData['data']['participants']);
+      LoggerService.logger.i('Fetched participants: $participants');
+      return participants; // Return the list of participants
+    } else {
+      throw Exception('Failed to fetch participants: ${response.body}');
+    }
+  } catch (e) {
+    // Log the error and return an empty list in case of failure
+    LoggerService.logger.w('Failed to fetch participants: $e');
+    return [];
+  }
+}

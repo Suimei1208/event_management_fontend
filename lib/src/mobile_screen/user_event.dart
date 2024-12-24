@@ -34,7 +34,7 @@ class _UserEventsState extends State<UserEvents> {
 
   Future<void> _navigateToCreateEvent(BuildContext context) async {
     await Navigator.pushNamed(context, CreateEvent.routeName);
-    _loadEvents(); // Reload events after returning from the create event page
+    _loadEvents();
   }
 
   @override
@@ -162,7 +162,6 @@ class EventCard extends StatelessWidget {
 
   const EventCard({super.key, required this.event, required this.loadEvents});
 
-  // Method to get status colors based on status
   Color _getStatusColor(String status) {
     switch (status) {
       case 'Upcoming':
@@ -213,14 +212,12 @@ class EventCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: InkWell(
         onTap: () {
-          LoggerService.logger.e("button press: ${event.id}");
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => UpdateEvent(eventId: event.id!),
             ),
           );
-          LoggerService.logger.e("Pass EvenId: ${event.id}");
         },
         child: Material(
           color: Colors.transparent,

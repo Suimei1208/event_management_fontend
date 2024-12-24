@@ -27,20 +27,41 @@ class EventWithParticipants {
 
   factory EventWithParticipants.fromJson(Map<String, dynamic> json) {
     return EventWithParticipants(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
-      location: json['location'],
-      targetAudience: json['targetAudience'],
-      status: json['status'],
-      type: json['type'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? 'No name available',
+      description: json['description'] ?? 'No description available',
+      startDate: json['startDate'] != null
+          ? DateTime.parse(json['startDate'])
+          : DateTime.now(),
+      endDate: json['endDate'] != null
+          ? DateTime.parse(json['endDate'])
+          : DateTime.now(),
+      location: json['location'] ?? 'No location available',
+      targetAudience: json['targetAudience'] ?? 'No target audience available',
+      status: json['status'] ?? 'Unknown',
+      type: json['type'] ?? 'Unknown',
       banner: json['banner'],
-      participants: (json['participants'] as List<dynamic>)
-          .map((p) => Participant.fromJson(p))
-          .toList(),
+      participants: (json['participants'] as List<dynamic>?)
+              ?.map((p) => Participant.fromJson(p))
+              .toList() ??
+          [],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate.toIso8601String(),
+      'location': location,
+      'targetAudience': targetAudience,
+      'status': status,
+      'type': type,
+      'banner': banner,
+      'participants': participants.map((p) => p.toJson()).toList(),
+    };
   }
 }
 
@@ -63,12 +84,25 @@ class Participant {
 
   factory Participant.fromJson(Map<String, dynamic> json) {
     return Participant(
-      id: json['id'],
-      userId: json['userId'],
-      eventId: json['eventId'],
-      registrationDate: DateTime.parse(json['registrationDate']),
-      status: json['status'],
-      role: json['role'],
+      id: json['id'] ?? 0,
+      userId: json['userId'] ?? 'Unknown',
+      eventId: json['eventId'] ?? 0,
+      registrationDate: json['registrationDate'] != null
+          ? DateTime.parse(json['registrationDate'])
+          : DateTime.now(),
+      status: json['status'] ?? 'Unknown',
+      role: json['role'] ?? 'Unknown',
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'eventId': eventId,
+      'registrationDate': registrationDate.toIso8601String(),
+      'status': status,
+      'role': role,
+    };
   }
 }

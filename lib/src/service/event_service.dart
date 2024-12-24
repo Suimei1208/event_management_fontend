@@ -242,7 +242,6 @@ Future<void> updateEvent(Event event, BuildContext context) async {
       },
       body: json.encode(event.toJson()),
     );
-
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['success'] == true) {
@@ -261,7 +260,7 @@ Future<void> updateEvent(Event event, BuildContext context) async {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to update event.')),
       );
-      LoggerService.logger.w('HTTP error: ${response.statusCode}');
+      LoggerService.logger.w('HTTP error: ${response.body}');
     }
   } catch (error) {
     LoggerService.logger.w('Error: $error');
@@ -273,16 +272,16 @@ Future<void> updateEvent(Event event, BuildContext context) async {
 
 Future<EventWithParticipants> fetchEventWithParticipantsById(int id) async {
   try {
-    // Get the currently logged-in user
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception('No user logged in');
     }
 
-    // Get the user's ID token for authentication
     String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
 
-    // Make an HTTP GET request to fetch event details by ID
     final response = await http.get(
       Uri.parse('${Config.baseUrl}/event-service/event/$id'),
       headers: {
@@ -290,11 +289,9 @@ Future<EventWithParticipants> fetchEventWithParticipantsById(int id) async {
       },
     );
 
-    // Check if the request was successful
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = json.decode(response.body);
 
-      // Parse the event data from the response
       if (responseData['success'] == true) {
         return EventWithParticipants.fromJson(responseData['data']);
       } else {
@@ -302,17 +299,14 @@ Future<EventWithParticipants> fetchEventWithParticipantsById(int id) async {
             responseData['message'] ?? 'Failed to fetch event data');
       }
     } else {
-      // Log and throw an error if the HTTP request fails
       LoggerService.logger.w(
           'Failed to fetch event by ID: ${response.statusCode} ${response.body}');
       throw Exception('Failed to fetch event by ID');
     }
   } catch (e) {
-    LoggerService.logger.w('Error: $e');
     throw Exception('Failed to fetch event by ID');
   }
 }
-
 
 Future<List<Event>> fetchEventById(String id) async {
   try {
@@ -337,8 +331,6 @@ Future<List<Event>> fetchEventById(String id) async {
         throw Exception('Failed to fetch user role');
       }
     } else {
-      LoggerService.logger.w(
-          'Failed to fetch user role: ${responseRole.statusCode} ${responseRole.body}');
       throw Exception('Failed to fetch user role');
     }
 
@@ -358,13 +350,99 @@ Future<List<Event>> fetchEventById(String id) async {
           .toList();
       return events;
     } else {
-      LoggerService.logger.w(
-          'Failed to fetch event by ID: ${response.statusCode} ${response.body}');
       throw Exception('Failed to fetch event by ID');
     }
   } catch (e) {
-    LoggerService.logger.w('Error: $e');
     throw Exception('Failed to fetch event by ID');
   }
 }
 
+Future<void> addEventToSchedule(
+    int eventId, Map<String, dynamic> newEvent) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  try {
+    final response = await http.post(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/event/$eventId/create-schedule'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(newEvent),
+    );
+
+    if (response.statusCode != 200) {
+      LoggerService.logger.e('Failed to add event: ${response.body}');
+      throw Exception('Failed to add event');
+    }
+  } catch (error, stackTrace) {
+    LoggerService.logger.e('Error adding event $error, $stackTrace');
+    rethrow;
+  }
+}
+
+Future<void> updateEventInSchedule(
+    int eventId, Map<String, dynamic> updatedEvent) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  try {
+    final response = await http.put(
+      Uri.parse('${Config.baseUrl}/event/$eventId/schedule'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(updatedEvent),
+    );
+    if (response.statusCode != 200) {
+      LoggerService.logger.e('Failed to update event ${response.body}');
+      throw Exception('Failed to update event');
+    }
+  } catch (error, stackTrace) {
+    LoggerService.logger.e('Error adding event $error, $stackTrace');
+    rethrow;
+  }
+}
+
+Future<List<Map<String, dynamic>>> fetchSchedulesForEvent(int eventId) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  try {
+    final response = await http.get(
+        Uri.parse('${Config.baseUrl}/event-service/event/$eventId/schedules'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+          'Content-Type': 'application/json',
+        });
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+
+      if (responseBody['success'] == true) {
+        return List<Map<String, dynamic>>.from(responseBody['data']);
+      } else {
+        throw Exception(responseBody['message'] ?? 'Failed to fetch schedules');
+      }
+    } else {
+      throw Exception('Failed to fetch schedules: ${response.reasonPhrase}');
+    }
+  } catch (e) {
+    throw Exception('Error fetching schedules: $e');
+  }
+}
