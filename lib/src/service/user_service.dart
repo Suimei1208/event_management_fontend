@@ -44,6 +44,36 @@ Future<Map<String, dynamic>> getUserDetails() async {
   }
 }
 
+// ignore: non_constant_identifier_names
+Future<String> GetRoleUser() async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      String? idToken = await user.getIdToken();
+      final response = await http.get(
+        Uri.parse(
+            '${Config.baseUrl}/user-services/api/Users/ProfileData?id=$idToken'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data'];
+        return data['role'];
+      } else {
+        throw Exception(
+            'Failed to load user data, ${response.statusCode}, id: $idToken');
+      }
+    } else {
+      throw Exception('No user logged in');
+    }
+  } catch (e) {
+    rethrow;
+  }
+}
+
 Future<void> updateUserProfile(BuildContext context, String newName,
     String newPhone, String _uploadedImageUrl) async {
   try {
@@ -66,7 +96,7 @@ Future<void> updateUserProfile(BuildContext context, String newName,
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Faile')),
+          const SnackBar(content: Text('Faled')),
         );
       }
     } else {

@@ -1,5 +1,5 @@
 import 'package:event_management/src/mobile_screen/create_event.dart';
-import 'package:event_management/src/mobile_screen/update_event.dart';
+import 'package:event_management/src/mobile_screen/detail_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -215,7 +215,7 @@ class EventCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UpdateEvent(eventId: event.id!),
+              builder: (context) => EventDetailsPage(event: event),
             ),
           );
         },

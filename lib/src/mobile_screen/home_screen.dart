@@ -1,9 +1,12 @@
 // ignore_for_file: unnecessary_null_comparison
-
+import 'package:event_management/src/mobile_screen/detail_event.dart';
+import 'package:event_management/src/mobile_screen/forum_screen.dart';
+import 'package:event_management/src/mobile_screen/register_events.dart';
 import 'package:event_management/src/mobile_screen/user_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late String userName;
   late String userProfileUrl;
   late List<Event> events = [];
+  late String _role = "";
   int _currentIndex = 0;
 
   @override
@@ -35,8 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> fetchEvents() async {
     List<Event> listEvents = await fetchEventById(user!.uid);
+    String role = await GetRoleUser();
     setState(() {
       events = listEvents;
+      _role = role;
     });
   }
 
@@ -116,8 +122,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      const UserEvents(),
-      const ProfileWidget(),
+      if (_role == 'Admin' || _role == 'Organizer') const UserEvents(),
+      const EventRegisterScreen(),
+      CommunityForumScreen(),
+      // const EventDetailsPage(),
       const ProfileWidget(),
     ];
 
@@ -172,11 +180,17 @@ class _HomeScreenState extends State<HomeScreen> {
         children: screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.event), label: "Events"),
-          BottomNavigationBarItem(icon: Icon(Icons.forum), label: "Forum"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        items: [
+          const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          if (_role == 'Admin' || _role == 'Organizer')
+            const BottomNavigationBarItem(
+                icon: Icon(Icons.event), label: "Manage Events"),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.event), label: "Register Events"),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.forum), label: "Forum"),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.person), label: "Profile"),
         ],
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
@@ -199,6 +213,12 @@ class _HomeScreenState extends State<HomeScreen> {
         InkWell(
           onTap: () {
             LoggerService.logger.i("Event clicked ${event.id}");
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EventDetailsPage(event: event),
+              ),
+            );
           },
           child: Card(
             shape:
@@ -233,12 +253,25 @@ class _HomeScreenState extends State<HomeScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Icon(Icons.location_on),
-                            Text(
-                              event.location,
-                              style: const TextStyle(color: Colors.grey),
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on),
+                                Text(
+                                  event.location,
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                              ],
                             ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    LoggerService.logger
+                                        .i("Event clicked ticket ${event.id}");
+                                  });
+                                },
+                                child: const Text('View your ticket'))
                           ],
                         ),
                       ],
