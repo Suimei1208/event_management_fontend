@@ -1187,6 +1187,7 @@ class _UpdateEventState extends State<UpdateEvent> {
                                 MaterialPageRoute(
                                     builder: (context) => SchedulesWidget(
                                           eventId: widget.eventId,
+                                          userRole: 'Organizer',
                                         )),
                               );
                             },
