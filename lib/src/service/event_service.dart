@@ -398,7 +398,7 @@ Future<void> updateEventInSchedule(
   String? idToken = await user.getIdToken();
   try {
     final response = await http.put(
-      Uri.parse('${Config.baseUrl}/event/$eventId/schedule'),
+      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/schedules'),
       headers: {
         'Authorization': 'Bearer $idToken',
         'Content-Type': 'application/json',
@@ -406,11 +406,12 @@ Future<void> updateEventInSchedule(
       body: json.encode(updatedEvent),
     );
     if (response.statusCode != 200) {
-      LoggerService.logger.e('Failed to update event ${response.body}');
+      LoggerService.logger
+          .e('Failed to update schedule: ${response.statusCode}');
       throw Exception('Failed to update event');
     }
   } catch (error, stackTrace) {
-    LoggerService.logger.e('Error adding event $error, $stackTrace');
+    LoggerService.logger.e('Error adding schedule: $error, $stackTrace');
     rethrow;
   }
 }
@@ -444,5 +445,35 @@ Future<List<Map<String, dynamic>>> fetchSchedulesForEvent(int eventId) async {
     }
   } catch (e) {
     throw Exception('Error fetching schedules: $e');
+  }
+}
+
+Future<void> deleteSchedule(int scheduleId) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  try {
+    final response = await http.delete(
+      Uri.parse('${Config.baseUrl}/event-service/schedule/$scheduleId'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      LoggerService.logger
+          .e('Failed to delete schedule: ${response.statusCode}');
+      throw Exception('Failed to delete schedule');
+    }
+
+    LoggerService.logger.i('Schedule deleted successfully');
+  } catch (error, stackTrace) {
+    LoggerService.logger.e('Error deleting schedule: $error, $stackTrace');
+    rethrow;
   }
 }

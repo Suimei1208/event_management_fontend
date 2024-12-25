@@ -10,7 +10,9 @@ import 'package:intl/intl.dart';
 
 class SchedulesWidget extends StatefulWidget {
   final int eventId;
-  const SchedulesWidget({super.key, required this.eventId});
+  final String userRole;
+  const SchedulesWidget(
+      {super.key, required this.eventId, required this.userRole});
 
   @override
   State<SchedulesWidget> createState() => _SchedulesWidgetState();
@@ -195,17 +197,33 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
   String _combineDateTime(String date, String time) {
     if (date.isNotEmpty && time.isNotEmpty) {
       final dateParts = date.split('-');
-      final timeParts = time.split(':');
 
-      DateTime dateTime = DateTime(
-        int.parse(dateParts[0]),
-        int.parse(dateParts[1]),
-        int.parse(dateParts[2]),
-        int.parse(timeParts[0]),
-        int.parse(timeParts[1]),
-      );
+      try {
+        DateTime parsedTime;
+        if (time.contains('AM') || time.contains('PM')) {
+          parsedTime = DateFormat.jm().parse(time);
+        } else {
+          final timeParts = time.split(':');
+          parsedTime = DateTime(
+            0,
+            1,
+            1,
+            int.parse(timeParts[0]),
+            int.parse(timeParts[1]),
+          );
+        }
+        DateTime dateTime = DateTime(
+          int.parse(dateParts[0]),
+          int.parse(dateParts[1]),
+          int.parse(dateParts[2]),
+          parsedTime.hour,
+          parsedTime.minute,
+        );
 
-      return dateTime.toIso8601String();
+        return dateTime.toIso8601String();
+      } catch (e) {
+        throw Exception('Invalid date or time format: $e');
+      }
     } else {
       throw Exception('Invalid date or time');
     }
@@ -346,6 +364,27 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                               ),
                             ),
                           ),
+                          if (widget.userRole != 'Guest')
+                            PopupMenuButton<String>(
+                              onSelected: (value) async {
+                                if (value == 'edit') {
+                                  _editEvent(schedule);
+                                } else if (value == 'delete') {
+                                  await deleteSchedule(schedule['id']);
+                                  _loadSchedules();
+                                }
+                              },
+                              itemBuilder: (BuildContext context) => [
+                                const PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text('Edit'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text('Delete'),
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     ],
@@ -356,11 +395,13 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addNewEvent,
-        backgroundColor: Colors.purple,
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: widget.userRole != 'Guest'
+          ? FloatingActionButton(
+              onPressed: _addNewEvent,
+              backgroundColor: Colors.purple,
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
@@ -378,5 +419,128 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
       Colors.green,
     ];
     return colors[index % colors.length];
+  }
+
+  void _editEvent(Map<String, dynamic> schedule) {
+    final TextEditingController timeController = TextEditingController(
+        text: DateFormat('h:mm a').format(DateTime.parse(schedule['time'])));
+    final TextEditingController titleController =
+        TextEditingController(text: schedule['title']);
+    final TextEditingController locationController =
+        TextEditingController(text: schedule['location']);
+    DateTime? chosenDate = DateTime.parse(schedule['time']);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Schedule'),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: chosenDate!,
+                        firstDate: eventStartDate,
+                        lastDate: eventEndDate,
+                      );
+                      if (pickedDate != null) {
+                        setState(() {
+                          chosenDate = pickedDate;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        DateFormat('dd/MM/yyyy').format(chosenDate!),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () async {
+                      final TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.fromDateTime(chosenDate!),
+                      );
+                      if (pickedTime != null) {
+                        setState(() {
+                          timeController.text = pickedTime.format(context);
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        timeController.text,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: titleController,
+                    decoration: const InputDecoration(labelText: 'Title'),
+                  ),
+                  TextField(
+                    controller: locationController,
+                    decoration: const InputDecoration(labelText: 'Location'),
+                  ),
+                ],
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                if (timeController.text.isNotEmpty &&
+                    titleController.text.isNotEmpty &&
+                    locationController.text.isNotEmpty) {
+                  try {
+                    final date = DateFormat('yyyy-MM-dd').format(chosenDate!);
+                    final combinedDateTime =
+                        _combineDateTime(date, timeController.text);
+
+                    final updatedEvent = {
+                      'time': combinedDateTime,
+                      'title': titleController.text.trim(),
+                      'location': locationController.text.trim(),
+                    };
+
+                    await updateEventInSchedule(schedule['id'], updatedEvent);
+                    await _loadSchedules(); // Refresh schedules
+                    Navigator.pop(context);
+                  } catch (e) {
+                    LoggerService.logger.e('Error updating event: $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Failed to update event')),
+                    );
+                  }
+                }
+              },
+              child: const Text('Save'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
