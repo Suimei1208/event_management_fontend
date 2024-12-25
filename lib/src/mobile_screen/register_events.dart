@@ -1,77 +1,48 @@
+import 'package:event_management/src/service/participants.dart';
 import 'package:flutter/material.dart';
+import 'package:event_management/src/service/event_service.dart';
 
-// Giao diện danh sách sự kiện
-class EventListScreen extends StatefulWidget {
-  const EventListScreen({super.key});
+class EventRegisterScreen extends StatefulWidget {
+  const EventRegisterScreen({super.key});
 
-  // ignore: non_constant_identifier_names
   static const routeName = "/register_events";
 
   @override
-  State<EventListScreen> createState() => _EventListScreenState();
+  State<EventRegisterScreen> createState() => _EventRegisterScreenState();
 }
 
-class _EventListScreenState extends State<EventListScreen> {
-  // Dữ liệu mẫu
-  final List<Map<String, dynamic>> events = [
-    {
-      "id": 1,
-      "name": "AI & Machine Learning Conference",
-      "description": "Conference about AI and ML",
-      "startDate": DateTime(2024, 3, 15),
-      "endDate": DateTime(2024, 3, 17),
-      "location": "Location A",
-      "status": "Approved", // Approved, Pending, Available
-      "user": {
-        "id": 101,
-        "name": "John Doe",
-        "avatar":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ25ltiIj_X-v_Td2kdh0MMm7UH-GMwo00Q-g&s",
-      },
-    },
-    {
-      "id": 2,
-      "name": "Web Development Workshop",
-      "description": "Learn modern web development",
-      "startDate": DateTime(2024, 3, 20),
-      "endDate": DateTime(2024, 3, 20),
-      "location": "Location B",
-      "status": "Available", // Approved, Pending, Available
-      "user": {
-        "id": 102,
-        "name": "Jane Smith",
-        "avatar":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ25ltiIj_X-v_Td2kdh0MMm7UH-GMwo00Q-g&s",
-      },
-    },
-    {
-      "id": 3,
-      "name": "Flutter Development Bootcamp",
-      "description": "Learn to build mobile apps with Flutter",
-      "startDate": DateTime(2024, 4, 10),
-      "endDate": DateTime(2024, 4, 12),
-      "location": "Location C",
-      "status": "Pending",
-      "user": {
-        "id": 103,
-        "name": "Alice Johnson",
-        "avatar":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ25ltiIj_X-v_Td2kdh0MMm7UH-GMwo00Q-g&s",
-      },
-    },
-  ];
+class _EventRegisterScreenState extends State<EventRegisterScreen> {
+  late final List<Map<String, dynamic>> events = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() {
+    fetchEventCanRegister().then((data) {
+      if (mounted) {
+        setState(() {
+          events.addAll(data);
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Events"),
+        title: const Text("Register Events"),
       ),
       body: ListView.builder(
         itemCount: events.length,
         itemBuilder: (context, index) {
           final event = events[index];
           final user = event["user"];
+          String? isRegistered =
+              event["isRegistered"]; // Get registration state per event
 
           return Padding(
             padding:
@@ -85,7 +56,6 @@ class _EventListScreenState extends State<EventListScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Tên sự kiện và trạng thái sự kiện
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -106,21 +76,17 @@ class _EventListScreenState extends State<EventListScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8.0, vertical: 4.0),
                           decoration: BoxDecoration(
-                            color: event["status"] == "Approved"
+                            color: event["status"] == "Upcoming"
                                 ? Colors.green[100]
-                                : event["status"] == "Pending"
-                                    ? Colors.orange[100]
-                                    : Colors.blue[100],
+                                : Colors.blue[100],
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           child: Text(
                             event["status"],
                             style: TextStyle(
-                              color: event["status"] == "Approved"
+                              color: event["status"] == "Upcoming"
                                   ? Colors.green
-                                  : event["status"] == "Pending"
-                                      ? Colors.orange
-                                      : Colors.blue,
+                                  : Colors.blue,
                               fontWeight: FontWeight.bold,
                               fontSize: 12.0,
                             ),
@@ -134,7 +100,7 @@ class _EventListScreenState extends State<EventListScreen> {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: NetworkImage(user["avatar"]),
+                          backgroundImage: NetworkImage(user["photoUrl"]),
                           radius: 16.0,
                         ),
                         const SizedBox(width: 8.0),
@@ -155,14 +121,14 @@ class _EventListScreenState extends State<EventListScreen> {
                         const Icon(Icons.calendar_today, size: 16.0),
                         const SizedBox(width: 4.0),
                         Text(
-                          "${event["startDate"].toLocal().toString().split(' ')[0]} to ${event["endDate"].toLocal().toString().split(' ')[0]}",
+                          "${_parseDate(event["startDate"])} to ${_parseDate(event["endDate"])}",
                           style: const TextStyle(fontSize: 14.0),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16.0),
 
-                    // Nút hành động
+                    // Nút hành động (Register/Unregister)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -179,11 +145,40 @@ class _EventListScreenState extends State<EventListScreen> {
                           child: const Text("View Details"),
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: isRegistered == "Approved"
+                              ? null // Vô hiệu hóa nút nếu trạng thái là "Approved"
+                              : () async {
+                                  if (isRegistered == null) {
+                                    await UserRegisterEvent(
+                                        event["id"].toString());
+                                  } else if (isRegistered == "Pending") {
+                                    await unregisterEvent(
+                                        event["id"].toString());
+                                  }
+                                  setState(() {
+                                    if (isRegistered == "Pending") {
+                                      event["isRegistered"] = null;
+                                    } else if (isRegistered == "Rejected") {
+                                    } else {
+                                      event["isRegistered"] = "Pending";
+                                    }
+                                  });
+                                },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
+                            backgroundColor: isRegistered == "Approved"
+                                ? Colors
+                                    .grey // Màu xám nếu trạng thái là "Approved" (disabled)
+                                : (isRegistered == "Pending"
+                                    ? Colors.green
+                                    : Colors.blue),
                           ),
-                          child: const Text("Register"),
+                          child: Text(
+                            isRegistered == "Approved"
+                                ? "Approved" // Nút hiển thị "Approved" và bị disable
+                                : (isRegistered == "Pending"
+                                    ? "Hủy đăng ký"
+                                    : "Đăng ký"),
+                          ),
                         ),
                       ],
                     ),
@@ -195,5 +190,18 @@ class _EventListScreenState extends State<EventListScreen> {
         },
       ),
     );
+  }
+
+  // Helper function to parse date and return formatted date string
+  String _parseDate(String date) {
+    try {
+      DateTime parsedDate = DateTime.parse(date);
+      return parsedDate
+          .toLocal()
+          .toString()
+          .split(' ')[0]; // returns the date in YYYY-MM-DD format
+    } catch (e) {
+      return "Invalid Date"; // Handle invalid date format
+    }
   }
 }

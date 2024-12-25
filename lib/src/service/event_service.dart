@@ -5,6 +5,8 @@ import 'package:event_management/config.dart';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/participants.dart';
+import 'package:event_management/src/service/user_service.dart';
 import 'package:event_management/widget/dialog_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -475,5 +477,62 @@ Future<void> deleteSchedule(int scheduleId) async {
   } catch (error, stackTrace) {
     LoggerService.logger.e('Error deleting schedule: $error, $stackTrace');
     rethrow;
+  }
+}
+
+Future<List<Map<String, dynamic>>> fetchEventCanRegister() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  try {
+    final response = await http.get(
+        Uri.parse('${Config.baseUrl}/event-service/event/can-register'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+        });
+
+    final isRegistered = await fetchStatusEventRegister(user.uid);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+
+      if (responseBody['success'] == true) {
+        List<Map<String, dynamic>> data =
+            List<Map<String, dynamic>>.from(responseBody['data']);
+        for (var i in data) {
+          final userData = await getUserData(i['idCreate']);
+          i['user'] = {
+            'name': userData['name'].toString(),
+            'role': userData['role'].toString(),
+            'photoUrl': userData['photoUrl'].toString(),
+          };
+          // i['isRegistered'] = "";
+          if (isRegistered.isNotEmpty) {
+            for (var user in isRegistered) {
+              // LoggerService.logger.e('${user['id']}');
+              // LoggerService.logger.e('event ${i['id']}');
+              if (user['id'].toString() == i['id'].toString()) {
+                i['isRegistered'] = user['status'];
+                // LoggerService.logger.e('event ${i['id']} = ${user['status']}');
+              }
+            }
+          }
+          // LoggerService.logger.e('$i');
+        }
+        return data;
+      } else {
+        throw Exception(responseBody['message'] ?? 'Failed to fetch schedules');
+      }
+    } else {
+      LoggerService.logger
+          .e('Failed to fetch schedules: ${response.reasonPhrase}');
+      throw Exception('Failed to fetch : ${response.reasonPhrase}');
+    }
+  } catch (e) {
+    throw Exception('$e');
   }
 }

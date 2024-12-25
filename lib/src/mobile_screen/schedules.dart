@@ -264,6 +264,8 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                           .textTheme
                           .headlineLarge
                           ?.copyWith(color: Colors.white),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -272,6 +274,8 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                           .textTheme
                           .bodyMedium
                           ?.copyWith(color: Colors.white),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       eventDate,
@@ -279,6 +283,8 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                           .textTheme
                           .headlineLarge
                           ?.copyWith(color: Colors.white),
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

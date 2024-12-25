@@ -5,6 +5,7 @@ import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/notification_service.dart';
 import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:flutter/material.dart';
@@ -289,6 +290,9 @@ class _UpdateEventState extends State<UpdateEvent> {
       );
 
       await updateEvent(updatedEvent, context);
+      await subscribeToTopic('event-${widget.eventId}');
+      await sendNotification('Event updated',
+          'Please check the updated event details', 'event-${widget.eventId}');
 
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(

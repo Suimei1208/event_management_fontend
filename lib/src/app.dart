@@ -3,9 +3,9 @@ import 'package:event_management/src/mobile_screen/edit_profile.dart';
 import 'package:event_management/src/mobile_screen/forgot_password.dart';
 import 'package:event_management/src/mobile_screen/home_screen.dart';
 import 'package:event_management/src/mobile_screen/register.dart';
-import 'package:event_management/src/mobile_screen/register_events.dart';
 import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:event_management/src/mobile_screen/user_event.dart';
+import 'package:event_management/src/service/notification_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/mobile_screen/language.dart';
@@ -18,7 +18,7 @@ import 'package:event_management/generated/l10n.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({
     super.key,
     required this.settingsController,
@@ -27,14 +27,27 @@ class MyApp extends StatelessWidget {
   final SettingsController settingsController;
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    setupFirebaseMessaging();
+
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: settingsController,
+      listenable: widget.settingsController,
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
           theme: ThemeData(textTheme: GoogleFonts.robotoSlabTextTheme()),
           restorationScopeId: 'app',
-          locale: settingsController.locale,
+          locale: widget.settingsController.locale,
           localizationsDelegates: const [
             S.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -49,7 +62,7 @@ class MyApp extends StatelessWidget {
               AppLocalizations.of(context)?.appTitle ?? 'Default Title',
           // theme: ThemeData(),
           darkTheme: ThemeData.dark(),
-          themeMode: settingsController.themeMode,
+          themeMode: widget.settingsController.themeMode,
           home: StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
@@ -71,7 +84,7 @@ class MyApp extends StatelessWidget {
                   switch (routeSettings.name) {
                     case '/language':
                       return LanguageSelectionPage(
-                          settingsController: settingsController);
+                          settingsController: widget.settingsController);
                     case LoginScreen.routeName:
                       return const LoginScreen();
                     case RoleSelectionScreen.routeName:
@@ -91,9 +104,6 @@ class MyApp extends StatelessWidget {
 
                     case HomeScreen.routeName:
                       return const HomeScreen();
-
-                    case EventListScreen.routeName:
-                      return const EventListScreen();
                     default:
                       return const LoginScreen();
                   }
