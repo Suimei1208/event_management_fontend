@@ -10,6 +10,7 @@ class Event {
   String banner;
   String status;
   String type;
+  int eventCode;
 
   Event({
     required this.id,
@@ -23,6 +24,7 @@ class Event {
     required this.banner,
     required this.status,
     required this.type,
+    this.eventCode = 0,
   });
 
   Map<String, dynamic> toJson() {
@@ -38,6 +40,7 @@ class Event {
       'banner': banner,
       'status': status,
       'type': type,
+      'eventCode': eventCode,
     };
   }
 
@@ -54,6 +57,7 @@ class Event {
       banner: json['banner'] ?? '',
       status: json['status'] ?? 'Pending',
       type: json['type'] ?? 'General',
+      eventCode: json['eventCode'] ?? 0,
     );
   }
   @override
