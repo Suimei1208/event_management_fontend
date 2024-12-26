@@ -1,12 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print, use_build_context_synchronously
-import 'package:event_management/src/mobile_screen/add_guest.dart';
-import 'package:event_management/src/mobile_screen/schedules.dart';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/notification_service.dart';
-import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -46,147 +43,6 @@ class _UpdateEventState extends State<UpdateEvent> {
       TextEditingController(); // End Date
   final TextEditingController endTimeController =
       TextEditingController(); // End Time
-
-  Widget _buildParticipantsList(List<Map<String, dynamic>> participants,
-      String title, BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 20),
-        Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Theme.of(context).dividerColor,
-              width: 1,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontFamily: 'Inter',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 30,
-                          ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.add,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 24,
-                      ),
-                      onPressed: () async {
-                        final selectedUsers = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => AddMembersPage(name: title),
-                          ),
-                        );
-                        if (selectedUsers != null) {
-                          setState(() {
-                            participants.addAll(selectedUsers);
-                          });
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                if (participants.isEmpty)
-                  const Center(
-                    child: Text('No participants added yet.'),
-                  )
-                else
-                  ...participants.map((participant) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Theme.of(context).dividerColor,
-                            width: 1,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundImage: participant['photoUrl'] !=
-                                            null &&
-                                        participant['photoUrl'].isNotEmpty
-                                    ? NetworkImage(participant['photoUrl'])
-                                    : const NetworkImage(
-                                        'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png'),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      participant['name']!,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge
-                                          ?.copyWith(
-                                            fontFamily: 'Inter',
-                                          ),
-                                    ),
-                                    Text(
-                                      participant['role']!,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(
-                                            fontFamily: 'Inter',
-                                            color: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.color,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.close,
-                                  color: Theme.of(context).colorScheme.error,
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  LoggerService.logger
-                                      .e('Remove member button pressed');
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-                const SizedBox(height: 12),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
 
   @override
   void initState() {
@@ -259,13 +115,6 @@ class _UpdateEventState extends State<UpdateEvent> {
 
   Future<void> _updateEvent() async {
     try {
-      if (speaker.isNotEmpty) {
-        await addParticipant(speaker, widget.eventId, "Speaker");
-      }
-      if (guest.isNotEmpty) {
-        await addParticipant(guest, widget.eventId, "Guest");
-      }
-
       String name = _textController1.text;
       String description = _textController2.text;
       String targetAudience = _textController3.text;
@@ -1097,8 +946,6 @@ class _UpdateEventState extends State<UpdateEvent> {
                             ),
                           ),
                         ),
-                        _buildParticipantsList(speaker, 'Speaker', context),
-                        _buildParticipantsList(guest, 'Guest', context),
                       ],
                     ),
                   ]),
@@ -1184,36 +1031,6 @@ class _UpdateEventState extends State<UpdateEvent> {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SchedulesWidget(
-                                          eventId: widget.eventId,
-                                          userRole: 'Organizer',
-                                        )),
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 12, horizontal: 24),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).primaryColor,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Setting Schedules',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                            ),
-                          ),
                         ],
                       )),
                   const SizedBox(height: 24),

@@ -5,14 +5,13 @@ import 'dart:convert';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class SchedulesWidget extends StatefulWidget {
   final int eventId;
-  final String userRole;
-  const SchedulesWidget(
-      {super.key, required this.eventId, required this.userRole});
+  const SchedulesWidget({super.key, required this.eventId});
 
   @override
   State<SchedulesWidget> createState() => _SchedulesWidgetState();
@@ -28,6 +27,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
   DateTime eventEndDate = DateTime.now();
   List<DateTime> eventDays = [];
   List<Map<String, dynamic>> schedules = [];
+  late String _role = "";
 
   @override
   void initState() {
@@ -37,6 +37,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
   }
 
   Future<void> _loadEventData() async {
+    _role = await GetRoleUser();
     EventWithParticipants event =
         await fetchEventWithParticipantsById(widget.eventId);
 
@@ -370,7 +371,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                               ),
                             ),
                           ),
-                          if (widget.userRole != 'Guest')
+                          if (_role == 'Organizer' || _role == "Admin")
                             PopupMenuButton<String>(
                               onSelected: (value) async {
                                 if (value == 'edit') {
@@ -401,7 +402,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
           ],
         ),
       ),
-      floatingActionButton: widget.userRole != 'Guest'
+      floatingActionButton: (_role == 'Organizer' || _role == "Admin")
           ? FloatingActionButton(
               onPressed: _addNewEvent,
               backgroundColor: Colors.purple,

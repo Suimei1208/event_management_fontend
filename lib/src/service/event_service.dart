@@ -247,9 +247,6 @@ Future<void> updateEvent(Event event, BuildContext context) async {
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       if (responseData['success'] == true) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Event updated successfully!')),
-        );
         LoggerService.logger.i('Event updated successfully');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -352,10 +349,10 @@ Future<List<Event>> fetchEventById(String id) async {
           .toList();
       return events;
     } else {
-      throw Exception('Failed to fetch event by ID');
+      throw Exception('Failed to fetch event by ID: ${response.body}');
     }
   } catch (e) {
-    throw Exception('Failed to fetch event by ID');
+    throw Exception('Failed to fetch event by ID: $e');
   }
 }
 
@@ -534,5 +531,178 @@ Future<List<Map<String, dynamic>>> fetchEventCanRegister() async {
     }
   } catch (e) {
     throw Exception('$e');
+  }
+}
+
+Future<void> deleteParticipantsFromEvent(
+    int eventId, int participantId, String role) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.delete(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/event/$eventId/participants/$participantId/role/$role'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      LoggerService.logger.i('Participant deleted successfully');
+    } else {
+      LoggerService.logger
+          .w('Failed to delete participant: ${response.statusCode}');
+      throw Exception('Failed to delete participant');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Error deleting participant: $e');
+  }
+}
+
+Future<List<Participant>> fetchParticipantsByEventIdAndRole(
+    int eventId, String role) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/event/$eventId/participants/$role'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 404) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData['success'] == true) {
+        List<dynamic> participantsJson = responseData['data'];
+        List<Participant> participants =
+            participantsJson.map((json) => Participant.fromJson(json)).toList();
+
+        for (var participant in participants) {
+          final userData = await getUserData(participant.userId);
+
+          participant.name = userData['name'];
+          participant.photoUrl = userData['photoUrl'];
+        }
+
+        return participants;
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Failed to fetch participants');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to fetch participants: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to fetch participants');
+    }
+  } catch (e) {
+    throw Exception('Failed to fetch participants');
+  }
+}
+
+Future<List<Participant>> getPendingParticipants(int id) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/event/$id/participants/pending'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 404) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData['success'] == true) {
+        List<dynamic> participantsJson = responseData['data'];
+        List<Participant> participants =
+            participantsJson.map((json) => Participant.fromJson(json)).toList();
+
+        for (var participant in participants) {
+          final userData = await getUserData(participant.userId);
+
+          participant.name = userData['name'];
+          participant.photoUrl = userData['photoUrl'];
+        }
+
+        return participants;
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Failed to fetch participants');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to fetch participants: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to fetch participants');
+    }
+  } catch (e) {
+    throw Exception('Failed to fetch participants');
+  }
+}
+
+Future<bool> approveParticipant(int eventId, int participantId) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.put(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/event/$eventId/participants/$participantId/approve'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData['success'] == true) {
+        return true;
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Failed to approve participant');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to approve participant: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to approve participant');
+    }
+  } catch (e) {
+    throw Exception('Failed to approve participant');
   }
 }
