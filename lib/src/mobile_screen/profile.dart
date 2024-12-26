@@ -1,6 +1,5 @@
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart';
-
 import 'package:event_management/widget/options_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -217,7 +216,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     icon: Icons.settings,
                     text: S.of(context).setting,
                     onTap: () {
-                      Navigator.pushNamed(context, '/user-events');
+                      Navigator.pushNamed(context, '/settings');
                     },
                   ),
                   OptionsWidget(

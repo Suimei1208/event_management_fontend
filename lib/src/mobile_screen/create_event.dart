@@ -845,21 +845,22 @@ class _CreateEventState extends State<CreateEvent> {
                       onPressed: () async {
                         LoggerService.logger.w('Button pressed ...');
                         Event event = Event(
-                            id: 0,
-                            name: _textController1.text.toString(),
-                            description: _textController2.text.toString(),
-                            targetAudience: _textController3.text.toString(),
-                            location: _textController4.text.toString(),
-                            type: choiceChipsValue!.toString(),
-                            startDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
-                                .parse(_combineDateTime(
-                                    dateController.text, timeController.text)),
-                            endDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
-                                .parse(_combineDateTime(endDateController.text,
-                                    endTimeController.text)),
-                            banner: "123456789",
-                            status: "Upcoming",
-                            idCreate: "");
+                          id: 0,
+                          name: _textController1.text.toString(),
+                          description: _textController2.text.toString(),
+                          targetAudience: _textController3.text.toString(),
+                          location: _textController4.text.toString(),
+                          type: choiceChipsValue!.toString(),
+                          startDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
+                              .parse(_combineDateTime(
+                                  dateController.text, timeController.text)),
+                          endDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS').parse(
+                              _combineDateTime(endDateController.text,
+                                  endTimeController.text)),
+                          banner: "123456789",
+                          status: "Upcoming",
+                          idCreate: "",
+                        );
                         LoggerService.logger.w(event.toJson());
                         await createEvent(event, context);
                         getIdEvent(event.name).then((id) async {

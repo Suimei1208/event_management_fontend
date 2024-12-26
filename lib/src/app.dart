@@ -6,6 +6,7 @@ import 'package:event_management/src/mobile_screen/register.dart';
 import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:event_management/src/mobile_screen/user_event.dart';
 import 'package:event_management/src/service/notification_service.dart';
+import 'package:event_management/src/settings/settings_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/mobile_screen/language.dart';
@@ -100,7 +101,10 @@ class _MyAppState extends State<MyApp> {
                       return const CreateEvent();
                     case UserEvents.routeName:
                       return const UserEvents();
-
+                    case SettingsView.routeName:
+                      return SettingsView(
+                        controller: widget.settingsController,
+                      );
                     case HomeScreen.routeName:
                       return const HomeScreen();
                     default:
