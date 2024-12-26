@@ -71,16 +71,15 @@ class Participant {
   final int eventId;
   final DateTime registrationDate;
   final String status;
-  final String role;
+  late final String role;
 
-  Participant({
-    required this.id,
-    required this.userId,
-    required this.eventId,
-    required this.registrationDate,
-    required this.status,
-    required this.role,
-  });
+  Participant(
+      {required this.id,
+      required this.userId,
+      required this.eventId,
+      required this.registrationDate,
+      required this.status,
+      required this.role});
 
   factory Participant.fromJson(Map<String, dynamic> json) {
     return Participant(
@@ -93,6 +92,31 @@ class Participant {
       status: json['status'] ?? 'Unknown',
       role: json['role'] ?? 'Unknown',
     );
+  }
+
+  String _name = 'Unknown';
+  String _photoUrl =
+      'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+
+  set name(String newName) {
+    if (newName.isNotEmpty) {
+      _name = newName;
+    } else {
+      _name = 'Unknown';
+    }
+  }
+
+  String get name => _name;
+
+  String get photoUrl => _photoUrl;
+
+  set photoUrl(String newUrl) {
+    if (newUrl.isNotEmpty) {
+      _photoUrl = newUrl;
+    } else {
+      _photoUrl =
+          'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+    }
   }
 
   Map<String, dynamic> toJson() {

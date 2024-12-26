@@ -1,105 +1,208 @@
+// ignore_for_file: use_build_context_synchronously
+import 'package:event_management/src/mobile_screen/add_guest.dart';
+import 'package:event_management/src/mobile_screen/request.dart';
+import 'package:event_management/src/mobile_screen/schedules.dart';
+import 'package:event_management/src/mobile_screen/update_event.dart';
+import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
+import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/participants.dart';
+import 'package:event_management/src/service/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-// ignore: must_be_immutable
-class EventDetailsPage extends StatelessWidget {
+class EventDetailsPage extends StatefulWidget {
   final Event event;
 
-  EventDetailsPage({super.key, required this.event});
+  const EventDetailsPage({super.key, required this.event});
 
+  @override
+  State<EventDetailsPage> createState() => _EventDetailsPageState();
+}
+
+class _EventDetailsPageState extends State<EventDetailsPage> {
   User? user = FirebaseAuth.instance.currentUser;
+  String? userRole;
+  String eventName = '';
+  String description = '';
+  String targetAudience = '';
+  String location = '';
+  String startDate = '';
+  String endDate = '';
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    setState(() {
+      eventName = '';
+      description = '';
+      targetAudience = '';
+      location = '';
+      startDate = '';
+      endDate = '';
+      isLoading = true;
+    });
+
+    await _fetchUserRole();
+    await _loadEventData();
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<void> _loadEventData() async {
+    try {
+      EventWithParticipants event =
+          await fetchEventWithParticipantsById(widget.event.id);
+      setState(() {
+        eventName = event.name;
+        description = event.description;
+        targetAudience = event.targetAudience;
+        location = event.location;
+        startDate =
+            "${DateFormat.jm().format(event.startDate)} - ${event.startDate.day}/${event.startDate.month}/${event.startDate.year}";
+        endDate =
+            "${DateFormat.jm().format(event.endDate)} - ${event.endDate.day}/${event.endDate.month}/${event.endDate.year}";
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Failed to load event data. Please try again.')),
+      );
+    }
+  }
+
+  Future<void> _fetchUserRole() async {
+    try {
+      userRole = await GetRoleUser();
+      setState(() {});
+    } catch (e) {
+      LoggerService.logger.e("Failed to fetch user role: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(event.name),
+        title: Text(eventName),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+        actions: [
+          if (userRole == "Organizer" || userRole == "Admin")
+            IconButton(
+              icon: const Icon(Icons.tune, color: Colors.black),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => _buildQuickActions(),
+                );
+              },
+            ),
+          IconButton(
+            icon:
+                const Icon(Icons.insert_invitation_sharp, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => RequestPage(id: widget.event.id)),
+              );
+            },
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Title and Date
-            Text(
-              event.name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(
-                  "${_formatDate(event.startDate)} - ${_formatDate(event.endDate)}",
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+      body: SafeArea(
+          child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Event Name: $eventName',
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Description: $description',
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Objective: $targetAudience',
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Location: $location',
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Start Date: $startDate',
+                    ),
+                    Text(
+                      'End Date: $endDate',
+                    ),
+                    const SizedBox(height: 24),
+                    _buildEventStats(),
+                    const SizedBox(height: 24),
+                    _buildFeaturedParticipant("Speaker"),
+                    const SizedBox(height: 8),
+                    _buildFeaturedParticipant("Guest"),
+                    const SizedBox(height: 24),
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SchedulesWidget(
+                                      eventId: widget.event.id,
+                                    )),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 32, vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          "View Full Schedule",
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.location_on, size: 16, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(event.location, style: const TextStyle(fontSize: 16)),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Description
-            Text(
-              event.description,
-              style: const TextStyle(fontSize: 16),
-            ),
-            if (event.idCreate == user?.uid) const SizedBox(height: 24),
-
-            // Quick Actions
-            _buildQuickActions(),
-
-            const SizedBox(height: 24),
-
-            // Event Stats
-            _buildEventStats(),
-
-            const SizedBox(height: 24),
-
-            // Featured Speakers
-            _buildFeaturedSpeakers(),
-
-            const SizedBox(height: 24),
-
-            // View Full Schedule Button
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  LoggerService.logger.i("View Full Schedule pressed");
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  "View Full Schedule",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+              ))),
+      floatingActionButton: userRole == "Organizer" || userRole == "Admin"
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          UpdateEvent(eventId: widget.event.id)),
+                );
+                _initializeData();
+              },
+              backgroundColor: const Color.fromARGB(255, 142, 106, 199),
+              child: const Icon(Icons.edit, size: 28),
+            )
+          : null,
     );
   }
 
-  // Widget: Quick Actions
   Widget _buildQuickActions() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -108,6 +211,7 @@ class EventDetailsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
             "Quick Actions",
@@ -117,14 +221,57 @@ class EventDetailsPage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildActionButton(Icons.person_add, "Add Guest", () {
-                LoggerService.logger.i("Add Guest pressed");
+              _buildActionButton(Icons.person_add, "Add Speaker", () async {
+                final newGuests = await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AddMembersPage(name: "Speakers"),
+                  ),
+                );
+
+                if (newGuests != null && newGuests.isNotEmpty) {
+                  await addParticipant(newGuests, widget.event.id, "Speaker");
+                  Navigator.of(context).pop();
+                  LoggerService.logger.i("Speaker added: $newGuests");
+                }
               }),
-              _buildActionButton(Icons.person, "Add Speaker", () {
-                LoggerService.logger.i("Add Speaker pressed");
+              _buildActionButton(Icons.person_add, "Add Guest", () async {
+                final newGuests = await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AddMembersPage(name: "Guests"),
+                  ),
+                );
+
+                if (newGuests != null && newGuests.isNotEmpty) {
+                  await addParticipant(newGuests, widget.event.id, "Guest");
+                  Navigator.of(context).pop();
+                  LoggerService.logger.i("Guests added: $newGuests");
+                }
               }),
               _buildActionButton(Icons.schedule, "Schedule", () {
-                LoggerService.logger.i("Schedule pressed");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          SchedulesWidget(eventId: widget.event.id)),
+                );
+              }),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildActionButton(Icons.edit, "Remove Speaker", () async {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => _buildEditGuest("Speaker"),
+                );
+              }),
+              _buildActionButton(Icons.edit, "Remove Guest", () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => _buildEditGuest("Guest"),
+                );
               }),
             ],
           ),
@@ -133,7 +280,77 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  // Widget: Event Stats
+  Widget _buildEditGuest(String role) {
+    return FutureBuilder<List<Participant>>(
+      future: fetchParticipantsByEventIdAndRole(widget.event.id, role),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(
+              child: Text('No guests available for this event.'));
+        } else if (snapshot.hasError) {
+          return Center(
+              child: Text('Failed to load guests: ${snapshot.error}'));
+        } else {
+          List<Participant> participants = snapshot.data!;
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: participants.length,
+            itemBuilder: (context, index) {
+              Participant guest = participants[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(guest.photoUrl),
+                  ),
+                  title: Text(guest.name),
+                  subtitle: Text(guest.role),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () async {
+                      bool confirmDelete = await showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text("Delete $role"),
+                          content: Text(
+                              'Are you sure you want to delete ${guest.name}?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(false);
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                await deleteParticipantsFromEvent(
+                                    widget.event.id, guest.id, role);
+                                Navigator.of(context).pop(true);
+                              },
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+                      if (confirmDelete) {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                        LoggerService.logger.i(
+                            '${guest.name} has been deleted from the event.');
+                      }
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+
   Widget _buildEventStats() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -161,32 +378,50 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  // Widget: Featured Speakers
-  Widget _buildFeaturedSpeakers() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Featured Speakers",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 16),
-        _buildSpeaker(
-          "Dr. Sarah Chen",
-          "AI Research Director, Tech Corp",
-          "https://via.placeholder.com/50",
-        ),
-        const SizedBox(height: 16),
-        _buildSpeaker(
-          "James Wilson",
-          "Blockchain Expert, CryptoFuture",
-          "https://via.placeholder.com/50",
-        ),
-      ],
+  Widget _buildFeaturedParticipant(String role) {
+    return FutureBuilder<List<Participant>>(
+      future: fetchParticipantsByEventIdAndRole(widget.event.id, role),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Featured ${role}s",
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              Text('No ${role}s available for this event.'),
+            ],
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Failed to load ${role}s: ${snapshot.error}'),
+          );
+        } else {
+          List<Participant> participants = snapshot.data!;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Featured ${role}s",
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              for (var participant in participants)
+                _buildSpeaker(
+                    participant.name, participant.role, participant.photoUrl),
+            ],
+          );
+        }
+      },
     );
   }
 
-  // Helper: Action Button
   Widget _buildActionButton(IconData icon, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -217,7 +452,6 @@ class EventDetailsPage extends StatelessWidget {
     );
   }
 
-  // Helper: Speaker Widget
   Widget _buildSpeaker(String name, String role, String imageUrl) {
     return Row(
       children: [
@@ -241,10 +475,5 @@ class EventDetailsPage extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  // Helper: Format Date
-  String _formatDate(DateTime date) {
-    return "${date.month}/${date.day}/${date.year}";
   }
 }

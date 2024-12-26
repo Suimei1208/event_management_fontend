@@ -1,5 +1,5 @@
 class Event {
-  int? id;
+  int id;
   String name;
   String idCreate;
   String description;
@@ -12,7 +12,7 @@ class Event {
   String type;
 
   Event({
-    this.id,
+    required this.id,
     required this.name,
     required this.idCreate,
     required this.description,
