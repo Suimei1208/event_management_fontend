@@ -150,6 +150,16 @@ class S {
     );
   }
 
+  /// `My Ticket`
+  String get myTicket {
+    return Intl.message(
+      'My Ticket',
+      name: 'myTicket',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `General`
   String get general {
     return Intl.message(

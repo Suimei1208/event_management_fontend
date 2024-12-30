@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_print
-import 'package:event_management/src/mobile_screen/add_guest.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/service/logger_service.dart';
 
@@ -61,17 +60,17 @@ class _GuestListState extends State<GuestList> {
                         size: 24,
                       ),
                       onPressed: () async {
-                        final selectedUsers = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                AddMembersPage(name: widget.title),
-                          ),
-                        );
-                        if (selectedUsers != null) {
-                          setState(() {
-                            members.addAll(selectedUsers);
-                          });
-                        }
+                        // final selectedUsers = await Navigator.of(context).push(
+                        //   MaterialPageRoute(
+                        //     builder: (context) =>
+                        //         AddMembersPage(name: widget.title),
+                        //   ),
+                        // );
+                        // if (selectedUsers != null) {
+                        //   setState(() {
+                        //     members.addAll(selectedUsers);
+                        //   });
+                        // }
                       },
                     ),
                   ],

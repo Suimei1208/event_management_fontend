@@ -152,7 +152,20 @@ Future<void> signInWithEmailPassword(
     );
 
     if (userCredential.user != null) {
-      final idToken = await userCredential.user?.getIdToken();
+      final User user = userCredential.user!;
+
+      // Check if the email is verified
+      if (!user.emailVerified) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Your email is not verified. Please verify your email before logging in.'),
+          ),
+        );
+        return;
+      }
+
+      final idToken = await user.getIdToken();
       final response = await http.get(
         Uri.parse(
             '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
@@ -262,6 +275,19 @@ Future<void> logout(BuildContext context) async {
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Error during logout: $e')),
+    );
+  }
+}
+
+Future<void> sendEmailVerification(BuildContext context) async {
+  final user = FirebaseAuth.instance.currentUser;
+
+  if (user != null && !user.emailVerified) {
+    await user.sendEmailVerification();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Verification email sent. Please check your inbox.'),
+      ),
     );
   }
 }

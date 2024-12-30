@@ -16,7 +16,6 @@ class RequestPage extends StatefulWidget {
 class _RequestPageState extends State<RequestPage> {
   Future<List<Participant>>? _pendingParticipants;
 
-  // Fetch participants when the page loads
   @override
   void initState() {
     super.initState();
@@ -25,17 +24,31 @@ class _RequestPageState extends State<RequestPage> {
 
   void _loadPendingParticipants() {
     setState(() {
-      _pendingParticipants = getPendingParticipants(widget.id);
+      _pendingParticipants = getStatusParticipants(widget.id, "Pending");
     });
   }
 
-  Future<void> _approveParticipant(int participantId) async {
-    bool isApproved = await approveParticipant(widget.id, participantId);
+  Future<void> _approveParticipant(int participantId, String userId) async {
+    bool isApproved =
+        await approveParticipant(widget.id, participantId, userId);
     if (isApproved) {
       _loadPendingParticipants();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to approve participant')),
+      );
+    }
+  }
+
+  Future<void> _approveAllParticipants() async {
+    if (_pendingParticipants != null) {
+      List<Participant> participants = await _pendingParticipants!;
+      for (var participant in participants) {
+        await approveParticipant(widget.id, participant.id, participant.userId);
+      }
+      _loadPendingParticipants();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All participants approved')),
       );
     }
   }
@@ -48,6 +61,13 @@ class _RequestPageState extends State<RequestPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.check),
+            onPressed: _approveAllParticipants,
+            tooltip: 'Approve All',
+          ),
+        ],
       ),
       body: FutureBuilder<List<Participant>>(
         future: _pendingParticipants,
@@ -78,7 +98,8 @@ class _RequestPageState extends State<RequestPage> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.check, color: Colors.green),
-                          onPressed: () => _approveParticipant(participant.id),
+                          onPressed: () => _approveParticipant(
+                              participant.id, participant.userId),
                         ),
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.red),

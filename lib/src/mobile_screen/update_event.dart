@@ -1,11 +1,11 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print, use_build_context_synchronously
-import 'package:event_management/src/models/event_with_participants.dart';
+import 'dart:io';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/notification_service.dart';
-import 'package:event_management/src/service/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class UpdateEvent extends StatefulWidget {
@@ -21,11 +21,12 @@ class UpdateEvent extends StatefulWidget {
 
 class _UpdateEventState extends State<UpdateEvent> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  List<Map<String, dynamic>> guest = [];
-  List<Map<String, dynamic>> speaker = [];
   String? choiceChipsValue;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+  File? _imageFile;
+  String _imageUrl = '';
+  bool _isLoading = false;
 
   final TextEditingController _textController1 =
       TextEditingController(); // Event Name
@@ -65,31 +66,7 @@ class _UpdateEventState extends State<UpdateEvent> {
 
   Future<void> _loadEventData() async {
     try {
-      EventWithParticipants event =
-          await fetchEventWithParticipantsById(widget.eventId);
-      List<Map<String, dynamic>> guestList = [];
-      List<Map<String, dynamic>> speakerList = [];
-
-      for (var participant in event.participants) {
-        final userData = await getUserData(participant.userId);
-
-        if (participant.role == 'Guest') {
-          guestList.add({
-            'userId': participant.userId,
-            'role': userData['role'],
-            'id': participant.id,
-            'name': userData['name'],
-            'photoUrl': userData['photoUrl'],
-          });
-        } else if (participant.role == 'Speaker') {
-          speakerList.add({
-            'userId': participant.userId,
-            'role': userData['role'],
-            'name': userData['name'],
-            'photoUrl': userData['photoUrl'],
-          });
-        }
-      }
+      Event event = await fetchEventByEventId(widget.eventId);
 
       setState(() {
         _textController1.text = event.name;
@@ -101,8 +78,8 @@ class _UpdateEventState extends State<UpdateEvent> {
         timeController.text = DateFormat('HH:mm').format(event.startDate);
         endDateController.text = DateFormat('yyyy-MM-dd').format(event.endDate);
         endTimeController.text = DateFormat('HH:mm').format(event.endDate);
-        guest = guestList;
-        speaker = speakerList;
+        _imageUrl =
+            '${event.banner}?updatedAt=${DateTime.now().millisecondsSinceEpoch}';
       });
     } catch (error) {
       LoggerService.logger.e('Failed to load event data: $error');
@@ -125,18 +102,19 @@ class _UpdateEventState extends State<UpdateEvent> {
           _combineDateTime(endDateController.text, endTimeController.text);
 
       final updatedEvent = Event(
-        id: widget.eventId,
-        name: name,
-        description: description,
-        targetAudience: targetAudience,
-        location: location,
-        type: choiceChipsValue!,
-        startDate: DateTime.parse(startDateTime),
-        endDate: DateTime.parse(endDateTime),
-        banner: '123456789',
-        status: 'Upcoming',
-        idCreate: '',
-      );
+          id: widget.eventId,
+          name: name,
+          description: description,
+          targetAudience: targetAudience,
+          location: location,
+          type: choiceChipsValue!,
+          startDate: DateTime.parse(startDateTime),
+          endDate: DateTime.parse(endDateTime),
+          banner: _imageUrl,
+          status: 'Upcoming',
+          idCreate: '',
+          access: false,
+          allowSelectSchedule: false);
 
       await updateEvent(updatedEvent, context);
       await subscribeToTopic('event-${widget.eventId}');
@@ -227,6 +205,41 @@ class _UpdateEventState extends State<UpdateEvent> {
       setState(() {
         endTimeController.text =
             "${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}:00";
+      });
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    if (_imageFile != null) {
+      try {
+        _isLoading = true;
+        String imageUrl =
+            await uploadImageEventToImageKit(_imageFile!, widget.eventId);
+        setState(() {
+          _imageUrl = imageUrl;
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Image uploaded successfully!')));
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to upload image: $e')));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select an image first')));
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    _isLoading = true;
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+        _isLoading = false;
       });
     }
   }
@@ -1032,6 +1045,80 @@ class _UpdateEventState extends State<UpdateEvent> {
                           ),
                           const SizedBox(height: 12),
                         ],
+                      )),
+                  Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                          width: 1,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            if (_imageFile != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(
+                                  _imageFile!,
+                                  height: 200,
+                                  width: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            const SizedBox(height: 20),
+                            if (_isLoading) const CircularProgressIndicator(),
+                            if (!_isLoading) ...[
+                              ElevatedButton(
+                                onPressed: _pickImage,
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                    horizontal: 20.0,
+                                  ),
+                                ),
+                                child: const Text('Pick Image'),
+                              ),
+                              const SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: _uploadImage,
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12.0,
+                                    horizontal: 20.0,
+                                  ),
+                                ),
+                                child: const Text('Save Image'),
+                              ),
+                            ],
+                            const SizedBox(height: 20),
+                            if (_imageUrl.isNotEmpty)
+                              Column(
+                                children: [
+                                  const Text(
+                                    'Uploaded Image URL:',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Image.network(
+                                      '$_imageUrl?updatedAt=${DateTime.now().millisecondsSinceEpoch}',
+                                      height: 200,
+                                      width: 200,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
                       )),
                   const SizedBox(height: 24),
                   SizedBox(

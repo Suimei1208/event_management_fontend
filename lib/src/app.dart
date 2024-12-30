@@ -2,6 +2,7 @@ import 'package:event_management/src/mobile_screen/create_event.dart';
 import 'package:event_management/src/mobile_screen/edit_profile.dart';
 import 'package:event_management/src/mobile_screen/forgot_password.dart';
 import 'package:event_management/src/mobile_screen/home_screen.dart';
+import 'package:event_management/src/mobile_screen/manage_ticket.dart';
 import 'package:event_management/src/mobile_screen/register.dart';
 import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:event_management/src/mobile_screen/user_event.dart';
@@ -101,6 +102,8 @@ class _MyAppState extends State<MyApp> {
                       return const CreateEvent();
                     case UserEvents.routeName:
                       return const UserEvents();
+                    case MyTicketsPage.routeName:
+                      return const MyTicketsPage();
                     case SettingsView.routeName:
                       return SettingsView(
                         controller: widget.settingsController,

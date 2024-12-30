@@ -33,6 +33,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
         "login": MessageLookupByLibrary.simpleMessage("Đăng nhập"),
         "logout": MessageLookupByLibrary.simpleMessage("Đăng xuất"),
+        "myTicket": MessageLookupByLibrary.simpleMessage("Vé của tôi"),
         "register_account":
             MessageLookupByLibrary.simpleMessage("Đăng ký tài khoản"),
         "setting": MessageLookupByLibrary.simpleMessage("Cài đặt"),

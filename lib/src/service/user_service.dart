@@ -1,6 +1,7 @@
-// ignore_for_file: use_build_context_synchronously, no_leading_underscores_for_local_identifiers
+// ignore_for_file: use_build_context_synchronously, no_leading_underscores_for_local_identifiers, non_constant_identifier_names
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:event_management/config.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -30,7 +31,6 @@ Future<Map<String, dynamic>> getUserDetails() async {
           'name': data['name'],
           'email': data['email'],
           'phone': data['phone'],
-          'role': data['role'],
         };
       } else {
         throw Exception(
@@ -44,8 +44,7 @@ Future<Map<String, dynamic>> getUserDetails() async {
   }
 }
 
-// ignore: non_constant_identifier_names
-Future<String> GetRoleUser() async {
+Future<String> GetNameUser() async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
 
@@ -61,7 +60,36 @@ Future<String> GetRoleUser() async {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data'];
-        return data['role'];
+        return data['name'];
+      } else {
+        throw Exception(
+            'Failed to load user data, ${response.statusCode}, id: $idToken');
+      }
+    } else {
+      throw Exception('No user logged in');
+    }
+  } catch (e) {
+    rethrow;
+  }
+}
+
+Future<String> GetIdUser() async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      String? idToken = await user.getIdToken();
+      final response = await http.get(
+        Uri.parse(
+            '${Config.baseUrl}/user-services/api/Users/ProfileData?id=$idToken'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)['data'];
+        return data['id'];
       } else {
         throw Exception(
             'Failed to load user data, ${response.statusCode}, id: $idToken');
@@ -188,7 +216,41 @@ Future<Map<String, dynamic>> getUserData(String userId) async {
     return {
       'name': 'Unknown',
       'role': 'Unknown',
-      'photoUrl': 'default-avatar-url',
+      'photoUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png',
     };
+  }
+}
+
+Future<String> uploadImageToImageKit(File imageFile) async {
+  const privateKey = 'private_F801T1Ot8g2c8BCrrN+7+y+Kvdc=';
+  final base64EncodedKey = base64Encode(utf8.encode('$privateKey:'));
+  User? user = FirebaseAuth.instance.currentUser;
+
+  final request = http.MultipartRequest(
+    'POST',
+    Uri.parse('https://upload.imagekit.io/api/v1/files/upload'),
+  );
+  request.headers['Authorization'] = 'Basic $base64EncodedKey';
+  request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+  request.fields['fileName'] = 'profile_pic_${user!.uid}.jpg';
+  request.fields['useUniqueFileName'] = 'false';
+  request.fields['folder'] = '/profile_pictures';
+
+  final response = await request.send();
+
+  if (response.statusCode == 200) {
+    final responseData = await response.stream.bytesToString();
+    final decodedData = json.decode(responseData);
+    final imageUrl = decodedData['url'];
+
+    LoggerService.logger.i("Image uploaded successfully. URL: $imageUrl");
+
+    return imageUrl;
+  } else {
+    final responseData = await response.stream.bytesToString();
+    LoggerService.logger
+        .e('Failed to upload image: ${response.statusCode}, $responseData');
+    throw Exception('Failed to upload image ${response.statusCode}');
   }
 }

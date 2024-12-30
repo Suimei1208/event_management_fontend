@@ -16,7 +16,6 @@ class ProfileWidget extends StatefulWidget {
 
 class _ProfileWidgetState extends State<ProfileWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  var role = '';
   User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
@@ -55,185 +54,174 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
             if (snapshot.hasData) {
               final userData = snapshot.data!;
-              role = userData['role'];
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(0, 1, 0, 0),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: brightness == Brightness.dark
-                            ? Colors.grey[850]
-                            : Colors.white,
-                        boxShadow: const [
-                          BoxShadow(
-                            blurRadius: 50,
-                            color: Color(0x33000000),
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 90,
-                              height: 90,
-                              decoration: BoxDecoration(
-                                color: brightness == Brightness.dark
-                                    ? Colors.grey[600]
-                                    : Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.grey,
-                                  width: 2,
-                                ),
-                              ),
-                              child: StreamBuilder<User?>(
-                                stream: FirebaseAuth.instance.userChanges(),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.active) {
-                                    final user = snapshot.data;
-                                    final photoURL = user?.photoURL;
-                                    return CircleAvatar(
-                                      radius: 60,
-                                      backgroundImage: (photoURL != null)
-                                          ? NetworkImage(photoURL)
-                                          : null,
-                                      child: (photoURL == null)
-                                          ? const Icon(Icons.person, size: 60)
-                                          : null,
-                                    );
-                                  }
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                },
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsetsDirectional.fromSTEB(
-                                  16, 0, 0, 0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    userData['name'] ?? 'Default',
-                                    style: TextStyle(
-                                      fontFamily: 'Inter Tight',
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0.0,
-                                      color: brightness == Brightness.dark
-                                          ? Colors.white
-                                          : Colors.black,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0, 4, 0, 0),
-                                    child: Text(
-                                      userData['email'] ?? 'default@gmail.com',
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontSize: 14,
-                                        color: brightness == Brightness.dark
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        const EdgeInsetsDirectional.fromSTEB(
-                                            0, 4, 0, 0),
-                                    child: Text(
-                                      'Role: ${userData['role'] ?? 'None'}',
-                                      style: TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontSize: 14,
-                                        color: brightness == Brightness.dark
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+              return SingleChildScrollView(
+                // Add SingleChildScrollView here
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsetsDirectional.fromSTEB(0, 1, 0, 0),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: brightness == Brightness.dark
+                              ? Colors.grey[850]
+                              : Colors.white,
+                          boxShadow: const [
+                            BoxShadow(
+                              blurRadius: 50,
+                              color: Color(0x33000000),
+                              offset: Offset(0, 1),
                             ),
                           ],
                         ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 90,
+                                height: 90,
+                                decoration: BoxDecoration(
+                                  color: brightness == Brightness.dark
+                                      ? Colors.grey[600]
+                                      : Colors.white,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.grey,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: StreamBuilder<User?>(
+                                  stream: FirebaseAuth.instance.userChanges(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.active) {
+                                      final user = snapshot.data;
+                                      final photoURL = user?.photoURL;
+                                      return CircleAvatar(
+                                        radius: 60,
+                                        backgroundImage: (photoURL != null)
+                                            ? NetworkImage(photoURL)
+                                            : null,
+                                        child: (photoURL == null)
+                                            ? const Icon(Icons.person, size: 60)
+                                            : null,
+                                      );
+                                    }
+                                    return const Center(
+                                        child: CircularProgressIndicator());
+                                  },
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsetsDirectional.fromSTEB(
+                                    16, 0, 0, 0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      userData['name'] ?? 'Default',
+                                      style: TextStyle(
+                                        fontFamily: 'Inter Tight',
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.0,
+                                        color: brightness == Brightness.dark
+                                            ? Colors.white
+                                            : Colors.black,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(
+                                              0, 4, 0, 0),
+                                      child: Text(
+                                        userData['email'] ??
+                                            'default@gmail.com',
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 14,
+                                          color: brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
-                    child: Text(
-                      S.of(context).account,
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 16,
-                        color: brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
+                      child: Text(
+                        S.of(context).account,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 16,
+                          color: brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-                  OptionsWidget(
-                    icon: Icons.account_circle_outlined,
-                    text: S.of(context).editProfile,
-                    onTap: () {
-                      Navigator.pushNamed(context, '/edit_profile');
-                    },
-                  ),
-                  if (role == "organizer")
                     OptionsWidget(
-                      icon: Icons.event_rounded,
-                      text: "Your events",
+                      icon: Icons.account_circle_outlined,
+                      text: S.of(context).editProfile,
                       onTap: () {
-                        Navigator.pushNamed(context, '/user-events');
+                        Navigator.pushNamed(context, '/edit_profile');
                       },
                     ),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
-                    child: Text(
-                      S.of(context).general,
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 16,
-                        color: brightness == Brightness.dark
-                            ? Colors.white
-                            : Colors.black,
+                    OptionsWidget(
+                      icon: Icons.confirmation_num,
+                      text: S.of(context).myTicket,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/my-ticket');
+                      },
+                    ),
+                    Padding(
+                      padding:
+                          const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
+                      child: Text(
+                        S.of(context).general,
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 16,
+                          color: brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black,
+                        ),
                       ),
                     ),
-                  ),
-                  OptionsWidget(
-                    icon: Icons.settings,
-                    text: S.of(context).setting,
-                    onTap: () {
-                      Navigator.pushNamed(context, '/settings');
-                    },
-                  ),
-                  OptionsWidget(
-                    icon: Icons.language,
-                    text: S.of(context).language,
-                    onTap: () {
-                      Navigator.pushNamed(context, '/language');
-                    },
-                  ),
-                  OptionsWidget(
-                    icon: Icons.logout,
-                    text: S.of(context).logout,
-                    onTap: () {
-                      logout(context);
-                    },
-                  ),
-                ],
+                    OptionsWidget(
+                      icon: Icons.settings,
+                      text: S.of(context).setting,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/settings');
+                      },
+                    ),
+                    OptionsWidget(
+                      icon: Icons.language,
+                      text: S.of(context).language,
+                      onTap: () {
+                        Navigator.pushNamed(context, '/language');
+                      },
+                    ),
+                    OptionsWidget(
+                      icon: Icons.logout,
+                      text: S.of(context).logout,
+                      onTap: () {
+                        logout(context);
+                      },
+                    ),
+                  ],
+                ),
               );
             }
 

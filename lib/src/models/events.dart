@@ -11,6 +11,8 @@ class Event {
   String status;
   String type;
   int eventCode;
+  bool access;
+  bool allowSelectSchedule;
 
   Event({
     required this.id,
@@ -24,6 +26,8 @@ class Event {
     required this.banner,
     required this.status,
     required this.type,
+    required this.access,
+    required this.allowSelectSchedule,
     this.eventCode = 0,
   });
 
@@ -40,6 +44,8 @@ class Event {
       'banner': banner,
       'status': status,
       'type': type,
+      'access': access,
+      'allowSelectSchedule': allowSelectSchedule,
       'eventCode': eventCode,
     };
   }
@@ -58,6 +64,8 @@ class Event {
       status: json['status'] ?? 'Pending',
       type: json['type'] ?? 'General',
       eventCode: json['eventCode'] ?? 0,
+      allowSelectSchedule: json['allowSelectSchedule'] ?? false,
+      access: json['acces'] ?? false,
     );
   }
   @override

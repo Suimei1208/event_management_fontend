@@ -39,7 +39,8 @@ Future<void> addParticipant(
     if (response.statusCode == 200) {
       LoggerService.logger.i('Participant added successfully.');
     } else {
-      throw Exception('Failed to add participant: ${response.body}');
+      throw Exception(
+          'Failed to add participant: ${response.body}, status: ${response.statusCode}');
     }
   } catch (e) {
     // Log lỗi nếu có
@@ -154,7 +155,6 @@ Future<void> unregisterEvent(String eventId) async {
     if (user == null) {
       throw Exception('No user logged in');
     }
-
 
     final response = await http.delete(
       Uri.parse(

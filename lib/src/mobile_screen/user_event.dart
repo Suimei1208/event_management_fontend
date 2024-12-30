@@ -325,7 +325,7 @@ class EventCard extends StatelessWidget {
                           size: 30,
                         ),
                         onPressed: () {
-                          DeleteEvent(event.id, context)
+                          deleteEvent(event.id, context)
                               .then((_) => loadEvents());
                           LoggerService.logger.e(event.id);
                         },

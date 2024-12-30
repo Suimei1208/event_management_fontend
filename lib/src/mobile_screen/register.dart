@@ -2,9 +2,9 @@
 import 'dart:convert';
 
 import 'package:event_management/config.dart';
+import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:http/http.dart' as http;
-import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -36,12 +36,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
       await userCredential.user
           ?.updateDisplayName(_usernameController.text.trim());
+      const String avatarUrl =
+          'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
+      await userCredential.user?.updatePhotoURL(avatarUrl);
 
-      const String avtarUrl =
-          'https://s3.getstickerpack.com/storage/uploads/sticker-pack/honkai-star-rail-hsr-then-wake-to-weep/sticker_2.png?d0ec19664277d77e2c85423a8d8f781d&d=200x200';
-      await userCredential.user?.updatePhotoURL(avtarUrl);
+      await sendEmailVerification(context);
 
       final idToken = await userCredential.user?.getIdToken();
 
@@ -55,10 +57,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       await _sendDataToBackend(data);
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const RoleSelectionScreen()),
-      );
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       debugPrint('Error during registration: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -234,7 +233,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
-                        // Add sign-up logic
                         await _registerWithEmailPassword(
                           context,
                         );
