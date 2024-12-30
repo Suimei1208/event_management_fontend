@@ -33,6 +33,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "language": MessageLookupByLibrary.simpleMessage("Language"),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
         "logout": MessageLookupByLibrary.simpleMessage("Logout"),
+        "myTicket": MessageLookupByLibrary.simpleMessage("My Ticket"),
         "register_account":
             MessageLookupByLibrary.simpleMessage("Register Account"),
         "setting": MessageLookupByLibrary.simpleMessage("Setting"),

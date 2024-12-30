@@ -1,6 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:event_management/src/mobile_screen/detail_event.dart';
+import 'package:event_management/src/models/events.dart';
+import 'package:event_management/src/service/event_service.dart';
+import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/participants.dart';
 import 'package:flutter/material.dart';
-import 'package:event_management/src/service/event_service.dart';
+import 'package:intl/intl.dart';
 
 class EventRegisterScreen extends StatefulWidget {
   const EventRegisterScreen({super.key});
@@ -12,22 +18,54 @@ class EventRegisterScreen extends StatefulWidget {
 }
 
 class _EventRegisterScreenState extends State<EventRegisterScreen> {
-  late final List<Map<String, dynamic>> events = [];
+  // Use a Future to load events dynamically
+  late Future<List<Map<String, dynamic>>> _eventsFuture;
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+    _eventsFuture = fetchEventCanRegister(); // Fetch events dynamically
   }
 
-  void fetchData() {
-    fetchEventCanRegister().then((data) {
-      if (mounted) {
-        setState(() {
-          events.addAll(data);
-        });
-      }
-    });
+  // Register user for an event
+  Future<void> _registerForEvent(String eventId) async {
+    try {
+      await UserRegisterEvent(eventId);
+      LoggerService.logger.i("Successfully registered for event: $eventId");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Successfully registered for the event")),
+      );
+      setState(() {
+        _eventsFuture =
+            fetchEventCanRegister(); // Reload events after registration
+      });
+    } catch (e) {
+      LoggerService.logger.e("Error registering for event: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to register for the event: $e")),
+      );
+    }
+  }
+
+  // Unregister user from an event
+  Future<void> _unregisterFromEvent(String eventId) async {
+    try {
+      await unregisterEvent(eventId);
+      LoggerService.logger.i("Successfully unregistered from event: $eventId");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("Successfully unregistered from the event")),
+      );
+      setState(() {
+        _eventsFuture =
+            fetchEventCanRegister(); // Reload events after unregistration
+      });
+    } catch (e) {
+      LoggerService.logger.e("Error unregistering from event: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to unregister from the event: $e")),
+      );
+    }
   }
 
   @override
@@ -36,172 +74,132 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
       appBar: AppBar(
         title: const Text("Register Events"),
       ),
-      body: ListView.builder(
-        itemCount: events.length,
-        itemBuilder: (context, index) {
-          final event = events[index];
-          final user = event["user"];
-          String? isRegistered =
-              event["isRegistered"]; // Get registration state per event
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _eventsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(
+                child: Text("No events available for registration"));
+          }
 
-          return Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            event["name"],
-                            style: const TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            softWrap: true,
-                            maxLines: 2,
-                          ),
-                        ),
-                        const SizedBox(width: 8.0),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 4.0),
-                          decoration: BoxDecoration(
-                            color: event["status"] == "Upcoming"
-                                ? Colors.green[100]
-                                : Colors.blue[100],
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          child: Text(
-                            event["status"],
-                            style: TextStyle(
-                              color: event["status"] == "Upcoming"
-                                  ? Colors.green
-                                  : Colors.blue,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12.0,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8.0),
+          final events = snapshot.data!;
 
-                    // Người dùng và avatar
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: NetworkImage(user["photoUrl"]),
-                          radius: 16.0,
-                        ),
-                        const SizedBox(width: 8.0),
-                        Text(
-                          user["name"],
-                          style: const TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8.0),
-
-                    // Ngày bắt đầu và kết thúc
-                    Row(
-                      children: [
-                        const Icon(Icons.calendar_today, size: 16.0),
-                        const SizedBox(width: 4.0),
-                        Text(
-                          "${_parseDate(event["startDate"])} to ${_parseDate(event["endDate"])}",
-                          style: const TextStyle(fontSize: 14.0),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16.0),
-
-                    // Nút hành động (Register/Unregister)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            // Xử lý logic View Details
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    "Viewing details for ${event["name"]}"),
-                              ),
-                            );
-                          },
-                          child: const Text("View Details"),
-                        ),
-                        ElevatedButton(
-                          onPressed: isRegistered == "Approved"
-                              ? null // Vô hiệu hóa nút nếu trạng thái là "Approved"
-                              : () async {
-                                  if (isRegistered == null) {
-                                    await UserRegisterEvent(
-                                        event["id"].toString());
-                                  } else if (isRegistered == "Pending") {
-                                    await unregisterEvent(
-                                        event["id"].toString());
-                                  }
-                                  setState(() {
-                                    if (isRegistered == "Pending") {
-                                      event["isRegistered"] = null;
-                                    } else if (isRegistered == "Rejected") {
-                                    } else {
-                                      event["isRegistered"] = "Pending";
-                                    }
-                                  });
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isRegistered == "Approved"
-                                ? Colors
-                                    .grey // Màu xám nếu trạng thái là "Approved" (disabled)
-                                : (isRegistered == "Pending"
-                                    ? Colors.green
-                                    : Colors.blue),
-                          ),
-                          child: Text(
-                            isRegistered == "Approved"
-                                ? "Approved" // Nút hiển thị "Approved" và bị disable
-                                : (isRegistered == "Pending"
-                                    ? "Hủy đăng ký"
-                                    : "Đăng ký"),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: events.length,
+            itemBuilder: (context, index) {
+              final event = events[index];
+              return _buildEventCard(event);
+            },
           );
         },
       ),
     );
   }
 
-  // Helper function to parse date and return formatted date string
-  String _parseDate(String date) {
+  Widget _buildEventCard(Map<String, dynamic> event) {
+    final user = event["user"];
+    final String? isRegistered = event["isRegistered"];
+    final eventObj = Event.fromJson(event);
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              event["name"],
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.calendar_today, size: 16),
+                const SizedBox(width: 4),
+                Text(
+                  "${_formatDate(event["startDate"])} - ${_formatDate(event["endDate"])}",
+                  style: const TextStyle(color: Colors.grey),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundImage: NetworkImage(user["photoUrl"]),
+                  radius: 16.0,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  user["name"],
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EventDetailsPage(event: eventObj),
+                      ),
+                    );
+                  },
+                  child: const Text("View Details"),
+                ),
+                ElevatedButton(
+                  onPressed: isRegistered == "Approved"
+                      ? null
+                      : () async {
+                          if (isRegistered == null) {
+                            await _registerForEvent(event["id"].toString());
+                          } else if (isRegistered == "Pending") {
+                            await _unregisterFromEvent(event["id"].toString());
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isRegistered == "Approved"
+                        ? Colors.grey
+                        : (isRegistered == "Pending"
+                            ? Colors.red
+                            : Colors.blue),
+                  ),
+                  child: Text(
+                    isRegistered == "Approved"
+                        ? "Approved"
+                        : (isRegistered == "Pending" ? "Cancel" : "Register"),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(String date) {
     try {
-      DateTime parsedDate = DateTime.parse(date);
-      return parsedDate
-          .toLocal()
-          .toString()
-          .split(' ')[0]; // returns the date in YYYY-MM-DD format
+      final DateTime parsedDate = DateTime.parse(date);
+      return DateFormat.yMMMd().format(parsedDate);
     } catch (e) {
-      return "Invalid Date"; // Handle invalid date format
+      LoggerService.logger.e("Error parsing date: $e");
+      return "Invalid Date";
     }
   }
 }

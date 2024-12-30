@@ -4,8 +4,6 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:event_management/src/service/user_service.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -62,7 +60,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (pickedFile != null) {
       File imageFile = File(pickedFile.path);
       try {
-        String imageUrl = await _uploadImageToImageKit(imageFile);
+        String imageUrl = await uploadImageToImageKit(imageFile);
 
         final updatedImageUrl = _appendUpdatedAtQuery(imageUrl);
 
@@ -94,38 +92,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String _appendUpdatedAtQuery(String url) {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     return '$url?updatedAt=$timestamp';
-  }
-
-  Future<String> _uploadImageToImageKit(File imageFile) async {
-    const privateKey = 'private_F801T1Ot8g2c8BCrrN+7+y+Kvdc=';
-    final base64EncodedKey = base64Encode(utf8.encode('$privateKey:'));
-
-    final request = http.MultipartRequest(
-      'POST',
-      Uri.parse('https://upload.imagekit.io/api/v1/files/upload'),
-    );
-    request.headers['Authorization'] = 'Basic $base64EncodedKey';
-    request.files
-        .add(await http.MultipartFile.fromPath('file', imageFile.path));
-    request.fields['fileName'] = 'profile_pic_${currentUser!.uid}.jpg';
-    request.fields['useUniqueFileName'] = 'false';
-    request.fields['folder'] = '/profile_pictures';
-
-    final response = await request.send();
-
-    if (response.statusCode == 200) {
-      final responseData = await response.stream.bytesToString();
-      final decodedData = json.decode(responseData);
-      final imageUrl = decodedData['url'];
-
-      print("Image uploaded successfully. URL: $imageUrl");
-
-      return imageUrl;
-    } else {
-      final responseData = await response.stream.bytesToString();
-      print('Failed to upload image: ${response.statusCode}, $responseData');
-      throw Exception('Failed to upload image ${response.statusCode}');
-    }
   }
 
   @override

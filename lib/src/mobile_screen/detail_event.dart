@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unrelated_type_equality_checks
 import 'package:event_management/src/mobile_screen/add_guest.dart';
 import 'package:event_management/src/mobile_screen/request.dart';
 import 'package:event_management/src/mobile_screen/schedules.dart';
@@ -24,7 +24,7 @@ class EventDetailsPage extends StatefulWidget {
 
 class _EventDetailsPageState extends State<EventDetailsPage> {
   User? user = FirebaseAuth.instance.currentUser;
-  String? userRole;
+  String? userId;
   String eventName = '';
   String description = '';
   String targetAudience = '';
@@ -32,6 +32,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   String startDate = '';
   String endDate = '';
   bool isLoading = true;
+  bool access = false;
+  bool allowSelectSchedule = false;
 
   @override
   void initState() {
@@ -47,10 +49,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       location = '';
       startDate = '';
       endDate = '';
-      isLoading = true;
+      access = false;
+      allowSelectSchedule = false;
     });
 
-    await _fetchUserRole();
+    await _fetchUserId();
     await _loadEventData();
 
     setState(() {
@@ -58,21 +61,30 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     });
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadEventData();
+  }
+
   Future<void> _loadEventData() async {
     try {
-      EventWithParticipants event =
-          await fetchEventWithParticipantsById(widget.event.id);
+      final eventData = await getEventData(widget.event.id);
+
       setState(() {
-        eventName = event.name;
-        description = event.description;
-        targetAudience = event.targetAudience;
-        location = event.location;
+        access = eventData['data']['access'];
+        allowSelectSchedule = eventData['data']['allowSelectSchedule'];
+        eventName = eventData['data']['name'];
+        description = eventData['data']['description'];
+        location = eventData['data']['location'];
         startDate =
-            "${DateFormat.jm().format(event.startDate)} - ${event.startDate.day}/${event.startDate.month}/${event.startDate.year}";
+            "${DateFormat.jm().format(DateTime.parse(eventData['data']['startDate']))} - ${DateTime.parse(eventData['data']['startDate']).day}/${DateTime.parse(eventData['data']['startDate']).month}/${DateTime.parse(eventData['data']['startDate']).year}";
         endDate =
-            "${DateFormat.jm().format(event.endDate)} - ${event.endDate.day}/${event.endDate.month}/${event.endDate.year}";
+            "${DateFormat.jm().format(DateTime.parse(eventData['data']['endDate']))} - ${DateTime.parse(eventData['data']['endDate']).day}/${DateTime.parse(eventData['data']['endDate']).month}/${DateTime.parse(eventData['data']['endDate']).year}";
       });
+      LoggerService.logger.i(access);
     } catch (error) {
+      LoggerService.logger.e(error);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Failed to load event data. Please try again.')),
@@ -80,17 +92,21 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
   }
 
-  Future<void> _fetchUserRole() async {
+  Future<void> _fetchUserId() async {
     try {
-      userRole = await GetRoleUser();
-      setState(() {});
+      userId = await GetIdUser();
     } catch (e) {
-      LoggerService.logger.e("Failed to fetch user role: $e");
+      LoggerService.logger.e("Failed to fetch user id: $e");
     }
+  }
+
+  Future<void> _refreshEventData() async {
+    await _initializeData();
   }
 
   @override
   Widget build(BuildContext context) {
+    final eventId = widget.event.id;
     return Scaffold(
       appBar: AppBar(
         title: Text(eventName),
@@ -98,7 +114,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         foregroundColor: Colors.black,
         elevation: 0,
         actions: [
-          if (userRole == "Organizer" || userRole == "Admin")
+          if (userId == widget.event.idCreate)
             IconButton(
               icon: const Icon(Icons.tune, color: Colors.black),
               onPressed: () {
@@ -108,91 +124,93 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 );
               },
             ),
-          IconButton(
-            icon:
-                const Icon(Icons.insert_invitation_sharp, color: Colors.black),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => RequestPage(id: widget.event.id)),
-              );
-            },
-          ),
+          if (userId == widget.event.idCreate)
+            IconButton(
+              icon: const Icon(Icons.insert_invitation_sharp,
+                  color: Colors.black),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RequestPage(id: eventId)),
+                );
+              },
+            ),
         ],
       ),
       body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: _refreshEventData,
           child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Event Name: $eventName',
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Description: $description',
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Objective: $targetAudience',
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Location: $location',
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Start Date: $startDate',
-                    ),
-                    Text(
-                      'End Date: $endDate',
-                    ),
-                    const SizedBox(height: 24),
-                    _buildEventStats(),
-                    const SizedBox(height: 24),
-                    _buildFeaturedParticipant("Speaker"),
-                    const SizedBox(height: 8),
-                    _buildFeaturedParticipant("Guest"),
-                    const SizedBox(height: 24),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SchedulesWidget(
-                                      eventId: widget.event.id,
-                                    )),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.deepPurple,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          "View Full Schedule",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Event Name: $eventName',
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Description: $description',
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Location: $location',
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Start Date: $startDate',
+                  ),
+                  Text(
+                    'End Date: $endDate',
+                  ),
+                  const SizedBox(height: 24),
+                  _buildEventStats(),
+                  const SizedBox(height: 24),
+                  _buildFeaturedParticipant("Speaker"),
+                  const SizedBox(height: 8),
+                  _buildFeaturedParticipant("Guest"),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SchedulesWidget(
+                                    event: widget.event,
+                                  )),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.deepPurple,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
                         ),
                       ),
+                      child: const Text(
+                        "View Full Schedule",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
                     ),
-                  ],
-                ),
-              ))),
-      floatingActionButton: userRole == "Organizer" || userRole == "Admin"
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      floatingActionButton: userId == widget.event.idCreate
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          UpdateEvent(eventId: widget.event.id)),
+                      builder: (context) => UpdateEvent(eventId: eventId)),
                 );
                 _initializeData();
               },
@@ -204,6 +222,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   Widget _buildQuickActions() {
+    final eventId = widget.event.id;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -218,62 +237,158 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildActionButton(Icons.person_add, "Add Speaker", () async {
-                final newGuests = await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => AddMembersPage(name: "Speakers"),
-                  ),
-                );
 
-                if (newGuests != null && newGuests.isNotEmpty) {
-                  await addParticipant(newGuests, widget.event.id, "Speaker");
-                  Navigator.of(context).pop();
-                  LoggerService.logger.i("Speaker added: $newGuests");
-                }
-              }),
-              _buildActionButton(Icons.person_add, "Add Guest", () async {
-                final newGuests = await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => AddMembersPage(name: "Guests"),
-                  ),
-                );
+          // Add Speaker and Guest Action Buttons
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(color: Colors.grey.withOpacity(0.5)),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildActionButton(Icons.person_add, "Add Speaker",
+                        () async {
+                      final newGuests = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AddMembersPage(name: "Speakers"),
+                        ),
+                      );
 
-                if (newGuests != null && newGuests.isNotEmpty) {
-                  await addParticipant(newGuests, widget.event.id, "Guest");
-                  Navigator.of(context).pop();
-                  LoggerService.logger.i("Guests added: $newGuests");
-                }
-              }),
-              _buildActionButton(Icons.schedule, "Schedule", () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          SchedulesWidget(eventId: widget.event.id)),
-                );
-              }),
-            ],
+                      if (newGuests != null && newGuests.isNotEmpty) {
+                        await addParticipant(newGuests, eventId, "Speaker");
+                        Navigator.of(context).pop();
+                        LoggerService.logger.i("Speaker added: $newGuests");
+                      }
+                    }),
+                    _buildActionButton(Icons.person_add, "Add Guest", () async {
+                      final newGuests = await Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => AddMembersPage(name: "Guests"),
+                        ),
+                      );
+
+                      if (newGuests != null && newGuests.isNotEmpty) {
+                        await addParticipant(newGuests, eventId, "Guest");
+                        Navigator.of(context).pop();
+                        LoggerService.logger.i("Guests added: $newGuests");
+                      }
+                    }),
+                  ],
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildActionButton(Icons.edit, "Remove Speaker", () async {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) => _buildEditGuest("Speaker"),
-                );
-              }),
-              _buildActionButton(Icons.edit, "Remove Guest", () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) => _buildEditGuest("Guest"),
-                );
-              }),
-            ],
+
+          // Remove Speaker and Guest Action Buttons
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(color: Colors.grey.withOpacity(0.5)),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildActionButton(Icons.edit, "Remove Speaker", () async {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) => _buildEditGuest("Speaker"),
+                      );
+                    }),
+                    _buildActionButton(Icons.edit, "Remove Guest", () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) => _buildEditGuest("Guest"),
+                      );
+                    }),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(color: Colors.grey.withOpacity(0.5)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Accessibility',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        updateEventAccess(eventId, true);
+                      },
+                      child: const Text('Enable'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        updateEventAccess(eventId, false);
+                      },
+                      child: const Text('Disable'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(color: Colors.grey.withOpacity(0.5)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Register Schedule',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        updateEventAllow(eventId, true);
+                      },
+                      child: const Text('Enable'),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () {
+                        updateEventAllow(eventId, false);
+                      },
+                      child: const Text('Disable'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

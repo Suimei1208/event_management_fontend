@@ -23,26 +23,31 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   User? user = FirebaseAuth.instance.currentUser;
-  late String userName;
   late String userProfileUrl;
   late List<Event> events = [];
-  late String _role = "";
   int _currentIndex = 0;
+  String userName = "";
 
   @override
   void initState() {
     super.initState();
-    userName = user?.displayName ?? "User";
     userProfileUrl = user?.photoURL ?? "";
     fetchEvents();
+    _fetchUserName();
+  }
+
+  Future<void> _fetchUserName() async {
+    try {
+      userName = await GetNameUser();
+    } catch (e) {
+      LoggerService.logger.e("Failed to fetch user name: $e");
+    }
   }
 
   Future<void> fetchEvents() async {
     List<Event> listEvents = await fetchEventById(user!.uid);
-    String role = await GetRoleUser();
     setState(() {
       events = listEvents;
-      _role = role;
     });
   }
 
@@ -122,10 +127,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      if (_role == 'Admin' || _role == 'Organizer') const UserEvents(),
+      const UserEvents(),
       const EventRegisterScreen(),
       CommunityForumScreen(),
-      // const EventDetailsPage(),
       const ProfileWidget(),
     ];
 
@@ -180,17 +184,14 @@ class _HomeScreenState extends State<HomeScreen> {
         children: screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          if (_role == 'Admin' || _role == 'Organizer')
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.event), label: "Manage Events"),
-          const BottomNavigationBarItem(
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.event), label: "Manage Events"),
+          BottomNavigationBarItem(
               icon: Icon(Icons.event), label: "Register Events"),
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.forum), label: "Forum"),
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.forum), label: "Forum"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
         ],
         currentIndex: _currentIndex,
         onTap: _onItemTapped,

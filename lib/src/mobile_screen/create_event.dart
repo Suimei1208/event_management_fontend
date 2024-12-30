@@ -2,8 +2,6 @@
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
-import 'package:event_management/src/service/participants.dart';
-import 'package:event_management/widget/guest_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -18,11 +16,11 @@ class CreateEvent extends StatefulWidget {
 
 class _CreateEventState extends State<CreateEvent> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  List<Map<String, dynamic>> guest = [];
-  List<Map<String, dynamic>> speaker = [];
   String? choiceChipsValue;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+  // File? _imageFile;
+  // String _imageUrl = '';
 
   final TextEditingController _textController1 = TextEditingController();
   final TextEditingController _textController2 = TextEditingController();
@@ -130,6 +128,36 @@ class _CreateEventState extends State<CreateEvent> {
       });
     }
   }
+
+  // Future<void> _uploadImage() async {
+  //   if (_imageFile != null) {
+  //     try {
+  //       String imageUrl = await uploadImageToImageKit(_imageFile!);
+  //       setState(() {
+  //         _imageUrl = imageUrl;
+  //       });
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(content: Text('Image uploaded successfully!')));
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('Failed to upload image: $e')));
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Please select an image first')));
+  //   }
+  // }
+
+  // Future<void> _pickImage() async {
+  //   final picker = ImagePicker();
+  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _imageFile = File(pickedFile.path);
+  //     });
+  //   }
+  // }
 
   String? textController1Validator(String? value) {
     if (value == null || value.isEmpty) {
@@ -828,14 +856,86 @@ class _CreateEventState extends State<CreateEvent> {
                           ),
                         ),
                       ),
-                      GuestList(
-                        title: 'Speakers',
-                        members: speaker,
-                      ),
-                      GuestList(
-                        title: 'Guest',
-                        members: guest,
-                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Theme.of(context).dividerColor,
+                            width: 1,
+                          ),
+                        ),
+                        // child: Padding(
+                        //   padding: const EdgeInsets.all(16.0),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.center,
+                        //     children: [
+                        //       // Display the selected image
+                        //       if (_imageFile != null)
+                        //         ClipRRect(
+                        //           borderRadius: BorderRadius.circular(12),
+                        //           child: Image.file(
+                        //             _imageFile!,
+                        //             height: 200,
+                        //             width: 200,
+                        //             fit: BoxFit.cover,
+                        //           ),
+                        //         ),
+                        //       const SizedBox(height: 20),
+
+                        //       // Pick Image Button
+                        //       ElevatedButton(
+                        //         onPressed: _pickImage,
+                        //         style: ElevatedButton.styleFrom(
+                        //           padding: const EdgeInsets.symmetric(
+                        //             vertical: 12.0,
+                        //             horizontal: 20.0,
+                        //           ),
+                        //         ),
+                        //         child: const Text('Pick Image'),
+                        //       ),
+                        //       const SizedBox(height: 20),
+
+                        //       // Save Image Button
+                        //       ElevatedButton(
+                        //         onPressed: _uploadImage,
+                        //         style: ElevatedButton.styleFrom(
+                        //           padding: const EdgeInsets.symmetric(
+                        //             vertical: 12.0,
+                        //             horizontal: 20.0,
+                        //           ),
+                        //         ),
+                        //         child: const Text('Save Image'),
+                        //       ),
+                        //       const SizedBox(height: 20),
+
+                        //       // Display uploaded image URL
+                        //       if (_imageUrl.isNotEmpty)
+                        //         Column(
+                        //           children: [
+                        //             const Text(
+                        //               'Uploaded Image URL:',
+                        //               style: TextStyle(
+                        //                   fontWeight: FontWeight.bold),
+                        //             ),
+                        //             const SizedBox(height: 10),
+                        //             ClipRRect(
+                        //               borderRadius: BorderRadius.circular(12),
+                        //               child: Image.network(
+                        //                 '$_imageUrl?updatedAt=${DateTime.now().millisecondsSinceEpoch}',
+                        //                 height: 200,
+                        //                 width: 200,
+                        //                 fit: BoxFit.cover,
+                        //               ),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //     ],
+                        //   ),
+                        // )
+                      )
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -845,37 +945,25 @@ class _CreateEventState extends State<CreateEvent> {
                       onPressed: () async {
                         LoggerService.logger.w('Button pressed ...');
                         Event event = Event(
-                          id: 0,
-                          name: _textController1.text.toString(),
-                          description: _textController2.text.toString(),
-                          targetAudience: _textController3.text.toString(),
-                          location: _textController4.text.toString(),
-                          type: choiceChipsValue!.toString(),
-                          startDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
-                              .parse(_combineDateTime(
-                                  dateController.text, timeController.text)),
-                          endDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS').parse(
-                              _combineDateTime(endDateController.text,
-                                  endTimeController.text)),
-                          banner: "123456789",
-                          status: "Upcoming",
-                          idCreate: "",
-                        );
+                            id: 0,
+                            name: _textController1.text.toString(),
+                            description: _textController2.text.toString(),
+                            targetAudience: _textController3.text.toString(),
+                            location: _textController4.text.toString(),
+                            type: choiceChipsValue!.toString(),
+                            startDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
+                                .parse(_combineDateTime(
+                                    dateController.text, timeController.text)),
+                            endDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
+                                .parse(_combineDateTime(endDateController.text,
+                                    endTimeController.text)),
+                            banner: "https://placehold.jp/150x150.png",
+                            status: "Pending",
+                            idCreate: "",
+                            access: false,
+                            allowSelectSchedule: false);
                         LoggerService.logger.w(event.toJson());
                         await createEvent(event, context);
-                        getIdEvent(event.name).then((id) async {
-                          LoggerService.logger.w('Event ID: $id');
-
-                          if (speaker.isNotEmpty) {
-                            await addParticipant(
-                                speaker, int.parse(id), "Speaker");
-                          }
-                          if (guest.isNotEmpty) {
-                            await addParticipant(guest, int.parse(id), "Guest");
-                          }
-                        }).catchError((error) {
-                          LoggerService.logger.w('Error: $error');
-                        });
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor:

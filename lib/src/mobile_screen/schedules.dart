@@ -2,16 +2,17 @@
 
 import 'dart:convert';
 
-import 'package:event_management/src/models/event_with_participants.dart';
+import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/user_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class SchedulesWidget extends StatefulWidget {
-  final int eventId;
-  const SchedulesWidget({super.key, required this.eventId});
+  final Event event;
+  const SchedulesWidget({super.key, required this.event});
 
   @override
   State<SchedulesWidget> createState() => _SchedulesWidgetState();
@@ -19,7 +20,7 @@ class SchedulesWidget extends StatefulWidget {
 
 class _SchedulesWidgetState extends State<SchedulesWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-
+  User? user = FirebaseAuth.instance.currentUser;
   String eventName = '';
   String eventLocation = '';
   String eventDate = '';
@@ -27,7 +28,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
   DateTime eventEndDate = DateTime.now();
   List<DateTime> eventDays = [];
   List<Map<String, dynamic>> schedules = [];
-  late String _role = "";
+  String id = "";
 
   @override
   void initState() {
@@ -37,9 +38,9 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
   }
 
   Future<void> _loadEventData() async {
-    _role = await GetRoleUser();
-    EventWithParticipants event =
-        await fetchEventWithParticipantsById(widget.eventId);
+    id = await GetIdUser();
+    Event event =
+        await fetchEventByEventId(widget.event.id);
 
     setState(() {
       eventName = event.name;
@@ -58,7 +59,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
   Future<void> _loadSchedules() async {
     try {
       List<Map<String, dynamic>> fetchedSchedules =
-          await fetchSchedulesForEvent(widget.eventId);
+          await fetchSchedulesForEvent(widget.event.id);
       setState(() {
         schedules = fetchedSchedules;
       });
@@ -172,7 +173,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                     };
 
                     LoggerService.logger.i('Payload: ${json.encode(newEvent)}');
-                    await addEventToSchedule(widget.eventId, newEvent);
+                    await addEventToSchedule(widget.event.id, newEvent);
                     await _loadSchedules();
                     Navigator.pop(context);
                   } catch (e) {
@@ -371,7 +372,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                               ),
                             ),
                           ),
-                          if (_role == 'Organizer' || _role == "Admin")
+                          if (id == widget.event.idCreate)
                             PopupMenuButton<String>(
                               onSelected: (value) async {
                                 if (value == 'edit') {
@@ -392,6 +393,13 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                                 ),
                               ],
                             ),
+                          TextButton(
+                            onPressed: () async {
+                              await addParticipantToSchedule(
+                                  widget.event.id, user!.uid);
+                            },
+                            child: const Text('Join'),
+                          ),
                         ],
                       ),
                     ],
@@ -402,7 +410,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
           ],
         ),
       ),
-      floatingActionButton: (_role == 'Organizer' || _role == "Admin")
+      floatingActionButton: (id == widget.event.idCreate)
           ? FloatingActionButton(
               onPressed: _addNewEvent,
               backgroundColor: Colors.purple,
