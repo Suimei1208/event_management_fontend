@@ -243,7 +243,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: Colors.grey.withOpacity(0.5)),
             ),
             child: Column(
               children: [
@@ -290,7 +289,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: Colors.grey.withOpacity(0.5)),
             ),
             child: Column(
               children: [
@@ -319,7 +317,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: Colors.grey.withOpacity(0.5)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -357,7 +354,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: Colors.grey.withOpacity(0.5)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
