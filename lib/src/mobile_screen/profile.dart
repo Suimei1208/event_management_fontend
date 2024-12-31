@@ -133,6 +133,14 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                             : Colors.black,
                                       ),
                                     ),
+                                    Text(userData['nameFromEmail'] ?? '',
+                                        style: TextStyle(
+                                          fontFamily: 'Inter',
+                                          fontSize: 14,
+                                          color: brightness == Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        )),
                                     Padding(
                                       padding:
                                           const EdgeInsetsDirectional.fromSTEB(

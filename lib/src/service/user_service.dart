@@ -27,10 +27,12 @@ Future<Map<String, dynamic>> getUserDetails() async {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body)['data'];
+        // LoggerService.logger.i('User data: $data');
         return {
           'name': data['name'],
           'email': data['email'],
           'phone': data['phone'],
+          'nameFromEmail': data['nameFromEmail'],
         };
       } else {
         throw Exception(
@@ -110,6 +112,7 @@ Future<void> updateUserProfile(BuildContext context, String newName,
     if (user != null) {
       String? idToken = await user.getIdToken();
       await user.updatePhotoURL(_uploadedImageUrl);
+      await user.updateDisplayName(newName);
       final response = await http.put(
         Uri.parse(
             '${Config.baseUrl}/user-services/api/Users/UpdateProfile?name=$newName&phone=$newPhone'),
@@ -160,9 +163,9 @@ Future<List<Map<String, dynamic>>> searchUser(String name) async {
       return List<Map<String, dynamic>>.from(
         jsonData['data'].map((item) => {
               'id': item['id'] ?? "",
-              'name': item['name'] ?? "Unknown",
-              'role': item['role'] ?? "No role",
-              'avtUrl': item['avtUrl'] ?? "",
+              'name': item['userRecord']['displayName'] ?? "Unknown",
+              'role': item['nameFromEmail'] ?? "no nameFromEmail",
+              'avtUrl': item['userRecord']['photoUrl'] ?? "",
             }),
       );
     } else {
@@ -198,9 +201,9 @@ Future<Map<String, dynamic>> getUserData(String userId) async {
         final Map<String, dynamic> user = responseData['data'];
 
         return {
-          'name': user['name'] ?? 'Unknown',
+          'name': user['userRecord']['displayName'] ?? 'Unknown',
           'role': user['role'] ?? 'Unknown',
-          'photoUrl': user['avtUrl'] ??
+          'photoUrl': user['userRecord']['photoUrl'] ??
               'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png',
         };
       } else {

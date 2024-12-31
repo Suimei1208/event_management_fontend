@@ -145,6 +145,24 @@ Future<void> _sendDataToBackend(Map<String, String> data) async {
 Future<void> signInWithEmailPassword(
     BuildContext context, String email, String password) async {
   try {
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email and password!')),
+      );
+      return;
+    } else if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Password must be at least 6 characters!')),
+      );
+      return;
+    } else if (!email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid email!')),
+      );
+      return;
+    }
+
     final UserCredential userCredential =
         await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: email,
@@ -152,47 +170,47 @@ Future<void> signInWithEmailPassword(
     );
 
     if (userCredential.user != null) {
-      final User user = userCredential.user!;
+      // final User user = userCredential.user!;
 
       // Check if the email is verified
-      if (!user.emailVerified) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'Your email is not verified. Please verify your email before logging in.'),
-          ),
-        );
-        return;
-      }
+      // if (!user.emailVerified) {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(
+      //       content: Text(
+      //           'Your email is not verified. Please verify your email before logging in.'),
+      //     ),
+      //   );
+      //   return;
+      // }
 
-      final idToken = await user.getIdToken();
-      final response = await http.get(
-        Uri.parse(
-            '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
-      );
+      // final idToken = await user.getIdToken();
+      // final response = await http.get(
+      //   Uri.parse(
+      //       '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
+      // );
 
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        if (responseData['success'] == true && responseData['data'] != null) {
-          final role = responseData['data']['role'];
+      // if (response.statusCode == 200) {
+      //   final responseData = json.decode(response.body);
+      //   if (responseData['success'] == true && responseData['data'] != null) {
+      //     final role = responseData['data']['role'];
 
-          if (role == "None") {
-            Navigator.pushNamed(context, '/role');
-          } else {
-            Navigator.pushNamed(context, '/home');
-          }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Failed to get role: ${responseData['message']}')));
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${response.statusCode}')));
-      }
+      //     if (role == "None") {
+      //       Navigator.pushNamed(context, '/role');
+      //     } else {
+      Navigator.pushNamed(context, '/home');
     }
-  } on FirebaseAuthException catch (e) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('Login failed: ${e.message}')));
+    //     } else {
+    //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //           content: Text('Failed to get role: ${responseData['message']}')));
+    //     }
+    //   } else {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //         SnackBar(content: Text('Error: ${response.statusCode}')));
+    //   }
+    // }
+  } on FirebaseAuthException {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Login failed: Check your email and password')));
   }
 }
 

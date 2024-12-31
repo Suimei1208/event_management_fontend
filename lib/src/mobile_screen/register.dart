@@ -1,9 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:convert';
-
 import 'package:event_management/config.dart';
-import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,7 +17,6 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordConfirmController =
@@ -31,29 +29,84 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _registerWithEmailPassword(BuildContext context) async {
     try {
+      if (_passwordController.text.trim() !=
+          _passwordConfirmController.text.trim()) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Passwords do not match')),
+        );
+        return;
+      } else if (_phoneController.text.trim().length != 10) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Phone number should be 10 digits')),
+        );
+        return;
+      } else if (_emailController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email cannot be empty')),
+        );
+        return;
+      } else if (_passwordController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password cannot be empty')),
+        );
+        return;
+      } else if (_phoneController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Phone number cannot be empty')),
+        );
+        return;
+      } else if (_emailController.text.trim().contains('@') == false) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email should contain @')),
+        );
+        return;
+      } else if (_emailController.text.trim().contains('.') == false) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email should contain .')),
+        );
+        return;
+      } else if (_emailController.text.trim().contains('com') == false) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email should contain .com')),
+        );
+        return;
+      } else if (_emailController.text.trim().contains(' ') == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email should not contain space')),
+        );
+        return;
+      } else if (_passwordController.text.trim().length < 6) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Password should be at least 6 characters')),
+        );
+        return;
+      }
+
       final UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      await userCredential.user
-          ?.updateDisplayName(_usernameController.text.trim());
       const String avatarUrl =
           'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png';
       await userCredential.user?.updatePhotoURL(avatarUrl);
+      await userCredential.user?.updateDisplayName(_nameController.text.trim());
 
-      await sendEmailVerification(context);
+      // await sendEmailVerification(context);
 
       final idToken = await userCredential.user?.getIdToken();
 
       final Map<String, String> data = {
         'id': idToken ?? '',
-        'name': _usernameController.text.trim(),
+        'name': _nameController.text.trim(),
         'email': _emailController.text.trim(),
         'phone': _phoneController.text.trim(),
-        'role': 'None',
+        'nameFromEmail': '',
       };
+
+      LoggerService.logger.e(data);
 
       await _sendDataToBackend(data);
 
@@ -125,19 +178,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    TextField(
-                      controller: _usernameController,
-                      decoration: InputDecoration(
-                        labelText: 'Username',
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.surface,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    // Name field
+                    //
                     TextField(
                       controller: _nameController,
                       decoration: InputDecoration(
@@ -150,7 +191,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                     const SizedBox(height: 15),
-                    // Email field
+                    // const SizedBox(height: 20),
+                    //
                     TextField(
                       controller: _emailController,
                       decoration: InputDecoration(
@@ -166,6 +208,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     // Phone field
                     TextField(
                       controller: _phoneController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
                       decoration: InputDecoration(
                         labelText: 'Phone Number',
                         filled: true,

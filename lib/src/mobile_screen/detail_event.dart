@@ -31,6 +31,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   String location = '';
   String startDate = '';
   String endDate = '';
+  String photoUrl = '';
   bool isLoading = true;
   bool access = false;
   bool allowSelectSchedule = false;
@@ -49,6 +50,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       location = '';
       startDate = '';
       endDate = '';
+      photoUrl = '';
       access = false;
       allowSelectSchedule = false;
     });
@@ -77,6 +79,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         eventName = eventData['data']['name'];
         description = eventData['data']['description'];
         location = eventData['data']['location'];
+        photoUrl = eventData['data']['banner'];
         startDate =
             "${DateFormat.jm().format(DateTime.parse(eventData['data']['startDate']))} - ${DateTime.parse(eventData['data']['startDate']).day}/${DateTime.parse(eventData['data']['startDate']).month}/${DateTime.parse(eventData['data']['startDate']).year}";
         endDate =
@@ -116,16 +119,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         actions: [
           if (userId == widget.event.idCreate)
             IconButton(
-              icon: const Icon(Icons.tune, color: Colors.black),
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) => _buildQuickActions(),
-                );
-              },
-            ),
-          if (userId == widget.event.idCreate)
-            IconButton(
               icon: const Icon(Icons.insert_invitation_sharp,
                   color: Colors.black),
               onPressed: () {
@@ -133,6 +126,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => RequestPage(id: eventId)),
+                );
+              },
+            ),
+          if (userId == widget.event.idCreate)
+            IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => _buildQuickActions(),
                 );
               },
             ),
@@ -148,6 +151,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  photoUrl.isNotEmpty
+                      ? Image.network(
+                          photoUrl,
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        )
+                      : const SizedBox.shrink(),
+                  const SizedBox(height: 10),
                   Text(
                     'Event Name: $eventName',
                   ),
@@ -277,6 +289,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         LoggerService.logger.i("Guests added: $newGuests");
                       }
                     }),
+                    _buildActionButton(Icons.share, "Share Role", () {}),
                   ],
                 ),
               ],
@@ -295,6 +308,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    _buildActionButton(
+                        Icons.group_add_outlined, "Add Member", () {}),
                     _buildActionButton(Icons.edit, "Remove Speaker", () async {
                       showModalBottomSheet(
                         context: context,
@@ -313,40 +328,38 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             ),
           ),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Accessibility',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Accessibility',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        updateEventAccess(eventId, true);
-                      },
-                      child: const Text('Enable'),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: () {
-                        updateEventAccess(eventId, false);
-                      },
-                      child: const Text('Disable'),
-                    ),
-                  ],
-                ),
-              ],
+                  Switch(
+                    value: access,
+                    onChanged: (bool value) async {
+                      setState(() {
+                        access = value;
+                      });
+
+                      await updateEventAccess(widget.event.id, value);
+                    },
+                    activeColor: Colors.green,
+                    inactiveThumbColor: Colors.grey,
+                    inactiveTrackColor: Colors.grey[300],
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -366,22 +379,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     color: Colors.black,
                   ),
                 ),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        updateEventAllow(eventId, true);
-                      },
-                      child: const Text('Enable'),
-                    ),
-                    const SizedBox(width: 8),
-                    ElevatedButton(
-                      onPressed: () {
-                        updateEventAllow(eventId, false);
-                      },
-                      child: const Text('Disable'),
-                    ),
-                  ],
+                Switch(
+                  value: allowSelectSchedule,
+                  onChanged: (bool value) async {
+                    setState(() {
+                      allowSelectSchedule = value;
+                    });
+
+                    await updateEventAllow(eventId, false);
+                  },
+                  activeColor: Colors.green,
+                  inactiveThumbColor: Colors.grey,
+                  inactiveTrackColor: Colors.grey[300],
                 ),
               ],
             ),
