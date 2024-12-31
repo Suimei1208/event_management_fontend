@@ -21,7 +21,6 @@ class _UserEventsState extends State<UserEvents> {
 
   // late Future<List<Event>> _eventsFuture;
   bool _isGridView = false;
-  String _searchQuery = '';
   List<Event> _allEvents = [];
   List<Event> _filteredEvents = [];
 
@@ -57,7 +56,6 @@ class _UserEventsState extends State<UserEvents> {
 
   void _filterEvents(String query) {
     setState(() {
-      _searchQuery = query;
       if (query.isEmpty) {
         _filteredEvents = _allEvents;
       } else {
