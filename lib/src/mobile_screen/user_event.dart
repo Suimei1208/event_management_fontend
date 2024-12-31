@@ -3,22 +3,27 @@ import 'package:event_management/src/mobile_screen/detail_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/widget/dialog_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class UserEvents extends StatefulWidget {
+  static const routeName = '/user-events';
   const UserEvents({super.key});
 
-  static const routeName = '/user-events';
-
   @override
-  State<UserEvents> createState() => _UserEventsState();
+  // ignore: library_private_types_in_public_api
+  _UserEventsState createState() => _UserEventsState();
 }
 
 class _UserEventsState extends State<UserEvents> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late Future<List<Event>> _eventsFuture;
+  // late Future<List<Event>> _eventsFuture;
+  bool _isGridView = false;
+  String _searchQuery = '';
+  List<Event> _allEvents = [];
+  List<Event> _filteredEvents = [];
 
   @override
   void initState() {
@@ -26,15 +31,43 @@ class _UserEventsState extends State<UserEvents> {
     _loadEvents();
   }
 
+  // Load events and initialize filtered events
   Future<void> _loadEvents() async {
-    setState(() {
-      _eventsFuture = fetchEvents();
-    });
+    try {
+      final events = await fetchEvents();
+      setState(() {
+        _allEvents = events;
+        _filteredEvents = events; // Initially, all events are shown
+      });
+    } catch (error) {
+      LoggerService.logger.e('Error loading events: $error');
+    }
   }
 
   Future<void> _navigateToCreateEvent(BuildContext context) async {
     await Navigator.pushNamed(context, CreateEvent.routeName);
     _loadEvents();
+  }
+
+  void _toggleView() {
+    setState(() {
+      _isGridView = !_isGridView;
+    });
+  }
+
+  void _filterEvents(String query) {
+    setState(() {
+      _searchQuery = query;
+      if (query.isEmpty) {
+        _filteredEvents = _allEvents;
+      } else {
+        _filteredEvents = _allEvents
+            .where((event) =>
+                event.name.toLowerCase().contains(query.toLowerCase()) ||
+                event.location.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
   }
 
   @override
@@ -46,19 +79,37 @@ class _UserEventsState extends State<UserEvents> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         automaticallyImplyLeading: false,
         title: Text(
-          'My Events',
+          'Quản Lý Sự Kiện',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.filter_list_outlined,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              size: 24,
+            ),
+            onPressed: () {
+              LoggerService.logger.i('Filter icon pressed');
+
+              /// lọc sự kiện theo trạng thái, loại sự kiện gì gì đó
+            },
+          ),
           IconButton(
             icon: Icon(
               Icons.tune,
               color: Theme.of(context).textTheme.bodyLarge?.color,
               size: 24,
             ),
-            onPressed: () {
-              LoggerService.logger.i('IconButton pressed ...');
-            },
+            onPressed: _toggleView,
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.add,
+              color: Theme.of(context).textTheme.bodyLarge?.color,
+              size: 24,
+            ),
+            onPressed: () => _navigateToCreateEvent(context),
           ),
         ],
         centerTitle: false,
@@ -68,87 +119,67 @@ class _UserEventsState extends State<UserEvents> {
         top: true,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: FutureBuilder<List<Event>>(
-            future: _eventsFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              }
-              if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('No events found.'),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () => _navigateToCreateEvent(context),
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor:
-                              Theme.of(context).colorScheme.onPrimary,
-                          backgroundColor: Theme.of(context).primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: const Text('Create Event'),
-                      ),
-                    ],
+          child: Column(
+            children: [
+              // Search bar
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: TextField(
+                  onChanged: _filterEvents,
+                  decoration: InputDecoration(
+                    hintText: 'Tìm kiếm sự kiện...',
+                    prefixIcon: Icon(Icons.search,
+                        color: Theme.of(context).primaryColor),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    filled: true,
+                    fillColor:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                   ),
-                );
-              }
-
-              final events = snapshot.data!;
-
-              // Sort events by startDate (newest first)
-              events.sort((a, b) => b.startDate.compareTo(a.startDate));
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Events',
-                          style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              // Event list
+              Expanded(
+                child: _filteredEvents.isEmpty
+                    ? Center(
+                        child: Text(
+                          'Không tìm thấy sự kiện nào.',
+                          style: Theme.of(context).textTheme.bodyLarge,
                         ),
-                        ElevatedButton(
-                          onPressed: () => _navigateToCreateEvent(context),
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor:
-                                Theme.of(context).colorScheme.onPrimary,
-                            backgroundColor: Theme.of(context).primaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                      )
+                    : (_isGridView
+                        ? GridView.builder(
+                            padding: EdgeInsets.zero,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16.0,
+                              mainAxisSpacing: 16.0,
+                              childAspectRatio: 0.6,
                             ),
-                          ),
-                          child: const Text('Create Event'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      children: [
-                        // Display all events, sorted by startDate
-                        ...events.map((event) => EventCard(
-                              event: event,
-                              loadEvents: _loadEvents,
-                            )),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
+                            itemCount: _filteredEvents.length,
+                            itemBuilder: (context, index) {
+                              return EventCard(
+                                event: _filteredEvents[index],
+                                loadEvents: _loadEvents,
+                                isGridView: _isGridView,
+                              );
+                            },
+                          )
+                        : ListView.builder(
+                            padding: EdgeInsets.zero,
+                            itemCount: _filteredEvents.length,
+                            itemBuilder: (context, index) {
+                              return EventCard(
+                                event: _filteredEvents[index],
+                                loadEvents: _loadEvents,
+                                isGridView: _isGridView,
+                              );
+                            },
+                          )),
+              ),
+            ],
           ),
         ),
       ),
@@ -158,11 +189,17 @@ class _UserEventsState extends State<UserEvents> {
 
 class EventCard extends StatelessWidget {
   final Event event;
+  final bool isGridView;
   final VoidCallback loadEvents;
 
-  const EventCard({super.key, required this.event, required this.loadEvents});
+  const EventCard({
+    super.key,
+    required this.event,
+    required this.loadEvents,
+    required this.isGridView,
+  });
 
-  Color _getStatusColor(String status) {
+  Color? _getStatusColor(String status) {
     switch (status) {
       case 'Upcoming':
         return const Color(0xFFE8F5E9);
@@ -171,7 +208,7 @@ class EventCard extends StatelessWidget {
       case 'Completed':
         return Colors.grey;
       default:
-        return Colors.grey;
+        return Colors.yellow[200];
     }
   }
 
@@ -208,9 +245,8 @@ class EventCard extends StatelessWidget {
     final statusColor = _getStatusColor(event.status);
     final statusTextColor = _getStatusTextColor(event.status, context);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: InkWell(
+    if (isGridView) {
+      return InkWell(
         onTap: () {
           Navigator.push(
             context,
@@ -219,125 +255,250 @@ class EventCard extends StatelessWidget {
             ),
           );
         },
-        child: Material(
-          color: Colors.transparent,
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+        child: Center(
           child: Container(
-            width: MediaQuery.sizeOf(context).width,
-            decoration: BoxDecoration(
-              border: Border.all(width: 0.3),
-              color: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            padding: const EdgeInsets.all(8),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          event.name,
-                          softWrap: true,
-                          style: Theme.of(context).textTheme.titleMedium,
+                  Text(event.name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.date_range_outlined),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(DateFormat('d/MM/yyyy').format(event.startDate)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.timelapse),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(DateFormat('h:mm a').format(event.startDate)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on),
+                      const SizedBox(
+                        width: 5,
+                      ),
+                      Text(event.location),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: statusColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 8),
+                      child: Text(
+                        event.status,
+                        style: TextStyle(
+                          color: statusTextColor,
+                          fontSize: 15,
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          DateFormat('MMMM d, yyyy • h:mm a')
-                              .format(event.startDate),
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              color:
-                                  Theme.of(context).textTheme.bodySmall?.color,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                event.location,
-                                style: Theme.of(context).textTheme.bodySmall,
-                                softWrap: true,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: statusColor,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 4, vertical: 8),
-                                child: Text(
-                                  event.type,
-                                  style: TextStyle(
-                                    color: _getStatusColorType(event.type),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: statusColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 8),
-                          child: Text(
-                            event.status,
-                            style: TextStyle(
-                              color: statusTextColor,
-                              fontSize: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          color: Color(0xFFFF6F00),
-                          size: 30,
-                        ),
-                        onPressed: () {
-                          deleteEvent(event.id, context)
-                              .then((_) => loadEvents());
-                          LoggerService.logger.e(event.id);
-                        },
-                      ),
-                    ],
+                  const SizedBox(height: 8),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.delete_outline,
+                      color: Color(0xFFFF6F00),
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      if (event.status == 'Canceled') {
+                        deleteEvent(event.id, context)
+                            .then((_) => loadEvents());
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return const DialogWidget(
+                              message:
+                                  'Không thể xóa sự kiện sắp diễn ra hoặc đang diễn ra!',
+                              title: 'Notification',
+                            );
+                          },
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EventDetailsPage(event: event),
+              ),
+            );
+          },
+          child: Material(
+            color: Colors.transparent,
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Container(
+              width: MediaQuery.sizeOf(context).width,
+              decoration: BoxDecoration(
+                border: Border.all(width: 0.3),
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            event.name,
+                            softWrap: true,
+                            style: Theme.of(context).textTheme.titleMedium,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            DateFormat('MMMM d, yyyy • h:mm a')
+                                .format(event.startDate),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.color,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  event.location,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                  softWrap: true,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: statusColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 4, vertical: 8),
+                                  child: Text(
+                                    event.type,
+                                    style: TextStyle(
+                                      color: _getStatusColorType(event.type),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: statusColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 8),
+                            child: Text(
+                              event.status,
+                              style: TextStyle(
+                                color: statusTextColor,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Color(0xFFFF6F00),
+                            size: 30,
+                          ),
+                          onPressed: () {
+                            if (event.status == 'Canceled') {
+                              deleteEvent(event.id, context)
+                                  .then((_) => loadEvents());
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return const DialogWidget(
+                                    message:
+                                        'Không thể xóa sự kiện sắp diễn ra hoặc đang diễn ra!',
+                                    title: 'Notification',
+                                  );
+                                },
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

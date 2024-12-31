@@ -958,7 +958,7 @@ class _CreateEventState extends State<CreateEvent> {
                                 .parse(_combineDateTime(endDateController.text,
                                     endTimeController.text)),
                             banner: "https://placehold.jp/150x150.png",
-                            status: "Pending",
+                            status: "Upcoming",
                             idCreate: "",
                             access: false,
                             allowSelectSchedule: false);
