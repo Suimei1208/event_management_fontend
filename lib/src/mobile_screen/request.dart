@@ -40,6 +40,26 @@ class _RequestPageState extends State<RequestPage> {
     }
   }
 
+  Future<void> _removeParticipant(int participantId) async {
+    try {
+      bool isRemoved = await removeParticipant(widget.id, participantId);
+      if (isRemoved) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Participant removed successfully')),
+        );
+        _loadPendingParticipants();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to remove participant')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
   Future<void> _approveAllParticipants() async {
     if (_pendingParticipants != null) {
       List<Participant> participants = await _pendingParticipants!;
@@ -103,9 +123,7 @@ class _RequestPageState extends State<RequestPage> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.close, color: Colors.red),
-                          onPressed: () {
-                            // Handle rejection if needed
-                          },
+                          onPressed: () => _removeParticipant(participant.id),
                         ),
                       ],
                     ),

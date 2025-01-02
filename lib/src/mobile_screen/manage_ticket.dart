@@ -50,7 +50,7 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
           final tickets = snapshot.data!;
           final upcomingTickets = tickets
               .where((ticket) =>
-                  ticket.eventStatus == 'Pending' ||
+                  ticket.eventStatus == 'Upcoming' ||
                   ticket.eventStatus == 'Ongoing')
               .toList();
           final pastTickets = tickets

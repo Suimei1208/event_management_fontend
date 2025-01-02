@@ -1,5 +1,9 @@
 // ignore_for_file: use_build_context_synchronously, unrelated_type_equality_checks
+import 'dart:io';
+
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/add_guest.dart';
+import 'package:event_management/src/mobile_screen/existed_participants.dart';
 import 'package:event_management/src/mobile_screen/request.dart';
 import 'package:event_management/src/mobile_screen/schedules.dart';
 import 'package:event_management/src/mobile_screen/update_event.dart';
@@ -7,11 +11,14 @@ import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/notification_service.dart';
 import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:excel/excel.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
@@ -69,6 +76,37 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     _loadEventData();
   }
 
+  Future<List<String>> parseExcelFile() async {
+    List<String> studentIds = [];
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+    );
+
+    if (result != null) {
+      final bytes = File(result.files.single.path!).readAsBytesSync();
+      final excel = Excel.decodeBytes(bytes);
+
+      for (var table in excel.tables.keys) {
+        final rows = excel.tables[table]?.rows ?? [];
+
+        for (var i = 1; i < rows.length; i++) {
+          var studentId = rows[i][0]?.value?.toString();
+
+          if (studentId != null && studentId.isNotEmpty) {
+            studentIds.add(studentId);
+          } else {
+            LoggerService.logger.e("Invalid or empty Student ID in row $i.");
+          }
+        }
+      }
+    } else {
+      LoggerService.logger.e("No file selected.");
+    }
+    return studentIds;
+  }
+
   Future<void> _loadEventData() async {
     try {
       final eventData = await getEventData(widget.event.id);
@@ -85,7 +123,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         endDate =
             "${DateFormat.jm().format(DateTime.parse(eventData['data']['endDate']))} - ${DateTime.parse(eventData['data']['endDate']).day}/${DateTime.parse(eventData['data']['endDate']).month}/${DateTime.parse(eventData['data']['endDate']).year}";
       });
-      LoggerService.logger.i(access);
     } catch (error) {
       LoggerService.logger.e(error);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -107,9 +144,49 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     await _initializeData();
   }
 
+  void handleExcelUpload(int eventId, String eventName) async {
+    final studentIds = await parseExcelFile();
+
+    if (studentIds.isEmpty) {
+      LoggerService.logger.e("No valid Student IDs found in the Excel file.");
+      return;
+    }
+
+    List<String> userIds = [];
+    for (var studentId in studentIds) {
+      final user = await fetchUserByStudentId(studentId);
+      userIds.add(user['id']);
+    }
+
+    if (userIds.isNotEmpty) {
+      final success = await addParticipantsToEventByExcel(eventId, userIds);
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Participants added successfully.')),
+        );
+        LoggerService.logger.i("Participants added successfully: $userIds");
+        String title = "Congratulation <3!";
+        String body = "You have been added to the event: $eventName.";
+        String topic = "event_${eventId}_$eventName";
+
+        try {
+          await sendNotification(title, body, topic);
+          LoggerService.logger.i("Notification sent successfully.");
+        } catch (e) {
+          LoggerService.logger.e("Failed to send notification: $e");
+        }
+      } else {
+        LoggerService.logger.e("Failed to add participants.");
+      }
+    } else {
+      LoggerService.logger.e("No valid users found to add as participants.");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final eventId = widget.event.id;
+    final eventName = widget.event.name;
     return Scaffold(
       appBar: AppBar(
         title: Text(eventName),
@@ -127,6 +204,24 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   MaterialPageRoute(
                       builder: (context) => RequestPage(id: eventId)),
                 );
+              },
+            ),
+          if (userId == widget.event.idCreate)
+            IconButton(
+              icon: const Icon(Icons.person, color: Colors.black),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ExistedParticipants(id: eventId)),
+                );
+              },
+            ),
+          if (userId == widget.event.idCreate)
+            IconButton(
+              icon: const Icon(Icons.file_copy, color: Colors.black),
+              onPressed: () {
+                handleExcelUpload(eventId, eventName);
               },
             ),
           if (userId == widget.event.idCreate)
@@ -161,22 +256,22 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       : const SizedBox.shrink(),
                   const SizedBox(height: 10),
                   Text(
-                    'Event Name: $eventName',
+                    '${S.of(context).event_name}: $eventName',
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Description: $description',
+                    '${S.of(context).desc} $description',
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Location: $location',
+                    '${S.of(context).location}: $location',
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Start Date: $startDate',
+                    '${S.of(context).start_date}: $startDate',
                   ),
                   Text(
-                    'End Date: $endDate',
+                    '${S.of(context).end_date}: $endDate',
                   ),
                   const SizedBox(height: 24),
                   _buildEventStats(),
@@ -204,9 +299,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: const Text(
-                        "View Full Schedule",
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      child: Text(
+                        S.of(context).view_schedule,
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
                   ),
@@ -334,32 +430,32 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8.0),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Accessibility',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Switch(
-                    value: access,
-                    onChanged: (bool value) async {
-                      setState(() {
-                        access = value;
-                      });
+              // child: Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     const Text(
+              //       'Accessibility',
+              //       style: TextStyle(
+              //         fontSize: 16,
+              //         fontWeight: FontWeight.bold,
+              //         color: Colors.black,
+              //       ),
+              //     ),
+              //     Switch(
+              //       value: access,
+              //       onChanged: (bool value) async {
+              //         setState(() {
+              //           access = value;
+              //         });
 
-                      await updateEventAccess(widget.event.id, value);
-                    },
-                    activeColor: Colors.green,
-                    inactiveThumbColor: Colors.grey,
-                    inactiveTrackColor: Colors.grey[300],
-                  ),
-                ],
-              ),
+              //         await updateEventAccess(widget.event.id, value);
+              //       },
+              //       activeColor: Colors.green,
+              //       inactiveThumbColor: Colors.grey,
+              //       inactiveTrackColor: Colors.grey[300],
+              //     ),
+              //   ],
+              // ),
             ),
           ),
           const SizedBox(height: 16),
@@ -368,32 +464,32 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Register Schedule',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                Switch(
-                  value: allowSelectSchedule,
-                  onChanged: (bool value) async {
-                    setState(() {
-                      allowSelectSchedule = value;
-                    });
+            // child: Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     const Text(
+            //       'Register Schedule',
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.bold,
+            //         color: Colors.black,
+            //       ),
+            //     ),
+            //     Switch(
+            //       value: allowSelectSchedule,
+            //       onChanged: (bool value) async {
+            //         setState(() {
+            //           allowSelectSchedule = value;
+            //         });
 
-                    await updateEventAllow(eventId, false);
-                  },
-                  activeColor: Colors.green,
-                  inactiveThumbColor: Colors.grey,
-                  inactiveTrackColor: Colors.grey[300],
-                ),
-              ],
-            ),
+            //         await updateEventAllow(eventId, false);
+            //       },
+            //       activeColor: Colors.green,
+            //       inactiveThumbColor: Colors.grey,
+            //       inactiveTrackColor: Colors.grey[300],
+            //     ),
+            //   ],
+            // ),
           ),
         ],
       ),

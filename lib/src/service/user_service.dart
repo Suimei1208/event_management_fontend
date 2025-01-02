@@ -257,3 +257,45 @@ Future<String> uploadImageToImageKit(File imageFile) async {
     throw Exception('Failed to upload image ${response.statusCode}');
   }
 }
+
+Future<Map<String, dynamic>> fetchUserByStudentId(String studentId) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      LoggerService.logger.e("No user logged in");
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      LoggerService.logger.e("Failed to retrieve ID token");
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/user-services/api/Users/GetUserByStudentId/$studentId'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+
+      if (result['success'] == true) {
+        return result['data'] ?? {};
+      } else {
+        LoggerService.logger
+            .e("Failed to fetch user data, Success flag is false.");
+      }
+    } else {
+      LoggerService.logger
+          .e("Failed to fetch user data, status code: ${response.statusCode}");
+    }
+  } catch (e) {
+    LoggerService.logger.e("Error fetching user by student ID: $e");
+  }
+  return {};
+}
