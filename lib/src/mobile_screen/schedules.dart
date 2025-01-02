@@ -12,7 +12,9 @@ import 'package:intl/intl.dart';
 
 class SchedulesWidget extends StatefulWidget {
   final Event event;
-  const SchedulesWidget({super.key, required this.event});
+  final bool isRegistered;
+  const SchedulesWidget(
+      {super.key, required this.event, required this.isRegistered});
 
   @override
   State<SchedulesWidget> createState() => _SchedulesWidgetState();
@@ -39,8 +41,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
 
   Future<void> _loadEventData() async {
     id = await GetIdUser();
-    Event event =
-        await fetchEventByEventId(widget.event.id);
+    Event event = await fetchEventByEventId(widget.event.id);
 
     setState(() {
       eventName = event.name;
@@ -394,10 +395,12 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                               ],
                             ),
                           TextButton(
-                            onPressed: () async {
-                              await addParticipantToSchedule(
-                                  widget.event.id, user!.uid);
-                            },
+                            onPressed: widget.isRegistered
+                                ? () async {
+                                    await addParticipantToSchedule(
+                                        widget.event.id, user!.uid);
+                                  }
+                                : null,
                             child: const Text('Join'),
                           ),
                         ],

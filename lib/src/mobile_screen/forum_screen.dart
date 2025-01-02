@@ -198,7 +198,7 @@ class CommunityForumScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12.0),
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -363,12 +363,14 @@ class DiscussionCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(width: 16.0),
-                    Row(
-                      children: [
-                        const Icon(Icons.favorite_border),
-                        const SizedBox(width: 8.0),
-                        Text("$likes likes")
-                      ],
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Icon(Icons.favorite_border),
+                          const SizedBox(width: 8.0),
+                          Expanded(child: Text("$likes likes"))
+                        ],
+                      ),
                     ),
                   ],
                 ),

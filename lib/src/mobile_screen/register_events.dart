@@ -47,6 +47,21 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
     });
   }
 
+  Color _getStatusColorType(String type) {
+    switch (type) {
+      case 'Seminar':
+        return Colors.green.shade600;
+      case 'Workshop':
+        return Colors.blue.shade600;
+      case 'Conference':
+        return Colors.red.shade600;
+      case 'Competitions':
+        return Colors.purple.shade600;
+      default:
+        return Colors.grey;
+    }
+  }
+
   void _filterEvents(String query) {
     final filtered = _allEvents.where((event) {
       final eventName = event["name"].toLowerCase();
@@ -235,12 +250,38 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              event["name"],
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    event["name"],
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    softWrap: true,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: _getStatusColorType(event["type"]),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      event["type"],
+                      style: const TextStyle(
+                        // color: statusTextColor,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
             const SizedBox(height: 8),
             Row(
@@ -273,6 +314,9 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
+                  style: Theme.of(context).brightness == Brightness.dark
+                      ? ElevatedButton.styleFrom(backgroundColor: Colors.purple)
+                      : null,
                   onPressed: () {
                     Navigator.push(
                       context,
