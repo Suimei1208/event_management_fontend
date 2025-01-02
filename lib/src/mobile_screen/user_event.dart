@@ -155,7 +155,7 @@ class _UserEventsState extends State<UserEvents> {
                               crossAxisCount: 2,
                               crossAxisSpacing: 16.0,
                               mainAxisSpacing: 16.0,
-                              childAspectRatio: 0.6,
+                              childAspectRatio: 0.555,
                             ),
                             itemCount: _filteredEvents.length,
                             itemBuilder: (context, index) {
@@ -202,27 +202,12 @@ class EventCard extends StatelessWidget {
     switch (status) {
       case 'Upcoming':
         return const Color(0xFFE8F5E9);
-      case 'Canceled':
-        return const Color(0xFFFFEBEE);
+      case 'Cancelled':
+        return Colors.red[300];
       case 'Completed':
         return Colors.grey;
       default:
-        return Colors.yellow[200];
-    }
-  }
-
-  Color _getStatusColorType(String type) {
-    switch (type) {
-      case 'Seminar':
-        return Colors.green.shade600;
-      case 'Workshop':
-        return Colors.blue.shade600;
-      case 'Conference':
-        return Colors.red.shade600;
-      case 'Competitions':
-        return Colors.purple.shade600;
-      default:
-        return Colors.grey;
+        return const Color.fromARGB(255, 245, 203, 18);
     }
   }
 
@@ -230,8 +215,8 @@ class EventCard extends StatelessWidget {
     switch (status) {
       case 'Upcoming':
         return const Color(0xFF2E7D32);
-      case 'Canceled':
-        return const Color(0xFFC62828);
+      case 'Cancelled':
+        return Colors.white;
       case 'Completed':
         return Theme.of(context).textTheme.bodySmall?.color ?? Colors.black;
       default:
@@ -255,97 +240,110 @@ class EventCard extends StatelessWidget {
           );
         },
         child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(event.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis),
-                  const SizedBox(height: 8),
-                  Row(
+          child: Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(Icons.date_range_outlined),
-                      const SizedBox(
-                        width: 5,
+                      Text(event.name,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.date_range_outlined),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Expanded(
+                              child: Text(DateFormat('d/MM/yyyy')
+                                  .format(event.startDate))),
+                        ],
                       ),
-                      Text(DateFormat('d/MM/yyyy').format(event.startDate)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.timelapse),
-                      const SizedBox(
-                        width: 5,
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.timelapse),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Expanded(
+                              child: Text(DateFormat('h:mm a')
+                                  .format(event.startDate))),
+                        ],
                       ),
-                      Text(DateFormat('h:mm a').format(event.startDate)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on),
-                      const SizedBox(
-                        width: 5,
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Expanded(
+                            child: Text(event.location,
+                                maxLines: 2, overflow: TextOverflow.ellipsis),
+                          ),
+                        ],
                       ),
-                      Text(event.location),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: statusColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 4, vertical: 8),
-                      child: Text(
-                        event.status,
-                        style: TextStyle(
-                          color: statusTextColor,
-                          fontSize: 15,
+                      const SizedBox(height: 8),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4, vertical: 8),
+                          child: Text(
+                            event.status,
+                            style: TextStyle(
+                              color: statusTextColor,
+                              fontSize: 15,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.delete_outline,
-                      color: Color(0xFFFF6F00),
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      if (event.status == 'Canceled') {
-                        deleteEvent(event.id, context)
-                            .then((_) => loadEvents());
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const DialogWidget(
-                              message:
-                                  'Không thể xóa sự kiện sắp diễn ra hoặc đang diễn ra!',
-                              title: 'Notification',
+                      const SizedBox(height: 8),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Color(0xFFFF6F00),
+                          size: 30,
+                        ),
+                        onPressed: () {
+                          if (event.status == 'Canceled') {
+                            deleteEvent(event.id, context)
+                                .then((_) => loadEvents());
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const DialogWidget(
+                                  message:
+                                      'Không thể xóa sự kiện sắp diễn ra hoặc đang diễn ra!',
+                                  title: 'Notification',
+                                );
+                              },
                             );
-                          },
-                        );
-                      }
-                    },
+                          }
+                        },
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -387,8 +385,12 @@ class EventCard extends StatelessWidget {
                         children: [
                           Text(
                             event.name,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
                             softWrap: true,
-                            style: Theme.of(context).textTheme.titleMedium,
+                            // style: Theme.of(context).textTheme.titleMedium,
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 12),
@@ -428,8 +430,8 @@ class EventCard extends StatelessWidget {
                                       horizontal: 4, vertical: 8),
                                   child: Text(
                                     event.type,
-                                    style: TextStyle(
-                                      color: _getStatusColorType(event.type),
+                                    style: const TextStyle(
+                                      color: Colors.black,
                                       fontSize: 12,
                                     ),
                                   ),

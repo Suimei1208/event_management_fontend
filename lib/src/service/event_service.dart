@@ -1018,3 +1018,193 @@ Future<bool> removeParticipant(int eventId, int participantId) async {
     throw Exception('Failed to remove participant: $e');
   }
 }
+
+Future<Map<String, dynamic>> getStats(int eventId) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.get(
+      Uri.parse('${Config.baseUrl}/event-service/event/data/$eventId/stats'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData['success'] == true) {
+        return responseData['data'];
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Failed to fetch stats data');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to fetch stats data: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to fetch stats data');
+    }
+  } catch (e) {
+    throw Exception('Failed to fetch stats data: $e');
+  }
+}
+
+Future<void> cancelEvent(int eventId, BuildContext context) async {
+  try {
+    bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Hủy Event'),
+          content: const Text('Bạn có muốn hủy Event này không?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != null && confirmed) {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('No user logged in');
+      }
+
+      String? idToken = await user.getIdToken();
+      if (idToken == null) {
+        throw Exception('Failed to retrieve ID token');
+      }
+
+      final response = await http.put(
+        Uri.parse('${Config.baseUrl}/event-service/event/$eventId/cancel'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        if (responseData['success'] == true) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const DialogWidget(
+                message: 'Sự kiện đã được hủy.',
+                title: 'Notification',
+              );
+            },
+          );
+        } else {
+          throw Exception(responseData['message'] ?? 'Không thể hủy sự kiện');
+        }
+      } else {
+        LoggerService.logger.w(
+            'Failed to cancel event: ${response.statusCode} ${response.body}');
+        throw Exception(
+            'Không thể hủy sự kiện: ${response.statusCode} ${response.body}');
+      }
+    } else {
+      // Người dùng hủy hành động
+      LoggerService.logger.e("Người dùng đã hủy việc hủy sự kiện");
+    }
+  } catch (e) {
+    // Hiển thị lỗi
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Lỗi khi hủy sự kiện: $e')));
+  }
+}
+
+Future<void> resetEvent(int eventId, BuildContext context) async {
+  try {
+    bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Mở lại Event'),
+          content: const Text('Bạn có muốn mở lại Event này không?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('No'),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: const Text('Yes'),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != null && confirmed) {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        throw Exception('No user logged in');
+      }
+
+      String? idToken = await user.getIdToken();
+      if (idToken == null) {
+        throw Exception('Failed to retrieve ID token');
+      }
+
+      final response = await http.put(
+        Uri.parse('${Config.baseUrl}/event-service/event/$eventId/reset'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        if (responseData['success'] == true) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const DialogWidget(
+                message: 'Sự kiện đã được mở lại.',
+                title: 'Notification',
+              );
+            },
+          );
+        } else {
+          throw Exception(responseData['message'] ?? 'Không thể mở sự kiện');
+        }
+      } else {
+        LoggerService.logger.w(
+            'Failed to reset event: ${response.statusCode} ${response.body}');
+        throw Exception(
+            'Không thể mở sự kiện: ${response.statusCode} ${response.body}');
+      }
+    } else {
+      // Người dùng hủy hành động
+      LoggerService.logger.e("Người dùng đã hủy việc mở sự kiện");
+    }
+  } catch (e) {
+    // Hiển thị lỗi
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Lỗi khi hủy sự kiện: $e')));
+  }
+}

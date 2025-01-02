@@ -2,8 +2,6 @@
 import 'dart:io';
 
 import 'package:event_management/generated/l10n.dart';
-import 'package:event_management/src/mobile_screen/add_guest.dart';
-import 'package:event_management/src/mobile_screen/existed_participants.dart';
 import 'package:event_management/src/mobile_screen/request.dart';
 import 'package:event_management/src/mobile_screen/schedules.dart';
 import 'package:event_management/src/mobile_screen/update_event.dart';
@@ -12,8 +10,8 @@ import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/notification_service.dart';
-import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/src/service/user_service.dart';
+import 'package:event_management/widget/quick_actions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -42,6 +40,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   bool isLoading = true;
   bool access = false;
   bool allowSelectSchedule = false;
+  String registered = '';
+  String speakers = '';
+  String sessions = '';
 
   @override
   void initState() {
@@ -60,6 +61,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       photoUrl = '';
       access = false;
       allowSelectSchedule = false;
+      registered = '';
+      speakers = '';
+      sessions = '';
     });
 
     await _fetchUserId();
@@ -110,7 +114,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   Future<void> _loadEventData() async {
     try {
       final eventData = await getEventData(widget.event.id);
-
+      final stats = await getStats(widget.event.id);
       setState(() {
         access = eventData['data']['access'];
         allowSelectSchedule = eventData['data']['allowSelectSchedule'];
@@ -122,6 +126,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             "${DateFormat.jm().format(DateTime.parse(eventData['data']['startDate']))} - ${DateTime.parse(eventData['data']['startDate']).day}/${DateTime.parse(eventData['data']['startDate']).month}/${DateTime.parse(eventData['data']['startDate']).year}";
         endDate =
             "${DateFormat.jm().format(DateTime.parse(eventData['data']['endDate']))} - ${DateTime.parse(eventData['data']['endDate']).day}/${DateTime.parse(eventData['data']['endDate']).month}/${DateTime.parse(eventData['data']['endDate']).year}";
+        registered = stats['registered'].toString();
+        speakers = stats['speaker'].toString();
+        sessions = stats['sessions'].toString();
       });
     } catch (error) {
       LoggerService.logger.e(error);
@@ -190,14 +197,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(eventName),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        // backgroundColor: Colors.white,
+        // foregroundColor: Colors.black,
         elevation: 0,
         actions: [
           if (userId == widget.event.idCreate)
             IconButton(
-              icon: const Icon(Icons.insert_invitation_sharp,
-                  color: Colors.black),
+              icon: const Icon(
+                Icons.insert_invitation_sharp,
+              ),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -206,20 +214,20 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 );
               },
             ),
+          // if (userId == widget.event.idCreate)
+          //   IconButton(
+          //     icon: const Icon(Icons.person),
+          //     onPressed: () {
+          //       Navigator.push(
+          //         context,
+          //         MaterialPageRoute(
+          //             builder: (context) => ExistedParticipants(id: eventId)),
+          //       );
+          //     },
+          //   ),
           if (userId == widget.event.idCreate)
             IconButton(
-              icon: const Icon(Icons.person, color: Colors.black),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ExistedParticipants(id: eventId)),
-                );
-              },
-            ),
-          if (userId == widget.event.idCreate)
-            IconButton(
-              icon: const Icon(Icons.file_copy, color: Colors.black),
+              icon: const Icon(Icons.file_copy),
               onPressed: () {
                 handleExcelUpload(eventId, eventName);
               },
@@ -229,8 +237,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               icon: const Icon(Icons.more_vert),
               onPressed: () {
                 showModalBottomSheet(
+                  isScrollControlled: true,
                   context: context,
-                  builder: (context) => _buildQuickActions(),
+                  builder: (context) => QuickActions(
+                    eventId: widget.event.id,
+                    access: access,
+                    allowSelectSchedule: allowSelectSchedule,
+                    status: widget.event.status,
+                  ),
                 );
               },
             ),
@@ -274,7 +288,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     '${S.of(context).end_date}: $endDate',
                   ),
                   const SizedBox(height: 24),
-                  _buildEventStats(),
+                  _buildEventStats(registered, speakers, sessions),
                   const SizedBox(height: 24),
                   _buildFeaturedParticipant("Speaker"),
                   const SizedBox(height: 8),
@@ -288,6 +302,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           MaterialPageRoute(
                               builder: (context) => SchedulesWidget(
                                     event: widget.event,
+                                    isRegistered: allowSelectSchedule,
                                   )),
                         );
                       },
@@ -329,249 +344,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  Widget _buildQuickActions() {
-    final eventId = widget.event.id;
+  Widget _buildEventStats(String registered, String speakers, String sessions) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            "Quick Actions",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-
-          // Add Speaker and Guest Action Buttons
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildActionButton(Icons.person_add, "Add Speaker",
-                        () async {
-                      final newGuests = await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              AddMembersPage(name: "Speakers"),
-                        ),
-                      );
-
-                      if (newGuests != null && newGuests.isNotEmpty) {
-                        await addParticipant(newGuests, eventId, "Speaker");
-                        Navigator.of(context).pop();
-                        LoggerService.logger.i("Speaker added: $newGuests");
-                      }
-                    }),
-                    _buildActionButton(Icons.person_add, "Add Guest", () async {
-                      final newGuests = await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => AddMembersPage(name: "Guests"),
-                        ),
-                      );
-
-                      if (newGuests != null && newGuests.isNotEmpty) {
-                        await addParticipant(newGuests, eventId, "Guest");
-                        Navigator.of(context).pop();
-                        LoggerService.logger.i("Guests added: $newGuests");
-                      }
-                    }),
-                    _buildActionButton(Icons.share, "Share Role", () {}),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Remove Speaker and Guest Action Buttons
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildActionButton(
-                        Icons.group_add_outlined, "Add Member", () {}),
-                    _buildActionButton(Icons.edit, "Remove Speaker", () async {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) => _buildEditGuest("Speaker"),
-                      );
-                    }),
-                    _buildActionButton(Icons.edit, "Remove Guest", () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) => _buildEditGuest("Guest"),
-                      );
-                    }),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              // child: Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //     const Text(
-              //       'Accessibility',
-              //       style: TextStyle(
-              //         fontSize: 16,
-              //         fontWeight: FontWeight.bold,
-              //         color: Colors.black,
-              //       ),
-              //     ),
-              //     Switch(
-              //       value: access,
-              //       onChanged: (bool value) async {
-              //         setState(() {
-              //           access = value;
-              //         });
-
-              //         await updateEventAccess(widget.event.id, value);
-              //       },
-              //       activeColor: Colors.green,
-              //       inactiveThumbColor: Colors.grey,
-              //       inactiveTrackColor: Colors.grey[300],
-              //     ),
-              //   ],
-              // ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            // child: Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     const Text(
-            //       'Register Schedule',
-            //       style: TextStyle(
-            //         fontSize: 16,
-            //         fontWeight: FontWeight.bold,
-            //         color: Colors.black,
-            //       ),
-            //     ),
-            //     Switch(
-            //       value: allowSelectSchedule,
-            //       onChanged: (bool value) async {
-            //         setState(() {
-            //           allowSelectSchedule = value;
-            //         });
-
-            //         await updateEventAllow(eventId, false);
-            //       },
-            //       activeColor: Colors.green,
-            //       inactiveThumbColor: Colors.grey,
-            //       inactiveTrackColor: Colors.grey[300],
-            //     ),
-            //   ],
-            // ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEditGuest(String role) {
-    return FutureBuilder<List<Participant>>(
-      future: fetchParticipantsByEventIdAndRole(widget.event.id, role),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(
-              child: Text('No guests available for this event.'));
-        } else if (snapshot.hasError) {
-          return Center(
-              child: Text('Failed to load guests: ${snapshot.error}'));
-        } else {
-          List<Participant> participants = snapshot.data!;
-          return ListView.builder(
-            shrinkWrap: true,
-            itemCount: participants.length,
-            itemBuilder: (context, index) {
-              Participant guest = participants[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(guest.photoUrl),
-                  ),
-                  title: Text(guest.name),
-                  subtitle: Text(guest.role),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () async {
-                      bool confirmDelete = await showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text("Delete $role"),
-                          content: Text(
-                              'Are you sure you want to delete ${guest.name}?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop(false);
-                              },
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                await deleteParticipantsFromEvent(
-                                    widget.event.id, guest.id, role);
-                                Navigator.of(context).pop(true);
-                              },
-                              child: const Text('Delete'),
-                            ),
-                          ],
-                        ),
-                      );
-                      if (confirmDelete) {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                        LoggerService.logger.i(
-                            '${guest.name} has been deleted from the event.');
-                      }
-                    },
-                  ),
-                ),
-              );
-            },
-          );
-        }
-      },
-    );
-  }
-
-  Widget _buildEventStats() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
+        // color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -584,9 +361,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildStat("250", "Registered"),
-              _buildStat("12", "Speakers"),
-              _buildStat("24", "Sessions"),
+              _buildStat(registered, "Registered"),
+              _buildStat(speakers, "Speakers"),
+              _buildStat(sessions, "Sessions"),
             ],
           ),
         ],
@@ -638,23 +415,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Colors.grey.shade200,
-            child: Icon(icon, size: 28, color: Colors.deepPurple),
-          ),
-          const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontSize: 14)),
-        ],
-      ),
-    );
-  }
-
   Widget _buildStat(String value, String label) {
     return Column(
       children: [
@@ -669,26 +429,34 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   Widget _buildSpeaker(String name, String role, String imageUrl) {
-    return Row(
+    return Column(
       children: [
-        CircleAvatar(
-          radius: 30,
-          backgroundImage: NetworkImage(imageUrl),
-        ),
-        const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            Text(
-              name,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            CircleAvatar(
+              radius: 30,
+              backgroundImage: NetworkImage(imageUrl),
             ),
-            Text(
-              role,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  role,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ],
             ),
           ],
         ),
+        const SizedBox(
+          height: 10,
+        )
       ],
     );
   }

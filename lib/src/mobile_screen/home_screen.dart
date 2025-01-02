@@ -64,6 +64,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       events = listEvents;
     });
+    // for (var event in events) {
+    //   LoggerService.logger.i("Event: ${event.name}");
+    // }
   }
 
   void _onItemTapped(int index) {
@@ -81,6 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
         : null;
     final Duration timeUntilNextEvent =
         nextEvent != null ? nextEvent.startDate.difference(now) : Duration.zero;
+    final ongoingEvents = events.isNotEmpty
+        ? events.firstWhere((event) => event.status == "Ongoing")
+        : null;
 
     final List<Widget> screens = [
       // Home Screen
@@ -90,6 +96,69 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (ongoingEvents != null)
+                Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("On-going Event",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                ongoingEvents.name,
+                                style: const TextStyle(fontSize: 16),
+                                softWrap: true,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            const Chip(
+                              label: Text("Ongoing",
+                                  style: TextStyle(color: Colors.white)),
+                              backgroundColor:
+                                  Color.fromARGB(255, 245, 203, 18),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "${DateFormat.jm().format(ongoingEvents.startDate)} - ${ongoingEvents.location}",
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                            ElevatedButton(
+                                style: Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.purple)
+                                    : null,
+                                onPressed: () {
+                                  setState(() {
+                                    LoggerService.logger.i(
+                                        "Event clicked ticket ${ongoingEvents.id}");
+                                  });
+                                },
+                                child: const Text('View your ticket'))
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
@@ -114,6 +183,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
+                          const SizedBox(
+                            width: 8,
+                          ),
                           Chip(
                             label: Text(
                                 "In ${timeUntilNextEvent.inHours} hours",
@@ -137,7 +209,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               Column(
-                children: events.map((event) => buildEventCard(event)).toList(),
+                children: events
+                    .where((event) =>
+                        ongoingEvents != null && event != ongoingEvents)
+                    .map((event) => buildEventCard(event))
+                    .toList(),
               )
             ],
           ),
@@ -284,60 +360,69 @@ class _HomeScreenState extends State<HomeScreen> {
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "${DateFormat.jm().format(event.startDate)} - ${event.startDate.day}/${event.startDate.month}/${event.startDate.year}",
-                          style: const TextStyle(
-                              fontSize: 16, color: Colors.purple),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          event.name,
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
-                          softWrap: true,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          event.description,
-                          style: const TextStyle(color: Colors.grey),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on),
-                                Text(
-                                  event.location,
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                            ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    LoggerService.logger
-                                        .i("Event clicked ticket ${event.id}");
-                                  });
-                                },
-                                child: const Text('View your ticket'))
-                          ],
-                        ),
-                      ],
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${DateFormat.jm().format(event.startDate)} - ${event.startDate.day}/${event.startDate.month}/${event.startDate.year}",
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.purple),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        event.name,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                        softWrap: true,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        event.description,
+                        style: const TextStyle(color: Colors.grey),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.location_on),
+                              Text(
+                                event.location,
+                                style: const TextStyle(color: Colors.grey),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const Icon(Icons.arrow_forward_ios,
-                      size: 16, color: Colors.grey),
+                  // const Icon(Icons.arrow_forward_ios,
+                  //     size: 16, color: Colors.grey),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton(
+                    style: Theme.of(context).brightness == Brightness.dark
+                        ? ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple)
+                        : null,
+                    onPressed: () {
+                      setState(() {
+                        LoggerService.logger
+                            .i("Event clicked ticket ${event.id}");
+                      });
+                    },
+                    child: const Text('View your ticket'),
+                  )
                 ],
               ),
             ),
