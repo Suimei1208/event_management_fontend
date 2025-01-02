@@ -940,3 +940,81 @@ Future<String> uploadImageEventToImageKit(File imageFile, int eventId) async {
     throw Exception('Failed to upload image ${response.statusCode}');
   }
 }
+
+Future<bool> addParticipantsToEventByExcel(
+    int eventId, List<String> userIds) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      LoggerService.logger.e("No user logged in");
+      throw Exception('No user logged in');
+    }
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      LoggerService.logger.e("Failed to retrieve ID token");
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.post(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/event/add-participants-excel/$eventId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $idToken',
+      },
+      body: json.encode(userIds),
+    );
+
+    if (response.statusCode == 200) {
+      LoggerService.logger.i("Participants added successfully.");
+      return true;
+    } else {
+      LoggerService.logger.e(
+          "Failed to add participants, status code: ${response.statusCode}, body: ${response.body}");
+      return false;
+    }
+  } catch (e) {
+    LoggerService.logger.e("Error adding participants to event: $e");
+    return false;
+  }
+}
+
+Future<bool> removeParticipant(int eventId, int participantId) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.delete(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/event/$eventId/participants/$participantId/remove'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData['success'] == true) {
+        return true;
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Failed to remove participant');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to remove participant: ${response.statusCode} ${response.body}');
+      throw Exception(
+          'Failed to remove participant: ${response.statusCode} ${response.body}');
+    }
+  } catch (e) {
+    throw Exception('Failed to remove participant: $e');
+  }
+}

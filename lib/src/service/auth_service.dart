@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, empty_catches
 
 import 'dart:convert';
 
@@ -123,10 +123,7 @@ Future<void> signInWithGoogle(BuildContext context) async {
         }
       }
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('Login failed: ${e.toString()}')));
-  }
+  } catch (e) {}
 }
 
 Future<void> _sendDataToBackend(Map<String, String> data) async {

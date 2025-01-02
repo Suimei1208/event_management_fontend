@@ -1,9 +1,13 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print, use_build_context_synchronously
+// import 'package:device_calendar/device_calendar.dart' as device_calendar;
+// import 'package:timezone/timezone.dart' as tz;
+// import 'package:timezone/data/latest.dart' as tz;
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:event_management/generated/l10n.dart';
 
 class CreateEvent extends StatefulWidget {
   const CreateEvent({super.key});
@@ -129,36 +133,6 @@ class _CreateEventState extends State<CreateEvent> {
     }
   }
 
-  // Future<void> _uploadImage() async {
-  //   if (_imageFile != null) {
-  //     try {
-  //       String imageUrl = await uploadImageToImageKit(_imageFile!);
-  //       setState(() {
-  //         _imageUrl = imageUrl;
-  //       });
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //           const SnackBar(content: Text('Image uploaded successfully!')));
-  //     } catch (e) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //           SnackBar(content: Text('Failed to upload image: $e')));
-  //     }
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Please select an image first')));
-  //   }
-  // }
-
-  // Future<void> _pickImage() async {
-  //   final picker = ImagePicker();
-  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-  //   if (pickedFile != null) {
-  //     setState(() {
-  //       _imageFile = File(pickedFile.path);
-  //     });
-  //   }
-  // }
-
   String? textController1Validator(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter event name';
@@ -196,7 +170,7 @@ class _CreateEventState extends State<CreateEvent> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           title: Text(
-            'Create Event',
+            S.of(context).create_event,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontFamily: 'Inter Tight',
                   letterSpacing: 0.0,
@@ -228,7 +202,7 @@ class _CreateEventState extends State<CreateEvent> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Fill in the details below to create your new event.',
+                    S.of(context).guide_create_event,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontFamily: 'Inter', letterSpacing: 0.0, fontSize: 16),
                   ),
@@ -245,7 +219,7 @@ class _CreateEventState extends State<CreateEvent> {
                           autofocus: false,
                           obscureText: false,
                           decoration: InputDecoration(
-                            labelText: 'Event Name',
+                            labelText: S.of(context).event_name,
                             labelStyle: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -253,7 +227,8 @@ class _CreateEventState extends State<CreateEvent> {
                                   fontFamily: 'Inter',
                                   letterSpacing: 0.0,
                                 ),
-                            hintText: 'Enter event name...',
+                            hintText:
+                                "${S.of(context).enter} ${S.of(context).event_name}",
                             hintStyle: Theme.of(context)
                                 .textTheme
                                 .titleMedium
@@ -321,7 +296,7 @@ class _CreateEventState extends State<CreateEvent> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Event Type',
+                                S.of(context).event_type,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -364,7 +339,7 @@ class _CreateEventState extends State<CreateEvent> {
                             autofocus: false,
                             obscureText: false,
                             decoration: InputDecoration(
-                              labelText: 'Description',
+                              labelText: S.of(context).desc,
                               labelStyle: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -372,7 +347,8 @@ class _CreateEventState extends State<CreateEvent> {
                                     fontFamily: 'Inter',
                                     letterSpacing: 0.0,
                                   ),
-                              hintText: 'Describe your event...',
+                              hintText:
+                                  "${S.of(context).describe} ${S.of(context).desc}",
                               hintStyle: Theme.of(context)
                                   .textTheme
                                   .titleMedium
@@ -441,7 +417,7 @@ class _CreateEventState extends State<CreateEvent> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Event Objectives',
+                                S.of(context).obj,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -459,7 +435,8 @@ class _CreateEventState extends State<CreateEvent> {
                                     autofocus: false,
                                     obscureText: false,
                                     decoration: InputDecoration(
-                                      hintText: 'Enter event objectives...',
+                                      hintText:
+                                          "${S.of(context).enter} ${S.of(context).obj}",
                                       hintStyle: Theme.of(context)
                                           .textTheme
                                           .titleMedium
@@ -536,7 +513,7 @@ class _CreateEventState extends State<CreateEvent> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Date & Time',
+                                S.of(context).start_date,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -583,9 +560,10 @@ class _CreateEventState extends State<CreateEvent> {
                                                 child: TextField(
                                                   controller: dateController,
                                                   readOnly: true,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    hintText: 'Select Date',
+                                                  decoration: InputDecoration(
+                                                    hintText: S
+                                                        .of(context)
+                                                        .select_date,
                                                     border: InputBorder.none,
                                                   ),
                                                 ),
@@ -629,9 +607,10 @@ class _CreateEventState extends State<CreateEvent> {
                                                 child: TextField(
                                                   controller: timeController,
                                                   readOnly: true,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    hintText: 'Select Time',
+                                                  decoration: InputDecoration(
+                                                    hintText: S
+                                                        .of(context)
+                                                        .select_time,
                                                     border: InputBorder.none,
                                                   ),
                                                 ),
@@ -647,7 +626,7 @@ class _CreateEventState extends State<CreateEvent> {
                               const SizedBox(height: 12),
                               const SizedBox(height: 20),
                               Text(
-                                'End Date & Time',
+                                S.of(context).end_date,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -694,9 +673,10 @@ class _CreateEventState extends State<CreateEvent> {
                                                 child: TextField(
                                                   controller: endDateController,
                                                   readOnly: true,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    hintText: 'Select End Date',
+                                                  decoration: InputDecoration(
+                                                    hintText: S
+                                                        .of(context)
+                                                        .select_date,
                                                     border: InputBorder.none,
                                                   ),
                                                 ),
@@ -740,9 +720,10 @@ class _CreateEventState extends State<CreateEvent> {
                                                 child: TextField(
                                                   controller: endTimeController,
                                                   readOnly: true,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    hintText: 'Select End Time',
+                                                  decoration: InputDecoration(
+                                                    hintText: S
+                                                        .of(context)
+                                                        .select_time,
                                                     border: InputBorder.none,
                                                   ),
                                                 ),
@@ -778,7 +759,7 @@ class _CreateEventState extends State<CreateEvent> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Location',
+                                S.of(context).location,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -796,7 +777,8 @@ class _CreateEventState extends State<CreateEvent> {
                                     autofocus: false,
                                     obscureText: false,
                                     decoration: InputDecoration(
-                                      hintText: 'Enter event location...',
+                                      hintText:
+                                          "${S.of(context).enter} ${S.of(context).location}",
                                       hintStyle: Theme.of(context)
                                           .textTheme
                                           .titleMedium
@@ -867,74 +849,6 @@ class _CreateEventState extends State<CreateEvent> {
                             width: 1,
                           ),
                         ),
-                        // child: Padding(
-                        //   padding: const EdgeInsets.all(16.0),
-                        //   child: Column(
-                        //     crossAxisAlignment: CrossAxisAlignment.center,
-                        //     children: [
-                        //       // Display the selected image
-                        //       if (_imageFile != null)
-                        //         ClipRRect(
-                        //           borderRadius: BorderRadius.circular(12),
-                        //           child: Image.file(
-                        //             _imageFile!,
-                        //             height: 200,
-                        //             width: 200,
-                        //             fit: BoxFit.cover,
-                        //           ),
-                        //         ),
-                        //       const SizedBox(height: 20),
-
-                        //       // Pick Image Button
-                        //       ElevatedButton(
-                        //         onPressed: _pickImage,
-                        //         style: ElevatedButton.styleFrom(
-                        //           padding: const EdgeInsets.symmetric(
-                        //             vertical: 12.0,
-                        //             horizontal: 20.0,
-                        //           ),
-                        //         ),
-                        //         child: const Text('Pick Image'),
-                        //       ),
-                        //       const SizedBox(height: 20),
-
-                        //       // Save Image Button
-                        //       ElevatedButton(
-                        //         onPressed: _uploadImage,
-                        //         style: ElevatedButton.styleFrom(
-                        //           padding: const EdgeInsets.symmetric(
-                        //             vertical: 12.0,
-                        //             horizontal: 20.0,
-                        //           ),
-                        //         ),
-                        //         child: const Text('Save Image'),
-                        //       ),
-                        //       const SizedBox(height: 20),
-
-                        //       // Display uploaded image URL
-                        //       if (_imageUrl.isNotEmpty)
-                        //         Column(
-                        //           children: [
-                        //             const Text(
-                        //               'Uploaded Image URL:',
-                        //               style: TextStyle(
-                        //                   fontWeight: FontWeight.bold),
-                        //             ),
-                        //             const SizedBox(height: 10),
-                        //             ClipRRect(
-                        //               borderRadius: BorderRadius.circular(12),
-                        //               child: Image.network(
-                        //                 '$_imageUrl?updatedAt=${DateTime.now().millisecondsSinceEpoch}',
-                        //                 height: 200,
-                        //                 width: 200,
-                        //                 fit: BoxFit.cover,
-                        //               ),
-                        //             ),
-                        //           ],
-                        //         ),
-                        //     ],
-                        //   ),
-                        // )
                       )
                     ],
                   ),
@@ -963,6 +877,52 @@ class _CreateEventState extends State<CreateEvent> {
                             access: false,
                             allowSelectSchedule: false);
                         LoggerService.logger.w(event.toJson());
+
+                        // Add event to device calendar
+                        // final device_calendar.DeviceCalendarPlugin
+                        //     deviceCalendarPlugin =
+                        //     device_calendar.DeviceCalendarPlugin();
+                        // try {
+                        //   var result =
+                        //       await deviceCalendarPlugin.requestPermissions();
+                        //   if (result.isSuccess && result.data!) {
+                        //     List<device_calendar.Calendar> calendars =
+                        //         (await deviceCalendarPlugin.retrieveCalendars())
+                        //             as List<device_calendar.Calendar>;
+                        //     if (calendars.isNotEmpty) {
+                        //       tz.initializeTimeZones();
+                        //       final location =
+                        //           tz.getLocation('Asia/Ho_Chi_Minh');
+                        //       final tzDateTimeStart =
+                        //           tz.TZDateTime.from(event.startDate, location);
+                        //       final tzDateTimeEnd =
+                        //           tz.TZDateTime.from(event.endDate, location);
+                        //       device_calendar.Calendar calendar =
+                        //           calendars.first;
+                        //       device_calendar.Event newEvent =
+                        //           device_calendar.Event(
+                        //         calendar.id,
+                        //         title: event.name,
+                        //         start: tzDateTimeStart,
+                        //         end: tzDateTimeEnd,
+                        //         description: event.description,
+                        //         location: event.location,
+                        //       );
+
+                        //       await deviceCalendarPlugin
+                        //           .createOrUpdateEvent(newEvent);
+                        //       LoggerService.logger
+                        //           .w('Event added to the calendar');
+                        //     }
+                        //   } else {
+                        //     LoggerService.logger
+                        //         .w('Calendar permission not granted');
+                        //   }
+                        // } catch (e) {
+                        //   LoggerService.logger
+                        //       .e('Error adding event to calendar: $e');
+                        // }
+
                         await createEvent(event, context);
                       },
                       style: ElevatedButton.styleFrom(
@@ -980,7 +940,7 @@ class _CreateEventState extends State<CreateEvent> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: const Text('Create Event'),
+                      child: Text(S.of(context).create_event),
                     ),
                   ),
                 ],

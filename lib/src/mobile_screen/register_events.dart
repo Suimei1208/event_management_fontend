@@ -1,5 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/detail_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
@@ -18,16 +18,55 @@ class EventRegisterScreen extends StatefulWidget {
 }
 
 class _EventRegisterScreenState extends State<EventRegisterScreen> {
-  // Use a Future to load events dynamically
   late Future<List<Map<String, dynamic>>> _eventsFuture;
+  List<Map<String, dynamic>> _allEvents = [];
+  List<Map<String, dynamic>> _filteredEvents = [];
+
+  String? _selectedType;
+  DateTime? _selectedStartDate;
+
+  final List<String> _eventTypes = [
+    "Seminar",
+    "Workshop",
+    "Conference",
+    "Competition"
+  ];
 
   @override
   void initState() {
     super.initState();
-    _eventsFuture = fetchEventCanRegister(); // Fetch events dynamically
+    _eventsFuture = fetchEventCanRegister();
+    _loadEvents();
   }
 
-  // Register user for an event
+  Future<void> _loadEvents() async {
+    final events = await fetchEventCanRegister();
+    setState(() {
+      _allEvents = events;
+      _filteredEvents = events;
+    });
+  }
+
+  void _filterEvents(String query) {
+    final filtered = _allEvents.where((event) {
+      final eventName = event["name"].toLowerCase();
+      final searchQuery = query.toLowerCase();
+      final matchesType = _selectedType == null ||
+          _selectedType!.isEmpty ||
+          event["type"] == _selectedType;
+      final matchesStartDate = _selectedStartDate == null ||
+          DateTime.parse(event["startDate"]).isAfter(_selectedStartDate!) ||
+          DateTime.parse(event["startDate"])
+              .isAtSameMomentAs(_selectedStartDate!);
+
+      return eventName.contains(searchQuery) && matchesType && matchesStartDate;
+    }).toList();
+
+    setState(() {
+      _filteredEvents = filtered;
+    });
+  }
+
   Future<void> _registerForEvent(String eventId) async {
     try {
       await UserRegisterEvent(eventId);
@@ -35,10 +74,7 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Successfully registered for the event")),
       );
-      setState(() {
-        _eventsFuture =
-            fetchEventCanRegister(); // Reload events after registration
-      });
+      await _loadEvents();
     } catch (e) {
       LoggerService.logger.e("Error registering for event: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,7 +83,6 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
     }
   }
 
-  // Unregister user from an event
   Future<void> _unregisterFromEvent(String eventId) async {
     try {
       await unregisterEvent(eventId);
@@ -56,10 +91,7 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
         const SnackBar(
             content: Text("Successfully unregistered from the event")),
       );
-      setState(() {
-        _eventsFuture =
-            fetchEventCanRegister(); // Reload events after unregistration
-      });
+      await _loadEvents();
     } catch (e) {
       LoggerService.logger.e("Error unregistering from event: $e");
       ScaffoldMessenger.of(context).showSnackBar(
@@ -68,35 +100,124 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
     }
   }
 
+  void _selectStartDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2101),
+    );
+
+    if (picked != null && picked != _selectedStartDate) {
+      setState(() {
+        _selectedStartDate = picked;
+      });
+      _filterEvents('');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Register Events"),
+        title: Text(S.of(context).register_event),
       ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _eventsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-                child: Text("No events available for registration"));
-          }
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: TextField(
+                onChanged: _filterEvents,
+                decoration: InputDecoration(
+                  hintText: S.of(context).search_event,
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor:
+                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: DropdownButtonFormField<String>(
+                value: _selectedType,
+                items: [
+                  const DropdownMenuItem(value: '', child: Text('All Types')),
+                  ..._eventTypes.map((type) {
+                    return DropdownMenuItem(
+                      value: type,
+                      child: Text(type),
+                    );
+                  }),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _selectedType = value;
+                  });
+                  _filterEvents('');
+                },
+                decoration: InputDecoration(
+                  labelText: S.of(context).event_type,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor:
+                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      _selectedStartDate == null
+                          ? 'Select Start or After Date'
+                          : 'Start or After Date: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.calendar_today),
+                    onPressed: () => _selectStartDate(context),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _eventsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                        child: Text("No events available for registration"));
+                  }
 
-          final events = snapshot.data!;
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: events.length,
-            itemBuilder: (context, index) {
-              final event = events[index];
-              return _buildEventCard(event);
-            },
-          );
-        },
+                  return ListView.builder(
+                    itemCount: _filteredEvents.length,
+                    itemBuilder: (context, index) {
+                      final event = _filteredEvents[index];
+                      return _buildEventCard(event);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -160,7 +281,7 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
                       ),
                     );
                   },
-                  child: const Text("View Details"),
+                  child: Text(S.of(context).view_detail),
                 ),
                 ElevatedButton(
                   onPressed: isRegistered == "Approved"
@@ -181,8 +302,10 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
                   ),
                   child: Text(
                     isRegistered == "Approved"
-                        ? "Approved"
-                        : (isRegistered == "Pending" ? "Cancel" : "Register"),
+                        ? S.of(context).approved
+                        : (isRegistered == "Pending"
+                            ? S.of(context).cancel
+                            : S.of(context).register),
                   ),
                 ),
               ],
@@ -198,8 +321,7 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
       final DateTime parsedDate = DateTime.parse(date);
       return DateFormat.yMMMd().format(parsedDate);
     } catch (e) {
-      LoggerService.logger.e("Error parsing date: $e");
-      return "Invalid Date";
+      return "Invalid date";
     }
   }
 }

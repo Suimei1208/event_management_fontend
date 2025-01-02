@@ -199,6 +199,396 @@ class S {
       args: [],
     );
   }
+
+  /// `Profile`
+  String get profile {
+    return Intl.message(
+      'Profile',
+      name: 'profile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Welcome Back`
+  String get welcome_back {
+    return Intl.message(
+      'Welcome Back',
+      name: 'welcome_back',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next Event`
+  String get next_event {
+    return Intl.message(
+      'Next Event',
+      name: 'next_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next Events`
+  String get next_events {
+    return Intl.message(
+      'Next Events',
+      name: 'next_events',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Home`
+  String get home {
+    return Intl.message(
+      'Home',
+      name: 'home',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Management Event`
+  String get manage_event {
+    return Intl.message(
+      'Management Event',
+      name: 'manage_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Register Event`
+  String get register_event {
+    return Intl.message(
+      'Register Event',
+      name: 'register_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Forum`
+  String get forum {
+    return Intl.message(
+      'Forum',
+      name: 'forum',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Event Name`
+  String get event_name {
+    return Intl.message(
+      'Event Name',
+      name: 'event_name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Description`
+  String get desc {
+    return Intl.message(
+      'Description',
+      name: 'desc',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Event Objectives`
+  String get obj {
+    return Intl.message(
+      'Event Objectives',
+      name: 'obj',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Location`
+  String get location {
+    return Intl.message(
+      'Location',
+      name: 'location',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start Date`
+  String get start_date {
+    return Intl.message(
+      'Start Date',
+      name: 'start_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `End Date`
+  String get end_date {
+    return Intl.message(
+      'End Date',
+      name: 'end_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Speaker`
+  String get speaker {
+    return Intl.message(
+      'Speaker',
+      name: 'speaker',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Special Guest`
+  String get special_guest {
+    return Intl.message(
+      'Special Guest',
+      name: 'special_guest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `View Schedule`
+  String get view_schedule {
+    return Intl.message(
+      'View Schedule',
+      name: 'view_schedule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Speaker`
+  String get add_speaker {
+    return Intl.message(
+      'Add Speaker',
+      name: 'add_speaker',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Special Guest`
+  String get add_special_guest {
+    return Intl.message(
+      'Add Special Guest',
+      name: 'add_special_guest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove Speaker`
+  String get remove_speaker {
+    return Intl.message(
+      'Remove Speaker',
+      name: 'remove_speaker',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Remove Special Guest`
+  String get remove_special_guest {
+    return Intl.message(
+      'Remove Special Guest',
+      name: 'remove_special_guest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share Role`
+  String get share_role {
+    return Intl.message(
+      'Share Role',
+      name: 'share_role',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add member`
+  String get add_member {
+    return Intl.message(
+      'Add member',
+      name: 'add_member',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pending Request`
+  String get pending_request {
+    return Intl.message(
+      'Pending Request',
+      name: 'pending_request',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Existed Participant`
+  String get existed_participant {
+    return Intl.message(
+      'Existed Participant',
+      name: 'existed_participant',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Approved Participants`
+  String get approved_participants {
+    return Intl.message(
+      'Approved Participants',
+      name: 'approved_participants',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Added Participants`
+  String get added_participants {
+    return Intl.message(
+      'Added Participants',
+      name: 'added_participants',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `View Detail`
+  String get view_detail {
+    return Intl.message(
+      'View Detail',
+      name: 'view_detail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Search Event...`
+  String get search_event {
+    return Intl.message(
+      'Search Event...',
+      name: 'search_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Event Type`
+  String get event_type {
+    return Intl.message(
+      'Event Type',
+      name: 'event_type',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Approved`
+  String get approved {
+    return Intl.message(
+      'Approved',
+      name: 'approved',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Register`
+  String get register {
+    return Intl.message(
+      'Register',
+      name: 'register',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel`
+  String get cancel {
+    return Intl.message(
+      'Cancel',
+      name: 'cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fill in the details below to create your new event`
+  String get guide_create_event {
+    return Intl.message(
+      'Fill in the details below to create your new event',
+      name: 'guide_create_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create Event`
+  String get create_event {
+    return Intl.message(
+      'Create Event',
+      name: 'create_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter`
+  String get enter {
+    return Intl.message(
+      'Enter',
+      name: 'enter',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Describe`
+  String get describe {
+    return Intl.message(
+      'Describe',
+      name: 'describe',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select Date`
+  String get select_date {
+    return Intl.message(
+      'Select Date',
+      name: 'select_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Selelct Time`
+  String get select_time {
+    return Intl.message(
+      'Selelct Time',
+      name: 'select_time',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

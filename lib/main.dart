@@ -8,7 +8,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
- LoggerService.logger.i('Application is starting');
+  LoggerService.logger.i('Application is starting');
 
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();

@@ -39,7 +39,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         appBar: AppBar(
           elevation: 0,
           centerTitle: false,
-          title: const Text("Profile"),
+          title: Text(S.of(context).profile),
         ),
         body: FutureBuilder<Map<String, dynamic>>(
           future: getUserDetails(),

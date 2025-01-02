@@ -6,6 +6,7 @@ import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/widget/dialog_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:event_management/generated/l10n.dart';
 
 class UserEvents extends StatefulWidget {
   static const routeName = '/user-events';
@@ -77,7 +78,7 @@ class _UserEventsState extends State<UserEvents> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         automaticallyImplyLeading: false,
         title: Text(
-          'Quản Lý Sự Kiện',
+          S.of(context).manage_event,
           style: Theme.of(context).textTheme.titleLarge,
         ),
         actions: [
@@ -125,7 +126,7 @@ class _UserEventsState extends State<UserEvents> {
                 child: TextField(
                   onChanged: _filterEvents,
                   decoration: InputDecoration(
-                    hintText: 'Tìm kiếm sự kiện...',
+                    hintText: S.of(context).search_event,
                     prefixIcon: Icon(Icons.search,
                         color: Theme.of(context).primaryColor),
                     border: OutlineInputBorder(

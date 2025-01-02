@@ -7,10 +7,12 @@ import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/user_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:event_management/src/mobile_screen/profile.dart';
+import 'package:event_management/generated/l10n.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';
@@ -27,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late List<Event> events = [];
   int _currentIndex = 0;
   String userName = "";
+  List<String> notifications = [];
 
   @override
   void initState() {
@@ -34,6 +37,18 @@ class _HomeScreenState extends State<HomeScreen> {
     userProfileUrl = user?.photoURL ?? "";
     fetchEvents();
     _fetchUserName();
+    _configureFCM();
+  }
+
+  void _configureFCM() {
+    FirebaseMessaging.instance.subscribeToTopic('event-updates');
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message.notification != null) {
+        setState(() {
+          notifications.add(message.notification!.body!);
+        });
+      }
+    });
   }
 
   Future<void> _fetchUserName() async {
@@ -83,8 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Next Event",
-                          style: TextStyle(
+                      Text(S.of(context).next_event,
+                          style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 10),
                       Row(
@@ -117,8 +132,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text("Next Scheduled and Your Tickets",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(S.of(context).next_events,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               Column(
                 children: events.map((event) => buildEventCard(event)).toList(),
@@ -138,12 +154,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ? AppBar(
               elevation: 0,
               centerTitle: false,
-              title: const Text("Welcome Back"),
+              title: Text(S.of(context).welcome_back),
               actions: [
                 Padding(
                   padding: const EdgeInsets.only(right: 16.0),
                   child: Row(
                     children: [
+                      IconButton(
+                        icon: const Icon(Icons.notifications),
+                        onPressed: () {
+                          _showNotificationsDialog(context);
+                        },
+                      ),
                       Text(
                         userName,
                         style: const TextStyle(
@@ -173,6 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: CircularProgressIndicator());
                         },
                       ),
+                      const SizedBox(width: 10),
                     ],
                   ),
                 ),
@@ -184,14 +207,18 @@ class _HomeScreenState extends State<HomeScreen> {
         children: screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+        items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.event), label: "Manage Events"),
+              icon: const Icon(Icons.home), label: S.of(context).home),
           BottomNavigationBarItem(
-              icon: Icon(Icons.event), label: "Register Events"),
-          BottomNavigationBarItem(icon: Icon(Icons.forum), label: "Forum"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+              icon: const Icon(Icons.event), label: S.of(context).manage_event),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.event),
+              label: S.of(context).register_event),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.forum), label: S.of(context).forum),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.person), label: S.of(context).profile),
         ],
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
@@ -205,6 +232,37 @@ class _HomeScreenState extends State<HomeScreen> {
             ? Colors.grey
             : Colors.black54,
       ),
+    );
+  }
+
+  void _showNotificationsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Notifications"),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: notifications.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(notifications[index]),
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              child: const Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
