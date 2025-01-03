@@ -215,9 +215,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      const UserEvents(),
       const EventRegisterScreen(),
       CommunityForumScreen(),
+      const UserEvents(),
       const ProfileWidget(),
     ];
 
@@ -283,12 +283,13 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
               icon: const Icon(Icons.home), label: S.of(context).home),
           BottomNavigationBarItem(
-              icon: const Icon(Icons.event), label: S.of(context).manage_event),
-          BottomNavigationBarItem(
               icon: const Icon(Icons.event),
               label: S.of(context).register_event),
           BottomNavigationBarItem(
               icon: const Icon(Icons.forum), label: S.of(context).forum),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.edit_calendar),
+              label: S.of(context).manage_event),
           BottomNavigationBarItem(
               icon: const Icon(Icons.person), label: S.of(context).profile),
         ],
