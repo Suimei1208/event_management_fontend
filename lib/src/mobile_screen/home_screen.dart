@@ -64,9 +64,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       events = listEvents;
     });
-    // for (var event in events) {
-    //   LoggerService.logger.i("Event: ${event.name}");
-    // }
   }
 
   void _onItemTapped(int index) {
@@ -89,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
         : null;
 
     final List<Widget> screens = [
-      // Home Screen
       SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

@@ -5,7 +5,6 @@ import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/request.dart';
 import 'package:event_management/src/mobile_screen/schedules.dart';
 import 'package:event_management/src/mobile_screen/update_event.dart';
-import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -290,9 +289,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   const SizedBox(height: 24),
                   _buildEventStats(registered, speakers, sessions),
                   const SizedBox(height: 24),
-                  _buildFeaturedParticipant("Speaker"),
-                  const SizedBox(height: 8),
-                  _buildFeaturedParticipant("Guest"),
+                  _buildSpecialParticipantsSection(widget.event.id),
+                  // const SizedBox(height: 8),
+                  // _buildFeaturedParticipant("Guest"),
                   const SizedBox(height: 24),
                   Center(
                     child: ElevatedButton(
@@ -362,7 +361,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildStat(registered, "Registered"),
-              _buildStat(speakers, "Speakers"),
+              _buildStat(speakers, "Special Participants"),
               _buildStat(sessions, "Sessions"),
             ],
           ),
@@ -371,46 +370,103 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  Widget _buildFeaturedParticipant(String role) {
-    return FutureBuilder<List<Participant>>(
-      future: fetchParticipantsByEventIdAndRole(widget.event.id, role),
+  Widget _buildSpecialParticipantsSection(int eventId) {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: fetchSpecialParticipants(eventId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(
+            child: Text('This event has no special participants'),
+          );
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Column(
+          return const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Featured ${role}s",
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                "Special Participants",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
-              Text('No ${role}s available for this event.'),
+              SizedBox(height: 16),
+              Text('No special participants available for this event.'),
             ],
           );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Failed to load ${role}s: ${snapshot.error}'),
-          );
         } else {
-          List<Participant> participants = snapshot.data!;
+          final participants = snapshot.data!;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Featured ${role}s",
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              const Text(
+                "Special Participants",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              for (var participant in participants)
-                _buildSpeaker(
-                    participant.name, participant.role, participant.photoUrl),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: participants.length,
+                itemBuilder: (context, index) {
+                  final participant = participants[index];
+                  return _buildParticipantTile(
+                    name: participant['name'] ?? 'Unknown',
+                    role: participant['role'] ?? 'Unknown',
+                    description: participant['description'] ?? "Unknown",
+                    photoUrl: participant['photoUrl'],
+                  );
+                },
+              ),
             ],
           );
         }
+      },
+    );
+  }
+
+  Widget _buildParticipantTile({
+    required String name,
+    required String role,
+    String? photoUrl,
+    required String description,
+  }) {
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {});
+      },
+      onExit: (_) {
+        setState(() {});
+      },
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+          child: photoUrl == null ? const Icon(Icons.person) : null,
+        ),
+        title: Text(name),
+        subtitle: Text(role),
+        trailing: const Icon(Icons.info),
+        onTap: () {
+          _showDescriptionDialog(description);
+        },
+      ),
+    );
+  }
+
+  void _showDescriptionDialog(String description) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Special participant description"),
+          content: Text(description),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
       },
     );
   }
@@ -428,36 +484,36 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  Widget _buildSpeaker(String name, String role, String imageUrl) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            CircleAvatar(
-              radius: 30,
-              backgroundImage: NetworkImage(imageUrl),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  role,
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
-                ),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(
-          height: 10,
-        )
-      ],
-    );
-  }
+  // Widget _buildSpeaker(String name, String role, String imageUrl) {
+  //   return Column(
+  //     children: [
+  //       Row(
+  //         children: [
+  //           CircleAvatar(
+  //             radius: 30,
+  //             backgroundImage: NetworkImage(imageUrl),
+  //           ),
+  //           const SizedBox(width: 16),
+  //           Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 name,
+  //                 style: const TextStyle(
+  //                     fontSize: 16, fontWeight: FontWeight.bold),
+  //               ),
+  //               Text(
+  //                 role,
+  //                 style: const TextStyle(fontSize: 14, color: Colors.grey),
+  //               ),
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //       const SizedBox(
+  //         height: 10,
+  //       )
+  //     ],
+  //   );
+  // }
 }

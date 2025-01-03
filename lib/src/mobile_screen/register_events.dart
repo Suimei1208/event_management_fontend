@@ -82,9 +82,9 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
     });
   }
 
-  Future<void> _registerForEvent(String eventId) async {
+  Future<void> _registerForEvent(int eventId) async {
     try {
-      await UserRegisterEvent(eventId);
+      await UserRegisterEvent(eventId, "Pending", "Participant");
       LoggerService.logger.i("Successfully registered for event: $eventId");
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Successfully registered for the event")),
@@ -332,7 +332,7 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
                       ? null
                       : () async {
                           if (isRegistered == null) {
-                            await _registerForEvent(event["id"].toString());
+                            await _registerForEvent(event["id"]);
                           } else if (isRegistered == "Pending") {
                             await _unregisterFromEvent(event["id"].toString());
                           }
