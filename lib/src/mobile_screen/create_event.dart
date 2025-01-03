@@ -854,11 +854,17 @@ class _CreateEventState extends State<CreateEvent> {
                     ],
                   ),
                   const SizedBox(height: 24),
+                  // Switch(value: value, onChanged: (){
+                  //   setState(() {
+                  //     value = !value;
+                  //   });
+                  // })
+                  // const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        LoggerService.logger.w('Button pressed ...');
+                        // LoggerService.logger.w('Button pressed ...');
                         Event event = Event(
                             id: 0,
                             name: _textController1.text.toString(),

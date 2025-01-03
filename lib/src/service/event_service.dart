@@ -493,7 +493,7 @@ Future<List<Map<String, dynamic>>> fetchEventCanRegister() async {
           final userData = await getUserData(i['idCreate']);
           i['user'] = {
             'name': userData['name'].toString(),
-            'role': userData['role'].toString(),
+            // 'role': userData['role'].toString(),
             'photoUrl': userData['photoUrl'].toString(),
           };
           if (isRegistered.isNotEmpty) {
@@ -678,7 +678,7 @@ Future<bool> approveParticipant(
       final Map<String, dynamic> responseData = json.decode(response.body);
 
       if (responseData['success'] == true) {
-        await addTicketForParticipant(eventId, userId);
+        await addTicketForParticipant(eventId, userId, "Approved");
         return true;
       } else {
         throw Exception(
@@ -801,7 +801,7 @@ Future<void> addParticipantToSchedule(int scheduleId, String userId) async {
   }
 }
 
-Future<void> addTicketForParticipant(int eventId, String userId) async {
+Future<void> addTicketForParticipant(int eventId, String userId, String status) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -815,7 +815,7 @@ Future<void> addTicketForParticipant(int eventId, String userId) async {
 
     final response = await http.post(
       Uri.parse(
-          '${Config.baseUrl}/ticket-service/event/$eventId/add-tickets/$userId'),
+          '${Config.baseUrl}/ticket-service/event/$eventId/add-tickets/$userId?status=$status'),
       headers: {
         'Authorization': 'Bearer $idToken',
         'Content-Type': 'application/json',
@@ -838,7 +838,7 @@ Future<void> addTicketForParticipant(int eventId, String userId) async {
   }
 }
 
-Future<List<Ticket>> fetchTickets(String userId) async {
+Future<List<Ticket>> fetchTickets() async {
   User? user = FirebaseAuth.instance.currentUser;
   if (user == null) {
     LoggerService.logger.e('Error: No user logged in');
@@ -853,7 +853,7 @@ Future<List<Ticket>> fetchTickets(String userId) async {
 
   try {
     final response = await http.get(
-      Uri.parse('${Config.baseUrl}/ticket-service/tickets/$userId'),
+      Uri.parse('${Config.baseUrl}/ticket-service/tickets/${user.uid}'),
       headers: {
         'Authorization': 'Bearer $idToken',
         'Content-Type': 'application/json',
@@ -861,10 +861,15 @@ Future<List<Ticket>> fetchTickets(String userId) async {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
-
-      List<Ticket> tickets =
-          data.map((ticketJson) => Ticket.fromJson(ticketJson)).toList();
+      Map<String, dynamic> data = json.decode(response.body);
+      if (data['success'] == false) {
+        return [];
+      }
+      LoggerService.logger.e('Data: $data');
+      List<Ticket> tickets = (data['data'] as List<dynamic>)
+          .map((ticketJson) =>
+              Ticket.fromJson(ticketJson as Map<String, dynamic>))
+          .toList();
 
       for (var ticket in tickets) {
         final eventData = await getEventData(ticket.eventId);
@@ -878,9 +883,7 @@ Future<List<Ticket>> fetchTickets(String userId) async {
 
       return tickets;
     } else {
-      LoggerService.logger.e(
-          'Failed to load tickets, body: ${response.body}, status code: ${response.statusCode}');
-      throw Exception('Failed to load tickets');
+      return [];
     }
   } catch (e) {
     LoggerService.logger.e('Error: $e');
@@ -976,6 +979,9 @@ Future<bool> addParticipantsToEventByExcel(
 
     if (response.statusCode == 200) {
       LoggerService.logger.i("Participants added successfully.");
+      for (var userId in userIds) {
+        await addTicketForParticipant(eventId, userId, "Added");
+      }
       return true;
     } else {
       LoggerService.logger.e(

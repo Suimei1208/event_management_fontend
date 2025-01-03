@@ -1,6 +1,8 @@
 import 'package:event_management/src/mobile_screen/setting_feed_back_cancel_event.dart';
 import 'package:flutter/material.dart';
 
+
+// ignore: must_be_immutable
 class CancelledUsersScreen extends StatelessWidget {
   // Danh sách người dùng đã hủy tham gia (mock data)
   final List<Map<String, String>> cancelledUsers = [
@@ -30,7 +32,9 @@ class CancelledUsersScreen extends StatelessWidget {
     },
   ];
 
-  CancelledUsersScreen({super.key});
+  String eventID;
+
+  CancelledUsersScreen({super.key,required this.eventID});
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +56,7 @@ class CancelledUsersScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const SettingCancelEvent()),
+                    builder: (context) =>  SettingCancelEvent(eventId: eventID,)),
               );
             },
           ),

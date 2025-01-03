@@ -3,7 +3,6 @@
 import 'package:event_management/src/models/tickets.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -22,7 +21,7 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
   @override
   void initState() {
     super.initState();
-    _ticketsFuture = fetchTickets(FirebaseAuth.instance.currentUser?.uid ?? '');
+    _ticketsFuture = fetchTickets();
   }
 
   @override
@@ -135,14 +134,31 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
               ],
             ),
             const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: () => _viewQRCode(context, ticket.qrCode),
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[300],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text('Hủy vé'),
                 ),
-              ),
-              child: const Text('View QR Code'),
+                ElevatedButton(
+                  onPressed: () => _viewQRCode(context, ticket.qrCode),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text('View QR Code'),
+                ),
+              ],
             ),
           ],
         ),
@@ -159,12 +175,15 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.black,
+            // color: Colors.black,
           ),
         ),
         Text(
           eventDate,
-          style: const TextStyle(fontSize: 14, color: Colors.grey),
+          style: const TextStyle(
+            fontSize: 14,
+            // color: Colors.grey
+          ),
         ),
       ],
     );

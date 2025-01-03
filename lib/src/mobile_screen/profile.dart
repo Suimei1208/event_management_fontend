@@ -193,6 +193,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         Navigator.pushNamed(context, '/my-ticket');
                       },
                     ),
+                    
                     Padding(
                       padding:
                           const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),

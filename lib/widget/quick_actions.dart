@@ -150,7 +150,9 @@ class _QuickActionsState extends State<QuickActions> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => CancelledUsersScreen()),
+                            builder: (context) => CancelledUsersScreen(
+                                  eventID: widget.eventId.toString(),
+                                )),
                       );
                     }),
                     _buildActionButton(Icons.analytics, "Statistics", () {}),
