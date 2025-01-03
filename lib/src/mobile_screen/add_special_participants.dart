@@ -17,7 +17,6 @@ class SpecialParticipantsPage extends StatefulWidget {
 class _SpecialParticipantsPageState extends State<SpecialParticipantsPage> {
   List<Map<String, dynamic>> specialParticipants = [];
   bool _isLoading = true;
-  String _errorMessage = '';
 
   @override
   void initState() {
@@ -35,7 +34,6 @@ class _SpecialParticipantsPageState extends State<SpecialParticipantsPage> {
     } catch (error) {
       setState(() {
         _isLoading = false;
-        _errorMessage = error.toString();
       });
     }
   }
