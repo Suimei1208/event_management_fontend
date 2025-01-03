@@ -5,6 +5,7 @@
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/participants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:event_management/generated/l10n.dart';
@@ -923,7 +924,20 @@ class _CreateEventState extends State<CreateEvent> {
                         //       .e('Error adding event to calendar: $e');
                         // }
 
-                        await createEvent(event, context);
+                        try {
+                          // Create the event and get the generated eventId
+                          int eventId = await createEvent(event, context);
+
+                          if (eventId != 0) {
+                            await UserRegisterEvent(
+                                eventId, "Approved", "Host-$eventId");
+                          } else {
+                            throw Exception(
+                                'Event creation failed, invalid event ID.');
+                          }
+                        } catch (e) {
+                          print("Error occurred: $e");
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor:

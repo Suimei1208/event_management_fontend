@@ -75,7 +75,7 @@ Future<List<Map<String, dynamic>>> fetchParticipants(int eventId) async {
 }
 
 // ignore: non_constant_identifier_names
-Future<void> UserRegisterEvent(String eventid) async {
+Future<void> UserRegisterEvent(int eventid, String status, String role) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -88,8 +88,8 @@ Future<void> UserRegisterEvent(String eventid) async {
       'userId': user.uid,
       'eventId': eventid,
       'registration_Date': DateTime.now().toIso8601String(),
-      'status': 'Pending',
-      'role': 'Participant',
+      'status': status,
+      'role': role,
     };
     List<Map<String, dynamic>> participants = [];
     participants.add(participant);

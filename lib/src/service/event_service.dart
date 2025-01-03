@@ -14,7 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-Future<void> createEvent(Event event, BuildContext context) async {
+Future<int> createEvent(Event event, BuildContext context) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -38,6 +38,9 @@ Future<void> createEvent(Event event, BuildContext context) async {
         ),
       );
       if (responseData['success'] == true) {
+        // Assuming the backend returns the generated event ID
+        int generatedEventId = responseData['data']['id'];
+
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -57,12 +60,16 @@ Future<void> createEvent(Event event, BuildContext context) async {
             );
           },
         );
+
+        // Return the generated event ID
+        return generatedEventId;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Failed to create event. Please try again.'),
           ),
         );
+        return 0;
       }
     } else {
       LoggerService.logger.w('Failed to create event: ${response.statusCode}');
@@ -71,6 +78,7 @@ Future<void> createEvent(Event event, BuildContext context) async {
           content: Text('Failed to create event 2. Please try again.'),
         ),
       );
+      return 0;
     }
   } catch (e) {
     LoggerService.logger.w('Error: $e');
@@ -79,6 +87,7 @@ Future<void> createEvent(Event event, BuildContext context) async {
         content: Text('An error occurred. Please try again.'),
       ),
     );
+    return 0;
   }
 }
 
@@ -907,10 +916,10 @@ Future<Map<String, dynamic>> getEventData(int eventId) async {
   }
 }
 
-Future<String> uploadImageEventToImageKit(File imageFile, int eventId) async {
+Future<String> uploadImageEventToImageKit(
+    File imageFile, int eventId, String fileName) async {
   const privateKey = 'private_F801T1Ot8g2c8BCrrN+7+y+Kvdc=';
   final base64EncodedKey = base64Encode(utf8.encode('$privateKey:'));
-  User? user = FirebaseAuth.instance.currentUser;
 
   final request = http.MultipartRequest(
     'POST',
@@ -919,7 +928,7 @@ Future<String> uploadImageEventToImageKit(File imageFile, int eventId) async {
   request.headers['Authorization'] = 'Basic $base64EncodedKey';
   request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
 
-  request.fields['fileName'] = 'event_${eventId}_profile_pic_${user!.uid}.jpg';
+  request.fields['fileName'] = fileName;
   request.fields['useUniqueFileName'] = 'false';
   request.fields['folder'] = '/event_images';
 
@@ -1206,5 +1215,126 @@ Future<void> resetEvent(int eventId, BuildContext context) async {
     // Hiển thị lỗi
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text('Lỗi khi hủy sự kiện: $e')));
+  }
+}
+
+Future<void> addSpecialParticipant({
+  required int eventId,
+  required String name,
+  required String role,
+  required String description,
+  required String photoUrl,
+}) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  if (idToken == null) {
+    LoggerService.logger.e('Failed to retrieve ID token');
+    throw Exception('Failed to retrieve ID token');
+  }
+
+  final url = Uri.parse(
+      '${Config.baseUrl}/event-service/event/$eventId/add-special-participant');
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'name': name,
+        'role': role,
+        'description': description,
+        'photoUrl': photoUrl,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      LoggerService.logger
+          .i('Special participant added successfully: $name, $role');
+    } else {
+      LoggerService.logger.e(
+          'Failed to add special participant: ${response.body}, status: ${response.statusCode}');
+      throw Exception(
+          'Failed to add special participant: ${response.body}, status: ${response.statusCode}');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Error adding special participant: $e');
+    throw Exception('Error adding special participant: $e');
+  }
+}
+
+Future<void> removeSpecialParticipant(int eventId, int participantId) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  if (idToken == null) {
+    throw Exception('Failed to retrieve ID token');
+  }
+
+  final url = Uri.parse(
+      '${Config.baseUrl}/event-service/event/$eventId/remove-special-participant/$participantId');
+
+  try {
+    final response = await http.delete(
+      url,
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to remove special participant: ${response.body}, status: ${response.statusCode}');
+    }
+  } catch (error) {
+    throw Exception('Error removing special participant: $error');
+  }
+}
+
+Future<List<Map<String, dynamic>>> fetchSpecialParticipants(int eventId) async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  if (idToken == null) {
+    throw Exception('Failed to retrieve ID token');
+  }
+
+  final url = Uri.parse(
+      '${Config.baseUrl}/event-service/event/$eventId/special-participants');
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData['success']) {
+        return List<Map<String, dynamic>>.from(responseData['data'] ?? []);
+      } else {
+        throw Exception('Failed to load participants');
+      }
+    } else {
+      throw Exception('Failed to fetch participants: ${response.body}');
+    }
+  } catch (error) {
+    throw Exception('Error fetching participants: $error');
   }
 }
