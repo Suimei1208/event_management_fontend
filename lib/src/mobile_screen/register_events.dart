@@ -40,12 +40,21 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
   }
 
   Future<void> _loadEvents() async {
-    final events = await fetchEventCanRegister();
+  final events = await fetchEventCanRegister();
+  if (mounted) {
     setState(() {
       _allEvents = events;
       _filteredEvents = events;
     });
   }
+}
+
+  @override
+void dispose() {
+
+  super.dispose();
+}
+
 
   Color _getStatusColorType(String type) {
     switch (type) {

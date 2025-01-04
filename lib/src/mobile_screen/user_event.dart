@@ -39,6 +39,9 @@ class _UserEventsState extends State<UserEvents> {
         _allEvents = events;
         _filteredEvents = events; // Initially, all events are shown
       });
+      // for (var event in events) {
+      //   LoggerService.logger.i('Event: ${event.status}');
+      // }
     } catch (error) {
       LoggerService.logger.e('Error loading events: $error');
     }
@@ -324,7 +327,7 @@ class EventCard extends StatelessWidget {
                           size: 30,
                         ),
                         onPressed: () {
-                          if (event.status == 'Canceled') {
+                          if (event.status == 'Cancelled') {
                             deleteEvent(event.id, context)
                                 .then((_) => loadEvents());
                           } else {
@@ -474,7 +477,8 @@ class EventCard extends StatelessWidget {
                             size: 30,
                           ),
                           onPressed: () {
-                            if (event.status == 'Canceled') {
+                            LoggerService.logger.i(event.status);
+                            if (event.status.trim() == 'Cancelled') {
                               deleteEvent(event.id, context)
                                   .then((_) => loadEvents());
                             } else {

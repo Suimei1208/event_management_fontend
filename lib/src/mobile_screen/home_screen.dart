@@ -61,9 +61,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> fetchEvents() async {
     List<Event> listEvents = await fetchEventById(user!.uid);
-    setState(() {
-      events = listEvents;
-    });
+    if (mounted) {
+      setState(() {
+        events = listEvents;
+      });
+    }
   }
 
   void _onItemTapped(int index) {
@@ -132,9 +134,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "${DateFormat.jm().format(ongoingEvents.startDate)} - ${ongoingEvents.location}",
-                              style: const TextStyle(color: Colors.grey),
+                            Expanded(
+                              child: Text(
+                                "${DateFormat.jm().format(ongoingEvents.startDate)} - ${ongoingEvents.location}",
+                                style: const TextStyle(color: Colors.grey),
+                                softWrap: true,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             ElevatedButton(
                                 style: Theme.of(context).brightness ==

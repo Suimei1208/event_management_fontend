@@ -176,7 +176,7 @@ class _QuickActionsState extends State<QuickActions> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => CancelledUsersScreen(
-                                  eventID: widget.eventId.toString(),
+                                  eventID: widget.eventId,
                                 )),
                       );
                     }),

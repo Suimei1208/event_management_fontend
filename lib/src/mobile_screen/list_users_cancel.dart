@@ -1,40 +1,52 @@
 import 'package:event_management/src/mobile_screen/setting_feed_back_cancel_event.dart';
+import 'package:event_management/src/service/ticket_service.dart';
+import 'package:event_management/widget/list_cancel_user.dart';
+import 'package:event_management/widget/list_user_already_cancel.dart';
 import 'package:flutter/material.dart';
 
+class CancelledUsersScreen extends StatefulWidget {
+  final int eventID;
 
-// ignore: must_be_immutable
-class CancelledUsersScreen extends StatelessWidget {
-  // Danh sách người dùng đã hủy tham gia (mock data)
-  final List<Map<String, String>> cancelledUsers = [
-    {
-      "name": "John Doe",
-      "email": "john.doe@example.com",
-      "reason": "No longer interested",
-      "avatar": "https://randomuser.me/api/portraits/men/1.jpg"
-    },
-    {
-      "name": "Jane Smith",
-      "email": "jane.smith@example.com",
-      "reason": "Scheduling conflict",
-      "avatar": "https://randomuser.me/api/portraits/women/2.jpg"
-    },
-    {
-      "name": "Michael Johnson",
-      "email": "michael.johnson@example.com",
-      "reason": "Personal reasons",
-      "avatar": "https://randomuser.me/api/portraits/men/3.jpg"
-    },
-    {
-      "name": "Emily Davis",
-      "email": "emily.davis@example.com",
-      "reason": "Found another event",
-      "avatar": "https://randomuser.me/api/portraits/women/4.jpg"
-    },
-  ];
+  const CancelledUsersScreen({super.key, required this.eventID});
 
-  String eventID;
+  @override
+  State<CancelledUsersScreen> createState() => _CancelledUsersScreenState();
+}
 
-  CancelledUsersScreen({super.key,required this.eventID});
+class _CancelledUsersScreenState extends State<CancelledUsersScreen> {
+  int _selectedIndex = 0;
+  final List<Map<String, dynamic>> cancelledUsers = [];
+  final List<Map<String, dynamic>> alreadyCancelledUsers = [];
+  late List<Widget> _pages;
+  bool isLoading = true; // Track if data is loading
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCancelledUsers();
+    _pages = [
+      CancelledUsersPage(cancelledUsers: cancelledUsers),
+      AlreadyCancelledUsersPage(cancelledUsers: alreadyCancelledUsers),
+    ];
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Future<void> _fetchCancelledUsers() async {
+    List<Map<String, dynamic>> data =
+        await fetchCancelledUsers(widget.eventID, 'Pending');
+    List<Map<String, dynamic>> data2 =
+        await fetchCancelledUsers(widget.eventID, 'Accepted');
+    setState(() {
+      cancelledUsers.addAll(data);
+      alreadyCancelledUsers.addAll(data2);
+      isLoading = false; // Set loading to false when data is loaded
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,59 +63,64 @@ class CancelledUsersScreen extends StatelessWidget {
         elevation: 0,
         actions: [
           IconButton(
+            icon: const Icon(Icons.file_open),
+            onPressed: () {},
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>  SettingCancelEvent(eventId: eventID,)),
+                  builder: (context) => SettingCancelEvent(
+                    eventId: widget.eventID.toString(),
+                  ),
+                ),
               );
             },
           ),
         ],
       ),
-      body: cancelledUsers.isNotEmpty
-          ? ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: cancelledUsers.length,
-              itemBuilder: (context, index) {
-                final user = cancelledUsers[index];
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 25,
-                      backgroundImage: user["avatar"] != null
-                          ? NetworkImage(user["avatar"]!)
-                          : const AssetImage("assets/default_avatar.png")
-                              as ImageProvider, // Hình ảnh mặc định nếu không có avatar
-                    ),
-                    title: Text(
-                      user["name"] ?? "Unknown",
-                      style: const TextStyle(
-                          fontSize: 16.0, fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(user["email"] ?? "No email"),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Reason: ${user["reason"] ?? "No reason provided"}",
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
+      body: Column(
+        children: [
+          Container(
+            color: Theme.of(context).colorScheme.primary,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton(
+                  onPressed: () => _onItemTapped(0),
+                  child: Text(
+                    'Danh sách chờ duyệt',
+                    style: TextStyle(
+                        color:
+                            _selectedIndex == 0 ? Colors.orange : Colors.white),
                   ),
-                );
-              },
-            )
-          : const Center(
-              child: Text(
-                'No cancelled users available.',
-                style: TextStyle(fontSize: 16.0, color: Colors.grey),
-              ),
+                ),
+                TextButton(
+                  onPressed: () => _onItemTapped(1),
+                  child: Text(
+                    'Danh sách đã hủy',
+                    style: TextStyle(
+                        color:
+                            _selectedIndex == 1 ? Colors.orange : Colors.white),
+                  ),
+                ),
+              ],
             ),
+          ),
+          Expanded(
+            child: isLoading
+                ? const Center(
+                    child:
+                        CircularProgressIndicator()) // Show loading indicator
+                : IndexedStack(
+                    index: _selectedIndex,
+                    children: _pages,
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
