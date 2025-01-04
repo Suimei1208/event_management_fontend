@@ -1,5 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
-
+import 'package:event_management/src/mobile_screen/form_cancel_ticket.dart';
+import 'package:event_management/src/service/logger_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:event_management/src/models/tickets.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +24,18 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
   void initState() {
     super.initState();
     _ticketsFuture = fetchTickets();
+  }
+
+  String text(String status) {
+    if (status == "Pending") {
+      return "Đang chờ xử lý";
+    } else if (status == "Approved") {
+      return "Đã được chấp nhận";
+    } else if (status == "Rejected") {
+      return "Đã bị từ chối";
+    } else {
+      return "";
+    }
   }
 
   @override
@@ -61,11 +75,11 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'View and manage your event tickets',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 24),
+                // const Text(
+                //   'View and manage your event tickets',
+                //   style: TextStyle(fontSize: 16, color: Colors.grey),
+                // ),
+                // const SizedBox(height: 24),
                 _buildEventSection(context, 'Upcoming Events', upcomingTickets),
                 const SizedBox(height: 24),
                 _buildEventSection(context, 'Past Events', pastTickets),
@@ -138,25 +152,106 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[300],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: const Text('Hủy vé'),
-                ),
-                ElevatedButton(
-                  onPressed: () => _viewQRCode(context, ticket.qrCode),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: const Text('View QR Code'),
+                (ticket.cancellationStartDate != null &&
+                        ticket.cancellationEndDate != null)
+                    ? (DateTime.now().isAfter(ticket.cancellationStartDate!) &&
+                            DateTime.now()
+                                .isBefore(ticket.cancellationEndDate!))
+                        ? Column(
+                            children: [
+                              Text(text(ticket.cancel_status!)),
+                              ElevatedButton(
+                                onPressed: ticket.cancel_status == "None"
+                                    ? () async {
+                                        // Nếu thời gian hiện tại nằm trong khoảng thời gian hủy vé
+                                        // thì cho phép hủy vé
+                                        // ignore: deprecated_member_use
+
+                                        if (ticket.cancellationLink != null &&
+                                            ticket
+                                                .cancellationLink!.isNotEmpty) {
+                                          final Uri url = Uri.parse(
+                                              ticket.cancellationLink!);
+                                          // LoggerService.logger.f(url);
+
+                                          if (url.isAbsolute) {
+                                            await launchUrl(url);
+                                          } else {
+                                            LoggerService.logger
+                                                .e("Invalid cancellation link");
+                                          }
+                                        } else {
+                                          // LoggerService.logger
+                                          //     .e("Cancellation link is null");
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TicketCancellationForm(
+                                                eventId: ticket.eventId,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red[300],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text('Hủy vé'),
+                              ),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              const Text("Đã hết hạn hủy vé"),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red[300],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                onPressed: null,
+                                child: const Text('Hủy vé'),
+                              )
+                            ],
+                          )
+                    : Column(
+                        children: [
+                          const Text(""),
+                          ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red[300],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: const Text('Hủy vé'),
+                          ),
+                        ],
+                      ),
+                Column(
+                  children: [
+                    const Text(""),
+                    ElevatedButton(
+                      onPressed: () => _viewQRCode(context, ticket.qrCode),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.purple
+                                : null,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      child: const Text('View QR Code'),
+                    )
+                  ],
                 ),
               ],
             ),

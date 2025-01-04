@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 class Ticket {
   final int id;
   final int eventId;
@@ -5,6 +7,13 @@ class Ticket {
   final DateTime purchaseDate;
   final String qrCode;
   final String status;
+
+  DateTime? cancellationStartDate;
+  DateTime? cancellationEndDate;
+  bool? isReasonImageRequired;
+  bool? isLinkRequired;
+  String? cancellationLink;
+  String? cancel_status;
 
   // Private variables for name and photoUrl
   String _eventName = 'Unknown Event';
@@ -22,6 +31,12 @@ class Ticket {
     required this.purchaseDate,
     required this.qrCode,
     required this.status,
+    this.cancellationStartDate,
+    this.cancellationEndDate,
+    this.isReasonImageRequired = false,
+    this.isLinkRequired = false,
+    this.cancellationLink,
+    this.cancel_status,
   });
 
   factory Ticket.fromJson(Map<String, dynamic> json) {
@@ -32,6 +47,16 @@ class Ticket {
       purchaseDate: DateTime.parse(json['purchaseDate']),
       qrCode: json['qrCode'],
       status: json['status'],
+      cancellationStartDate: json['cancellationStartDate'] != null
+          ? DateTime.parse(json['cancellationStartDate'])
+          : null,
+      cancellationEndDate: json['cancellationEndDate'] != null
+          ? DateTime.parse(json['cancellationEndDate'])
+          : null,
+      isReasonImageRequired: json['isReasonImageRequired'] ?? false,
+      isLinkRequired: json['isLinkRequired'] ?? false,
+      cancellationLink: json['cancellationLink'],
+      cancel_status: json['cancel_status'],
     );
   }
 
@@ -76,7 +101,7 @@ class Ticket {
     }
   }
 
-    String get eventStatus => _eventStatus;
+  String get eventStatus => _eventStatus;
 
   set eventStatus(String newEventStatus) {
     if (newEventStatus.isNotEmpty) {
@@ -97,6 +122,12 @@ class Ticket {
       'eventName': eventName,
       'eventBannerUrl': eventBannerUrl,
       'startDate': startDate,
+      'cancellationStartDate': cancellationStartDate?.toIso8601String(),
+      'cancellationEndDate': cancellationEndDate?.toIso8601String(),
+      'isReasonImageRequired': isReasonImageRequired,
+      'isLinkRequired': isLinkRequired,
+      'cancellationLink': cancellationLink,
+      'cancel_status': cancel_status ?? "None",
     };
   }
 }

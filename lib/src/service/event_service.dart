@@ -866,7 +866,7 @@ Future<List<Ticket>> fetchTickets() async {
       if (data['success'] == false) {
         return [];
       }
-      LoggerService.logger.e('Data: $data');
+      // LoggerService.logger.e('Data: $data');
       List<Ticket> tickets = (data['data'] as List<dynamic>)
           .map((ticketJson) =>
               Ticket.fromJson(ticketJson as Map<String, dynamic>))
@@ -880,6 +880,57 @@ Future<List<Ticket>> fetchTickets() async {
             eventData['data']['banner'] ?? 'https://placehold.jp/150x150.png';
         ticket.startDate = eventData['data']['startDate'];
         ticket.eventStatus = eventData['data']['status'];
+
+        //fetch feedback Cancel
+        try {
+          final responseCancel = await http.get(
+            Uri.parse(
+                '${Config.baseUrl}/ticket-service/feedback/get/${ticket.eventId}'),
+            headers: {
+              'Authorization': 'Bearer $idToken',
+              'Content-Type': 'application/json',
+            },
+          );
+          if (responseCancel.statusCode == 200) {
+            Map<String, dynamic> dataCancel = json.decode(responseCancel.body);
+            // LoggerService.logger.e('Data Cancel: $dataCancel');
+            if (dataCancel['success'] == true) {
+              if (dataCancel['data'] != null) {
+                ticket.cancellationStartDate =
+                    DateTime.parse(dataCancel['data']['start_date']);
+                ticket.cancellationEndDate =
+                    DateTime.parse(dataCancel['data']['end_date']);
+                ticket.isReasonImageRequired =
+                    dataCancel['data']['is_reason_image_required'];
+                ticket.isLinkRequired = dataCancel['data']['is_link_required'];
+                ticket.cancellationLink = dataCancel['data']['link'] ?? "";
+              } else {
+                ticket.isReasonImageRequired = false;
+                ticket.isLinkRequired = false;
+              }
+
+              final responseCancel = await http.get(
+            Uri.parse(
+                '${Config.baseUrl}/ticket-service/feedback/user-cancel/get/status?eventid=${ticket.eventId}&uid=${user.uid}'),
+            headers: {
+              'Authorization': 'Bearer $idToken',
+              'Content-Type': 'application/json',
+            },
+          );
+          if (responseCancel.statusCode == 200) {
+              Map<String, dynamic> dataCancel = json.decode(responseCancel.body);
+              if (dataCancel['success'] == true) {
+                ticket.cancel_status = dataCancel['data'] ?? "None";
+              }
+            }
+
+
+            }
+          }
+        } catch (e) {
+          LoggerService.logger.e('Error: $e');
+          throw Exception('Error fetching ticket data: $e');
+        }
       }
 
       return tickets;

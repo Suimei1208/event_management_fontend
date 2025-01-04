@@ -45,7 +45,6 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _fetchFeedbackData();
   }
