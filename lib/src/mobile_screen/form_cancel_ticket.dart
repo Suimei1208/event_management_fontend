@@ -8,7 +8,6 @@ class TicketCancellationForm extends StatefulWidget {
   const TicketCancellationForm({super.key, required this.eventId});
 
   @override
-  // ignore: library_private_types_in_public_api
   _TicketCancellationFormState createState() => _TicketCancellationFormState();
 }
 
@@ -26,19 +25,20 @@ class _TicketCancellationFormState extends State<TicketCancellationForm> {
               _cancellationReason!,
               'https://upload-os-bbs.hoyolab.com/upload/2024/10/01/427373429/617690b2c1bd3807e719d4b27eab2b5b_4733504345886202071.jpg?x-oss-process=image%2Fresize%2Cs_1000%2Fauto-orient%2C0%2Finterlace%2C1%2Fformat%2Cwebp%2Fquality%2Cq_70')
           .then((result) {
-        // Xử lý thành công
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return const DialogWidget(
-              message: 'Hủy bỏ vé thành công!',
-              title: 'Success',
-            );
-          },
-        ).then((_) {
-          // Đóng dialog và quay lại màn hình cũ
-          Navigator.pop(context); // Quay lại màn hình trước đó
-        });
+        // Ensure the widget is still mounted before using BuildContext
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const DialogWidget(
+                message: 'Hủy bỏ vé thành công!',
+                title: 'Success',
+              );
+            },
+          ).then((_) {
+            Navigator.pop(context); // Go back to the previous screen
+          });
+        }
       });
     }
   }
