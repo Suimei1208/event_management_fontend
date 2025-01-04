@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/widget/dialog_widget.dart';
@@ -21,28 +23,25 @@ class _TicketCancellationFormState extends State<TicketCancellationForm> {
       // Handle form submission logic here
       LoggerService.logger.e('Cancellation Reason: $_cancellationReason');
       // You can also implement image upload functionality here
-      await createTicketCancellationRequest(
-              widget.eventId,
-              _cancellationReason!,
-              'https://upload-os-bbs.hoyolab.com/upload/2024/10/01/427373429/617690b2c1bd3807e719d4b27eab2b5b_4733504345886202071.jpg?x-oss-process=image%2Fresize%2Cs_1000%2Fauto-orient%2C0%2Finterlace%2C1%2Fformat%2Cwebp%2Fquality%2Cq_70')
-          .then((result) {
-        // Ensure the widget is still mounted before using BuildContext
-        if (mounted) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const DialogWidget(
-                message: 'Hủy bỏ vé thành công!',
-                title: 'Success',
-              );
-            },
-          ).then((_) {
-            if (mounted) {
-              Navigator.pop(context); // Go back to the previous screen
-            }
-          });
-        }
-      });
+      final result = await createTicketCancellationRequest(
+          widget.eventId,
+          _cancellationReason!,
+          'https://upload-os-bbs.hoyolab.com/upload/2024/10/01/427373429/617690b2c1bd3807e719d4b27eab2b5b_4733504345886202071.jpg?x-oss-process=image%2Fresize%2Cs_1000%2Fauto-orient%2C0%2Finterlace%2C1%2Fformat%2Cwebp%2Fquality%2Cq_70');
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const DialogWidget(
+              message: 'Hủy bỏ vé thành công!',
+              title: 'Success',
+            );
+          },
+        ).then((_) {
+          if (mounted) {
+            Navigator.pop(context); // Go back to the previous screen
+          }
+        });
+      }
     }
   }
 
