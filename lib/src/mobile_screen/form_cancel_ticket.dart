@@ -23,7 +23,7 @@ class _TicketCancellationFormState extends State<TicketCancellationForm> {
       // Handle form submission logic here
       LoggerService.logger.e('Cancellation Reason: $_cancellationReason');
       // You can also implement image upload functionality here
-      final result = await createTicketCancellationRequest(
+      await createTicketCancellationRequest(
           widget.eventId,
           _cancellationReason!,
           'https://upload-os-bbs.hoyolab.com/upload/2024/10/01/427373429/617690b2c1bd3807e719d4b27eab2b5b_4733504345886202071.jpg?x-oss-process=image%2Fresize%2Cs_1000%2Fauto-orient%2C0%2Finterlace%2C1%2Fformat%2Cwebp%2Fquality%2Cq_70');
