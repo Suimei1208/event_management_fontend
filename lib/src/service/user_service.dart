@@ -164,7 +164,7 @@ Future<List<Map<String, dynamic>>> searchUser(String name) async {
         jsonData['data'].map((item) => {
               'id': item['id'] ?? "",
               'name': item['userRecord']['displayName'] ?? "Unknown",
-              'role': item['nameFromEmail'] ?? "no nameFromEmail",
+              'nameFromEmail': item['nameFromEmail'] ?? "no nameFromEmail",
               'avtUrl': item['userRecord']['photoUrl'] ?? "",
             }),
       );

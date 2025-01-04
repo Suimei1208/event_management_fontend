@@ -801,7 +801,8 @@ Future<void> addParticipantToSchedule(int scheduleId, String userId) async {
   }
 }
 
-Future<void> addTicketForParticipant(int eventId, String userId, String status) async {
+Future<void> addTicketForParticipant(
+    int eventId, String userId, String status) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -1342,5 +1343,107 @@ Future<List<Map<String, dynamic>>> fetchSpecialParticipants(int eventId) async {
     }
   } catch (error) {
     throw Exception('Error fetching participants: $error');
+  }
+}
+
+Future<Map<String, dynamic>> checkIn(int eventId, String qrCode) async {
+  LoggerService.logger.i(
+      'Entering checkIn function with eventId: $eventId and qrCode: $qrCode');
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  if (idToken == null) {
+    LoggerService.logger.e('Failed to retrieve ID token');
+    throw Exception('Failed to retrieve ID token');
+  }
+
+  final url =
+      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/checkin');
+  LoggerService.logger.i('Making POST request to URL: $url');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'QRCode': qrCode,
+      }),
+    );
+
+    LoggerService.logger
+        .i('Received response: ${response.statusCode} - ${response.body}');
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      LoggerService.logger.i('Response data: $responseData');
+      if (responseData['success']) {
+        return responseData;
+      } else {
+        throw Exception('Check-in failed: ${responseData['message']}');
+      }
+    } else {
+      throw Exception('Failed to check in: ${response.body}');
+    }
+  } catch (error) {
+    LoggerService.logger.e('Error during check-in: $error', error: error);
+    throw Exception('Error during check-in: $error');
+  }
+}
+
+Future<Map<String, dynamic>> checkOut(int eventId, String qrCode) async {
+  LoggerService.logger.i(
+      'Entering checkOut function with eventId: $eventId and qrCode: $qrCode');
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  if (idToken == null) {
+    LoggerService.logger.e('Failed to retrieve ID token');
+    throw Exception('Failed to retrieve ID token');
+  }
+
+  final url =
+      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/checkout');
+  LoggerService.logger.i('Making POST request to URL: $url');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'qrCode': qrCode}),
+    );
+
+    LoggerService.logger
+        .i('Received response: ${response.statusCode} - ${response.body}');
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      LoggerService.logger.i('Response data: $responseData');
+      if (responseData['success']) {
+        return responseData;
+      } else {
+        throw Exception('Check-out failed: ${responseData['message']}');
+      }
+    } else {
+      throw Exception('Failed to check out: ${response.body}');
+    }
+  } catch (error) {
+    LoggerService.logger.e('Error during check-out: $error', error: error);
+    throw Exception('Error during check-out: $error');
   }
 }

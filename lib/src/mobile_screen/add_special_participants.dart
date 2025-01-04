@@ -1,9 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
-import 'dart:io';
 import 'package:event_management/src/service/event_service.dart';
+import 'package:event_management/src/service/user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class SpecialParticipantsPage extends StatefulWidget {
   final int eventId;
@@ -16,7 +15,10 @@ class SpecialParticipantsPage extends StatefulWidget {
 
 class _SpecialParticipantsPageState extends State<SpecialParticipantsPage> {
   List<Map<String, dynamic>> specialParticipants = [];
+  List<Map<String, dynamic>> searchResults = [];
   bool _isLoading = true;
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -25,6 +27,9 @@ class _SpecialParticipantsPageState extends State<SpecialParticipantsPage> {
   }
 
   Future<void> _fetchParticipants() async {
+    setState(() {
+      _isLoading = true;
+    });
     try {
       final participants = await fetchSpecialParticipants(widget.eventId);
       setState(() {
@@ -38,67 +43,50 @@ class _SpecialParticipantsPageState extends State<SpecialParticipantsPage> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Special Participants'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _addSpecialParticipant,
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : specialParticipants.isEmpty
-              ? const Center(
-                  child: Text(
-                    'Currently no special participants',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                )
-              : ListView.builder(
-                  itemCount: specialParticipants.length,
-                  itemBuilder: (context, index) {
-                    final participant = specialParticipants[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      child: ListTile(
-                        leading: participant['photoUrl'] != null
-                            ? CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(participant['photoUrl']),
-                              )
-                            : const CircleAvatar(child: Icon(Icons.person)),
-                        title: Text(participant['name']),
-                        subtitle: Text(participant['role']),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () =>
-                              _removeParticipant(participant['id'], index),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-    );
+  Future<void> _searchUsers(String name) async {
+    if (name.isEmpty) {
+      setState(() {
+        searchResults = [];
+        _isSearching = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+    });
+
+    try {
+      final results = await searchUser(name);
+      setState(() {
+        searchResults = results;
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Search failed: $error')),
+      );
+    } finally {
+      setState(() {
+        _isSearching = false;
+      });
+    }
   }
 
-  void _addSpecialParticipant() {
+  void _addUserToParticipants(Map<String, dynamic> user) {
     showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
-      builder: (context) => AddSpecialParticipantForm(
-        onParticipantAdded: (participant) {
-          setState(() {
-            specialParticipants.add(participant);
-          });
-        },
-        eventId: widget.eventId,
+      builder: (context) => FractionallySizedBox(
+        heightFactor: 0.6,
+        child: AddSpecialParticipantForm(
+          eventId: widget.eventId,
+          user: user,
+          onParticipantAdded: (participant) {
+            setState(() {
+              specialParticipants.add(participant);
+            });
+          },
+        ),
       ),
     );
   }
@@ -115,16 +103,133 @@ class _SpecialParticipantsPageState extends State<SpecialParticipantsPage> {
       );
     }
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: TextField(
+          controller: _searchController,
+          decoration: const InputDecoration(
+            hintText: 'Search users...',
+            border: InputBorder.none,
+          ),
+          onChanged: _searchUsers,
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: Column(
+        children: [
+          if (_isSearching)
+            const Center(child: CircularProgressIndicator())
+          else if (searchResults.isNotEmpty)
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Search Results',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: searchResults.length,
+                      itemBuilder: (context, index) {
+                        final user = searchResults[index];
+                        return ListTile(
+                          leading: user['avtUrl'].isNotEmpty
+                              ? CircleAvatar(
+                                  backgroundImage: NetworkImage(user['avtUrl']),
+                                )
+                              : const CircleAvatar(child: Icon(Icons.person)),
+                          title: Text(user['name']),
+                          onTap: () {
+                            _addUserToParticipants(user);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            const SizedBox.shrink(),
+          if (_isLoading)
+            const Center(child: CircularProgressIndicator())
+          else
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Special Guests',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Expanded(
+                    child: specialParticipants.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'No special participants yet.',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: specialParticipants.length,
+                            itemBuilder: (context, index) {
+                              final participant = specialParticipants[index];
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                child: ListTile(
+                                  leading: participant['photoUrl'] != null
+                                      ? CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              participant['photoUrl']),
+                                        )
+                                      : const CircleAvatar(
+                                          child: Icon(Icons.person)),
+                                  title: Text(participant['name']),
+                                  subtitle: Text(participant['role']),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.red),
+                                    onPressed: () => _removeParticipant(
+                                        participant['id'], index),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
 
 class AddSpecialParticipantForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onParticipantAdded;
   final int eventId;
+  final Map<String, dynamic>? user;
 
   const AddSpecialParticipantForm({
     super.key,
     required this.onParticipantAdded,
     required this.eventId,
+    this.user,
   });
 
   @override
@@ -134,30 +239,13 @@ class AddSpecialParticipantForm extends StatefulWidget {
 
 class _AddSpecialParticipantFormState extends State<AddSpecialParticipantForm> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _roleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  File? _selectedImage;
-  bool _isLoading = false;
-
   final List<String> _roles = ['Speaker', 'Special Guest'];
   String? _selectedRole;
+  bool _isLoading = false;
 
-  // Function to pick image from gallery
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  // Function to handle form submission and image upload
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate() || _selectedImage == null) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -166,25 +254,20 @@ class _AddSpecialParticipantFormState extends State<AddSpecialParticipantForm> {
     });
 
     try {
-      final fileName =
-          '${_nameController.text}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final photoUrl = await uploadImageEventToImageKit(
-          _selectedImage!, widget.eventId, fileName);
-
       final participant = {
-        'name': _nameController.text,
-        'role': _roleController.text,
+        'name': widget.user!['name'],
+        'role': _selectedRole!,
         'description': _descriptionController.text,
-        'photoUrl': photoUrl,
+        'photoUrl': widget.user!['avtUrl'],
         'registration_Date': DateTime.now().toIso8601String(),
       };
 
       await addSpecialParticipant(
         eventId: widget.eventId,
-        name: _nameController.text,
-        role: _roleController.text,
+        name: widget.user!['name'],
+        role: _selectedRole!,
         description: _descriptionController.text,
-        photoUrl: photoUrl,
+        photoUrl: widget.user!['avtUrl'],
       );
 
       widget.onParticipantAdded(participant);
@@ -208,16 +291,16 @@ class _AddSpecialParticipantFormState extends State<AddSpecialParticipantForm> {
         key: _formKey,
         child: ListView(
           children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a name';
-                }
-                return null;
-              },
-            ),
+            if (widget.user != null) ...[
+              ListTile(
+                leading: widget.user!['avtUrl'].isNotEmpty
+                    ? CircleAvatar(
+                        backgroundImage: NetworkImage(widget.user!['avtUrl']),
+                      )
+                    : const CircleAvatar(child: Icon(Icons.person)),
+                title: Text(widget.user!['name']),
+              ),
+            ],
             DropdownButtonFormField<String>(
               value: _selectedRole,
               hint: const Text('Select Role'),
@@ -250,17 +333,9 @@ class _AddSpecialParticipantFormState extends State<AddSpecialParticipantForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 10),
-            _selectedImage != null
-                ? Image.file(_selectedImage!)
-                : const Text('No image selected'),
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: const Text('Pick Image'),
-            ),
             const SizedBox(height: 20),
             _isLoading
-                ? const CircularProgressIndicator()
+                ? const Center(child: CircularProgressIndicator())
                 : ElevatedButton(
                     onPressed: _submit,
                     child: const Text('Add Participant'),

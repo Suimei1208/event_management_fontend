@@ -3,6 +3,7 @@
 import 'package:event_management/src/mobile_screen/add_special_participants.dart';
 import 'package:event_management/src/mobile_screen/existed_participants.dart';
 import 'package:event_management/src/mobile_screen/list_users_cancel.dart';
+import 'package:event_management/src/mobile_screen/qr_scanner.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:flutter/material.dart';
 
@@ -126,6 +127,30 @@ class _QuickActionsState extends State<QuickActions> {
                   children: [
                     _buildActionButton(
                         Icons.description, "Documents", () async {}),
+                    _buildActionButton(Icons.login, "Scan CheckIn", () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QRScannerPage(
+                            onQRScanned: (qrCode) async {
+                              await checkIn(widget.eventId, qrCode);
+                            },
+                          ),
+                        ),
+                      );
+                    }),
+                    _buildActionButton(Icons.logout, "Scan CheckOut", () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QRScannerPage(
+                            onQRScanned: (qrCode) async {
+                              await checkOut(widget.eventId, qrCode);
+                            },
+                          ),
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ],
@@ -246,75 +271,4 @@ class _QuickActionsState extends State<QuickActions> {
       ),
     );
   }
-
-  // Widget _buildEditGuest(String role) {
-  //   return FutureBuilder<List<Participant>>(
-  //     future: fetchParticipantsByEventIdAndRole(widget.eventId, role),
-  //     builder: (context, snapshot) {
-  //       if (snapshot.connectionState == ConnectionState.waiting) {
-  //         return const Center(child: CircularProgressIndicator());
-  //       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-  //         return const Center(
-  //             child: Text('No guests available for this event.'));
-  //       } else if (snapshot.hasError) {
-  //         return Center(
-  //             child: Text('Failed to load guests: ${snapshot.error}'));
-  //       } else {
-  //         List<Participant> participants = snapshot.data!;
-  //         return ListView.builder(
-  //           shrinkWrap: true,
-  //           itemCount: participants.length,
-  //           itemBuilder: (context, index) {
-  //             Participant guest = participants[index];
-  //             return Card(
-  //               margin: const EdgeInsets.symmetric(vertical: 8),
-  //               child: ListTile(
-  //                 leading: CircleAvatar(
-  //                   backgroundImage: NetworkImage(guest.photoUrl),
-  //                 ),
-  //                 title: Text(guest.name),
-  //                 subtitle: Text(guest.role),
-  //                 trailing: IconButton(
-  //                   icon: const Icon(Icons.delete, color: Colors.red),
-  //                   onPressed: () async {
-  //                     bool confirmDelete = await showDialog(
-  //                       context: context,
-  //                       builder: (context) => AlertDialog(
-  //                         title: Text("Delete $role"),
-  //                         content: Text(
-  //                             'Are you sure you want to delete ${guest.name}?'),
-  //                         actions: [
-  //                           TextButton(
-  //                             onPressed: () {
-  //                               Navigator.of(context).pop(false);
-  //                             },
-  //                             child: const Text('Cancel'),
-  //                           ),
-  //                           TextButton(
-  //                             onPressed: () async {
-  //                               await deleteParticipantsFromEvent(
-  //                                   widget.eventId, guest.id, role);
-  //                               Navigator.of(context).pop(true);
-  //                             },
-  //                             child: const Text('Delete'),
-  //                           ),
-  //                         ],
-  //                       ),
-  //                     );
-  //                     if (confirmDelete) {
-  //                       Navigator.of(context).pop();
-  //                       Navigator.of(context).pop();
-  //                       LoggerService.logger.i(
-  //                           '${guest.name} has been deleted from the event.');
-  //                     }
-  //                   },
-  //                 ),
-  //               ),
-  //             );
-  //           },
-  //         );
-  //       }
-  //     },
-  //   );
-  // }
 }
