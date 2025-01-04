@@ -8,6 +8,7 @@ class TicketCancellationForm extends StatefulWidget {
   const TicketCancellationForm({super.key, required this.eventId});
 
   @override
+  // ignore: library_private_types_in_public_api
   _TicketCancellationFormState createState() => _TicketCancellationFormState();
 }
 
@@ -36,7 +37,9 @@ class _TicketCancellationFormState extends State<TicketCancellationForm> {
               );
             },
           ).then((_) {
-            Navigator.pop(context); // Go back to the previous screen
+            if (mounted) {
+              Navigator.pop(context); // Go back to the previous screen
+            }
           });
         }
       });
