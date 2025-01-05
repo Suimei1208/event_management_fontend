@@ -63,6 +63,10 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
           }
 
           final tickets = snapshot.data!;
+          // for (var ticket in tickets) {
+          //   LoggerService.logger.i(ticket.cancel_status);
+          //   LoggerService.logger.i(ticket.status);
+          // }
           final upcomingTickets = tickets
               .where((ticket) =>
                   ticket.eventStatus == 'Upcoming' ||
@@ -209,7 +213,10 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
                           )
                         : Column(
                             children: [
-                              const Text("Đã hết hạn hủy vé"),
+                              Text((ticket.status == "Cancelled" &&
+                                      ticket.cancel_status == "Accepted")
+                                  ? "Hủy vé thành công"
+                                  : "Đã hết hạn hủy vé"),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red[300],
@@ -226,7 +233,13 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
                         children: [
                           const Text(""),
                           ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Tính năng này chưa biết làm gì khi người ta chưa setting thời gian hủy vé')),
+                              );
+                            },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.red[300],
                               shape: RoundedRectangleBorder(

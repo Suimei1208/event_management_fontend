@@ -240,3 +240,68 @@ Future<List<Ticket>> fetchTickets() async {
     throw Exception('Error fetching ticket data: $e');
   }
 }
+
+Future<void> updateCancelTicketStatus(List<String> uid, String status) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      LoggerService.logger.e('User not logged in');
+      return;
+    }
+    String? token = await user.getIdToken();
+    if (token == null) {
+      LoggerService.logger.e('Token not found');
+      return;
+    }
+    final response = await http.put(
+      Uri.parse('${Config.baseUrl}/ticket-service/feedback/user-cancel/put/list-user/$status'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(uid),
+    );
+
+    if (response.statusCode == 200) {
+      LoggerService.logger
+          .i('Ticket cancellation request updated successfully');
+    } else {
+      LoggerService.logger.e('Failed to update ticket cancellation request');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Error: $e');
+  }
+}
+
+Future<Map<String,dynamic>> getQrTicket(int eventid) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      LoggerService.logger.e('User not logged in');
+      throw Exception('User not logged in');
+    }
+    String? token = await user.getIdToken();
+    if (token == null) {
+      LoggerService.logger.e('Token not found');
+      throw Exception('Token not found');
+    }
+    final response = await http.get(
+      Uri.parse('${Config.baseUrl}/ticket-service/tickets/${user.uid}/qr/$eventid'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      return data['data'];
+    } else {
+      LoggerService.logger.e('Failed to fetch QR ticket');
+      throw Exception('Failed to fetch QR ticket');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Error: $e');
+    throw Exception('Error: $e');
+  }
+}

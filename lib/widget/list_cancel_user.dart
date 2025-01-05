@@ -1,9 +1,15 @@
+import 'package:event_management/src/service/ticket_service.dart';
 import 'package:flutter/material.dart';
 
 class CancelledUsersPage extends StatefulWidget {
   final List<Map<String, dynamic>> cancelledUsers;
+  final VoidCallback refreshData;
 
-  const CancelledUsersPage({super.key, required this.cancelledUsers});
+  const CancelledUsersPage({
+    super.key,
+    required this.cancelledUsers,
+    required this.refreshData,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -13,7 +19,6 @@ class CancelledUsersPage extends StatefulWidget {
 class _CancelledUsersPageState extends State<CancelledUsersPage> {
   @override
   Widget build(BuildContext context) {
-    // ignore: unnecessary_null_comparison
     if (widget.cancelledUsers.isEmpty) {
       return const Center(
         child: Text('No user to display'),
@@ -27,14 +32,24 @@ class _CancelledUsersPageState extends State<CancelledUsersPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: () {
-                  // Giữ nút để hiển thị text, không cần thêm logic
+                onPressed: () async {
+                  await updateCancelTicketStatus(
+                      widget.cancelledUsers
+                          .map((user) => user['uid'] as String)
+                          .toList(),
+                      "Accepted");
+                  widget.refreshData(); // Làm mới dữ liệu sau khi cập nhật
                 },
                 child: const Text('Đồng ý tất cả'),
               ),
               TextButton(
-                onPressed: () {
-                  // Giữ nút để hiển thị text, không cần thêm logic
+                onPressed: () async {
+                  await updateCancelTicketStatus(
+                      widget.cancelledUsers
+                          .map((user) => user['uid'] as String)
+                          .toList(),
+                      "Rejected");
+                  widget.refreshData(); // Làm mới dữ liệu sau khi cập nhật
                 },
                 child: const Text('Từ chối tất cả'),
               ),
@@ -69,11 +84,6 @@ class _CancelledUsersPageState extends State<CancelledUsersPage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
-                        // Text(
-                        //   user["email"] ?? "No email",
-                        //   overflow: TextOverflow.ellipsis,
-                        // ),
-                        // const SizedBox(height: 4),
                         Row(
                           children: [
                             Text(
@@ -104,14 +114,18 @@ class _CancelledUsersPageState extends State<CancelledUsersPage> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.check),
-                          onPressed: () {
-                            // Đồng ý user
+                          onPressed: () async {
+                            await updateCancelTicketStatus(
+                                [user["uid"] as String], "Accepted");
+                            widget.refreshData(); // Làm mới dữ liệu sau khi cập nhật
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.close),
-                          onPressed: () {
-                            // Từ chối user
+                          onPressed: () async {
+                            await updateCancelTicketStatus(
+                                [user["uid"] as String], "Rejected");
+                            widget.refreshData(); // Làm mới dữ liệu sau khi cập nhật
                           },
                         ),
                       ],

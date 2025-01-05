@@ -33,8 +33,8 @@ class _AlreadyCancelledUsersPageState extends State<AlreadyCancelledUsersPage> {
             child: ListTile(
               leading: CircleAvatar(
                 radius: 25,
-                backgroundImage: user["avatar"] != null
-                    ? NetworkImage(user["avatar"]!)
+                backgroundImage: user["avtUrl"] != null
+                    ? NetworkImage(user["avtUrl"]!)
                     : const AssetImage("assets/default_avatar.png")
                         as ImageProvider,
               ),
@@ -46,7 +46,7 @@ class _AlreadyCancelledUsersPageState extends State<AlreadyCancelledUsersPage> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(user["email"] ?? "No email"),
+                  Text(user["nameFromEmail"] ?? "????"),
                   const SizedBox(height: 4),
                   Text(
                     "Reason: ${user["reason"] ?? "No reason provided"}",
@@ -57,7 +57,7 @@ class _AlreadyCancelledUsersPageState extends State<AlreadyCancelledUsersPage> {
               trailing: TextButton(
                 onPressed: () {
                   // Hiển thị ảnh khi bấm nút
-                  _showImageDialog(context, user["avatar"]);
+                  _showImageDialog(context, user["link_image"]);
                 },
                 child: const Text('Xem ảnh'),
               ),
