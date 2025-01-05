@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:event_management/src/service/participants.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/service/event_service.dart';

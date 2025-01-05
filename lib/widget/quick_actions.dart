@@ -4,10 +4,13 @@ import 'package:event_management/src/mobile_screen/add_special_participants.dart
 import 'package:event_management/src/mobile_screen/existed_participants.dart';
 import 'package:event_management/src/mobile_screen/list_users_cancel.dart';
 import 'package:event_management/src/mobile_screen/qr_scanner.dart';
+import 'package:event_management/src/mobile_screen/spending_overview.dart';
+import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:flutter/material.dart';
 
 class QuickActions extends StatefulWidget {
+  final Event event;
   final int eventId;
   final bool access;
   final bool allowSelectSchedule;
@@ -19,6 +22,7 @@ class QuickActions extends StatefulWidget {
     required this.access,
     required this.allowSelectSchedule,
     required this.status,
+    required this.event,
   });
 
   @override
@@ -168,8 +172,17 @@ class _QuickActionsState extends State<QuickActions> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildActionButton(
-                        Icons.money_outlined, "Chi Tiêu", () async {}),
+                    _buildActionButton(Icons.money_outlined, "Chi Tiêu",
+                        () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SpendingOverviewPage(
+                                  eventId: widget.eventId,
+                                  event: widget.event,
+                                )),
+                      );
+                    }),
                     _buildActionButton(
                         Icons.cancel_presentation, "Dữ liệu hủy tham gia", () {
                       Navigator.push(
