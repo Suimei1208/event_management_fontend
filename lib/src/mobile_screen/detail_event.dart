@@ -51,6 +51,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   Future<void> _initializeData() async {
+    if (!mounted) return;
     setState(() {
       eventName = '';
       description = '';
@@ -69,6 +70,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     await _fetchUserId();
     await _loadEventData();
 
+    if (!mounted) return;
     setState(() {
       isLoading = false;
     });
@@ -115,6 +117,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     try {
       final eventData = await getEventData(widget.event.id);
       final stats = await getStats(widget.event.id);
+      if (!mounted) return;
       setState(() {
         access = eventData['data']['access'];
         allowSelectSchedule = eventData['data']['allowSelectSchedule'];
@@ -132,6 +135,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       });
     } catch (error) {
       LoggerService.logger.e(error);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Failed to load event data. Please try again.')),

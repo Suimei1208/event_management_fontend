@@ -1,4 +1,5 @@
 import 'package:event_management/src/mobile_screen/setting_feed_back_cancel_event.dart';
+import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/widget/list_cancel_user.dart';
 import 'package:event_management/widget/list_user_already_cancel.dart';
@@ -25,7 +26,8 @@ class _CancelledUsersScreenState extends State<CancelledUsersScreen> {
     super.initState();
     _fetchCancelledUsers();
     _pages = [
-      CancelledUsersPage(cancelledUsers: cancelledUsers),
+      CancelledUsersPage(
+          cancelledUsers: cancelledUsers, refreshData: _fetchCancelledUsers),
       AlreadyCancelledUsersPage(cancelledUsers: alreadyCancelledUsers),
     ];
   }
@@ -37,15 +39,27 @@ class _CancelledUsersScreenState extends State<CancelledUsersScreen> {
   }
 
   Future<void> _fetchCancelledUsers() async {
-    List<Map<String, dynamic>> data =
-        await fetchCancelledUsers(widget.eventID, 'Pending');
-    List<Map<String, dynamic>> data2 =
-        await fetchCancelledUsers(widget.eventID, 'Accepted');
     setState(() {
-      cancelledUsers.addAll(data);
-      alreadyCancelledUsers.addAll(data2);
-      isLoading = false; // Set loading to false when data is loaded
+      isLoading = true;
     });
+    try {
+      List<Map<String, dynamic>> data =
+          await fetchCancelledUsers(widget.eventID, 'Pending');
+      List<Map<String, dynamic>> data2 =
+          await fetchCancelledUsers(widget.eventID, 'Accepted');
+      setState(() {
+        cancelledUsers.clear();
+        alreadyCancelledUsers.clear();
+        cancelledUsers.addAll(data);
+        alreadyCancelledUsers.addAll(data2);
+        isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      LoggerService.logger.i("Error: $error");
+    }
   }
 
   @override

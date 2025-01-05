@@ -1,4 +1,5 @@
 // ignore_for_file: unnecessary_null_comparison
+
 import 'package:event_management/src/mobile_screen/detail_event.dart';
 import 'package:event_management/src/mobile_screen/forum_screen.dart';
 import 'package:event_management/src/mobile_screen/register_events.dart';
@@ -6,6 +7,7 @@ import 'package:event_management/src/mobile_screen/user_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 import 'package:event_management/src/mobile_screen/profile.dart';
 import 'package:event_management/generated/l10n.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
+extension EventQRCode on Event {
+  static final Map<String, String?> _qrCodeMap = {};
+  static final Map<String, String?> _statusMap = {};
+
+  // Getter và Setter cho QR Code
+  // ignore: collection_methods_unrelated_type
+  String? get qrCode => _qrCodeMap[id];
+  set qrCode(String? value) => _qrCodeMap[id.toString()] = value;
+
+  // Getter và Setter cho Status
+  // ignore: collection_methods_unrelated_type
+  String? get statusTicket => _statusMap[id];
+  set statusTicket(String? value) => _statusMap[id.toString()] = value;
+}
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';
@@ -61,11 +79,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> fetchEvents() async {
     List<Event> listEvents = await fetchEventById(user!.uid);
+    List<Event> toRemove = [];
+
+    for (var event in listEvents) {
+      final ticket = await getQrTicket(event.id);
+      event.qrCode = ticket['qr'];
+      if (ticket['statusTicket'] == "Cancelled") {
+        toRemove.add(event);
+      }
+    }
+
     if (mounted) {
       setState(() {
-        events = listEvents;
+        events = listEvents..removeWhere((event) => toRemove.contains(event));
       });
     }
+
+    LoggerService.logger.i(events);
   }
 
   void _onItemTapped(int index) {
@@ -83,9 +113,15 @@ class _HomeScreenState extends State<HomeScreen> {
         : null;
     final Duration timeUntilNextEvent =
         nextEvent != null ? nextEvent.startDate.difference(now) : Duration.zero;
-    final ongoingEvents = events.isNotEmpty
-        ? events.firstWhere((event) => event.status == "Ongoing")
-        : null;
+    Event? ongoingEvents;
+    if (events.isNotEmpty) {
+      for (var event in events) {
+        if (event.status == "Ongoing") {
+          ongoingEvents = event;
+          break;
+        }
+      }
+    }
 
     final List<Widget> screens = [
       SingleChildScrollView(
@@ -94,74 +130,75 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (ongoingEvents != null)
-                Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("On-going Event",
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              ongoingEvents != null
+                  ? Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Text(
-                                ongoingEvents.name,
-                                style: const TextStyle(fontSize: 16),
-                                softWrap: true,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                            const Text("On-going Event",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    ongoingEvents.name,
+                                    style: const TextStyle(fontSize: 16),
+                                    softWrap: true,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                const Chip(
+                                  label: Text("Ongoing",
+                                      style: TextStyle(color: Colors.white)),
+                                  backgroundColor:
+                                      Color.fromARGB(255, 245, 203, 18),
+                                ),
+                              ],
                             ),
-                            const SizedBox(
-                              width: 8,
-                            ),
-                            const Chip(
-                              label: Text("Ongoing",
-                                  style: TextStyle(color: Colors.white)),
-                              backgroundColor:
-                                  Color.fromARGB(255, 245, 203, 18),
+                            const SizedBox(height: 5),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    "${DateFormat.jm().format(ongoingEvents.startDate)} - ${ongoingEvents.location}",
+                                    style: const TextStyle(color: Colors.grey),
+                                    softWrap: true,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                ElevatedButton(
+                                    style: Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.purple)
+                                        : null,
+                                    onPressed: () {
+                                      setState(() {
+                                        LoggerService.logger.i(
+                                            "Event clicked ticket ${ongoingEvents?.id}");
+                                      });
+                                    },
+                                    child: const Text('View your ticket'))
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 5),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "${DateFormat.jm().format(ongoingEvents.startDate)} - ${ongoingEvents.location}",
-                                style: const TextStyle(color: Colors.grey),
-                                softWrap: true,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            ElevatedButton(
-                                style: Theme.of(context).brightness ==
-                                        Brightness.dark
-                                    ? ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.purple)
-                                    : null,
-                                onPressed: () {
-                                  setState(() {
-                                    LoggerService.logger.i(
-                                        "Event clicked ticket ${ongoingEvents.id}");
-                                  });
-                                },
-                                child: const Text('View your ticket'))
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
               Card(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
@@ -213,8 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 10),
               Column(
                 children: events
-                    .where((event) =>
-                        ongoingEvents != null && event != ongoingEvents)
+                    .where((event) => event != ongoingEvents)
                     .map((event) => buildEventCard(event))
                     .toList(),
               )
@@ -347,6 +383,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildEventCard(Event event) {
+    // String? qr;
+    // getQrTicket(event.id).then((value) {
+    //   setState(() {
+    //     qr = value;
+    //   });
+    // });
     return Column(
       children: [
         InkWell(
@@ -409,24 +451,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  // const Icon(Icons.arrow_forward_ios,
-                  //     size: 16, color: Colors.grey),
                   const SizedBox(
                     height: 10,
                   ),
-                  ElevatedButton(
-                    style: Theme.of(context).brightness == Brightness.dark
-                        ? ElevatedButton.styleFrom(
-                            backgroundColor: Colors.purple)
-                        : null,
-                    onPressed: () {
-                      setState(() {
-                        LoggerService.logger
-                            .i("Event clicked ticket ${event.id}");
-                      });
-                    },
-                    child: const Text('View your ticket'),
-                  )
+                  event.idCreate == user?.uid
+                      ? const Text("Event của bạn")
+                      : ElevatedButton(
+                          style: Theme.of(context).brightness == Brightness.dark
+                              ? ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.purple)
+                              : null,
+                          onPressed: () => _viewQRCode(context, event.qrCode),
+                          child: const Text('View your ticket'),
+                        )
                 ],
               ),
             ),
@@ -436,6 +473,48 @@ class _HomeScreenState extends State<HomeScreen> {
           height: 3,
         )
       ],
+    );
+  }
+
+  void _viewQRCode(BuildContext context, String? qrCode) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    final trimmedTimestamp = timestamp.length > 8
+        ? timestamp.substring(timestamp.length - 8)
+        : timestamp;
+    final dynamicQrData = '$qrCode-$trimmedTimestamp';
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Your QR Code',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: QrImageView(
+                  data: dynamicQrData,
+                  version: QrVersions.auto,
+                  size: 200.0,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
