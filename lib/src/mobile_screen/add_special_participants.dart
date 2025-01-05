@@ -1,6 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
-import 'package:event_management/src/service/event_service.dart';
+import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:flutter/material.dart';
 

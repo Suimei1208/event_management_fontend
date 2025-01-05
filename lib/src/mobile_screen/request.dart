@@ -2,6 +2,7 @@
 
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/service/event_service.dart';
+import 'package:event_management/src/service/participants.dart';
 import 'package:flutter/material.dart';
 
 class RequestPage extends StatefulWidget {

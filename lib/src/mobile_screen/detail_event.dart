@@ -9,6 +9,7 @@ import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/notification_service.dart';
+import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:event_management/widget/quick_actions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -213,17 +214,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 );
               },
             ),
-          // if (userId == widget.event.idCreate)
-          //   IconButton(
-          //     icon: const Icon(Icons.person),
-          //     onPressed: () {
-          //       Navigator.push(
-          //         context,
-          //         MaterialPageRoute(
-          //             builder: (context) => ExistedParticipants(id: eventId)),
-          //       );
-          //     },
-          //   ),
           if (userId == widget.event.idCreate)
             IconButton(
               icon: const Icon(Icons.file_copy),
@@ -243,6 +233,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     access: access,
                     allowSelectSchedule: allowSelectSchedule,
                     status: widget.event.status,
+                    event: widget.event,
                   ),
                 );
               },
@@ -483,37 +474,4 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       ],
     );
   }
-
-  // Widget _buildSpeaker(String name, String role, String imageUrl) {
-  //   return Column(
-  //     children: [
-  //       Row(
-  //         children: [
-  //           CircleAvatar(
-  //             radius: 30,
-  //             backgroundImage: NetworkImage(imageUrl),
-  //           ),
-  //           const SizedBox(width: 16),
-  //           Column(
-  //             crossAxisAlignment: CrossAxisAlignment.start,
-  //             children: [
-  //               Text(
-  //                 name,
-  //                 style: const TextStyle(
-  //                     fontSize: 16, fontWeight: FontWeight.bold),
-  //               ),
-  //               Text(
-  //                 role,
-  //                 style: const TextStyle(fontSize: 14, color: Colors.grey),
-  //               ),
-  //             ],
-  //           ),
-  //         ],
-  //       ),
-  //       const SizedBox(
-  //         height: 10,
-  //       )
-  //     ],
-  //   );
-  // }
 }
