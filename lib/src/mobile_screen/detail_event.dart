@@ -372,19 +372,19 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         // color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Column(
+      child: Column(
         children: [
-          Text(
+          const Text(
             "Event Stats",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // _buildStat(registered, "Registered"),
-              // _buildStat(speakers, "Special Participants"),
-              // _buildStat(sessions, "Sessions"),
+              _buildStat(registered, "Registered"),
+              _buildStat(speakers, "Special Participants"),
+              _buildStat(sessions, "Sessions"),
             ],
           ),
         ],
@@ -493,16 +493,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  // Widget _buildStat(String value, String label) {
-  //   return Column(
-  //     children: [
-  //       Text(
-  //         value,
-  //         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-  //       ),
-  //       const SizedBox(height: 8),
-  //       Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-  //     ],
-  //   );
-  // }
+  Widget _buildStat(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+      ],
+    );
+  }
 }

@@ -1,6 +1,8 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:event_management/src/mobile_screen/add_special_participants.dart';
+import 'package:event_management/src/mobile_screen/document_page.dart';
+import 'package:event_management/src/mobile_screen/event_analystic.dart';
 import 'package:event_management/src/mobile_screen/existed_participants.dart';
 import 'package:event_management/src/mobile_screen/list_users_cancel.dart';
 import 'package:event_management/src/mobile_screen/qr_scanner.dart';
@@ -141,8 +143,14 @@ class _QuickActionsState extends State<QuickActions> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildActionButton(
-                          Icons.description, "Documents", () async {}),
+                      _buildActionButton(Icons.description, "Documents",
+                          () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const EventResourcesPage()),
+                        );
+                      }),
                       _buildActionButton(Icons.login, "Scan CheckIn", () async {
                         Navigator.push(
                           context,
@@ -207,7 +215,13 @@ class _QuickActionsState extends State<QuickActions> {
                                   )),
                         );
                       }),
-                      _buildActionButton(Icons.analytics, "Statistics", () {}),
+                      _buildActionButton(Icons.analytics, "Statistics", () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const EventAnalyticsPage()),
+                        );
+                      }),
                     ],
                   ),
                 ],

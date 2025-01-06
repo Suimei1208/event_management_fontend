@@ -40,21 +40,19 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
   }
 
   Future<void> _loadEvents() async {
-  final events = await fetchEventCanRegister();
-  if (mounted) {
-    setState(() {
-      _allEvents = events;
-      _filteredEvents = events;
-    });
+    final events = await fetchEventCanRegister();
+    if (mounted) {
+      setState(() {
+        _allEvents = events;
+        _filteredEvents = events;
+      });
+    }
   }
-}
 
   @override
-void dispose() {
-
-  super.dispose();
-}
-
+  void dispose() {
+    super.dispose();
+  }
 
   Color _getStatusColorType(String type) {
     switch (type) {
@@ -144,6 +142,7 @@ void dispose() {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(S.of(context).register_event),
       ),
       body: Padding(

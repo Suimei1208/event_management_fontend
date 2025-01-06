@@ -617,7 +617,7 @@ Future<Participant?> fetchParticipantRoleByUserIdAndEventId(int eventId) async {
 
     final response = await http.get(
       Uri.parse(
-          '${Config.baseUrl}/event-service/particpant/get-role?userId=${user.uid}&eventId=$eventId'),
+          '${Config.baseUrl}/event-service/participant/get-role?userId=${user.uid}&eventId=$eventId'),
       headers: {
         'Authorization': 'Bearer $idToken',
       },
@@ -649,7 +649,8 @@ Future<Participant?> fetchParticipantRoleByUserIdAndEventId(int eventId) async {
   return null;
 }
 
-Future<List<Participant>> getParticipants(int id, String status, String role) async {
+Future<List<Participant>> getParticipants(
+    int id, String status, String role) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -854,6 +855,7 @@ Future<Map<String, dynamic>> getStats(int eventId) async {
       final Map<String, dynamic> responseData = json.decode(response.body);
 
       if (responseData['success'] == true) {
+        // LoggerService.logger.i(responseData['data']);
         return responseData['data'];
       } else {
         throw Exception(

@@ -201,9 +201,15 @@ class _ShareRolePageState extends State<ShareRolePage> {
           ),
           onChanged: _searchUsers,
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        // backgroundColor: Colors.white,
+        // foregroundColor: Colors.black,
         elevation: 0,
+        actions: const [
+          Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Icon(Icons.search),
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -214,7 +220,7 @@ class _ShareRolePageState extends State<ShareRolePage> {
               child: ListView(
                 children: [
                   const Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.only(left: 20.0),
                     child: Text(
                       'Hosts',
                       style: TextStyle(
@@ -241,7 +247,7 @@ class _ShareRolePageState extends State<ShareRolePage> {
                     );
                   }),
                   const Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.only(left: 20.0),
                     child: Text(
                       'Staff',
                       style: TextStyle(
@@ -270,7 +276,7 @@ class _ShareRolePageState extends State<ShareRolePage> {
                   }),
                   const Divider(),
                   const Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: EdgeInsets.only(left: 20.0),
                     child: Text(
                       'Search Results',
                       style: TextStyle(

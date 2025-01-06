@@ -2,6 +2,7 @@
 import 'package:event_management/src/mobile_screen/form_cancel_ticket.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
+import 'package:event_management/widget/dialog_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:event_management/src/models/tickets.dart';
 // ignore: unused_import
@@ -229,27 +230,52 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
                               )
                             ],
                           )
-                    : Column(
-                        children: [
-                          const Text(""),
-                          ElevatedButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'Tính năng này chưa biết làm gì khi người ta chưa setting thời gian hủy vé')),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red[300],
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                    : DateTime.parse(ticket.startDate).isAfter(DateTime.now())
+                        ? Column(
+                            children: [
+                              Text(ticket.status == "Cancelled"
+                                  ? "Vé đã bị hủy"
+                                  : ""),
+                              ElevatedButton(
+                                onPressed: ticket.status == "Cancelled"
+                                    ? null
+                                    : () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return const DialogWidget(
+                                              message:
+                                                  'Vui lòng liên hệ Admin qua email để hủy vé!',
+                                              title: 'Notification',
+                                            );
+                                          },
+                                        );
+                                      },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red[300],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text('Hủy vé'),
                               ),
-                            ),
-                            child: const Text('Hủy vé'),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              const Text(""),
+                              ElevatedButton(
+                                onPressed: null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red[300],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                child: const Text('Hủy vé'),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
                 Column(
                   children: [
                     const Text(""),
