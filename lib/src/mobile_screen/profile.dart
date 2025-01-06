@@ -1,3 +1,4 @@
+import 'package:event_management/src/mobile_screen/review_event.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:event_management/widget/options_widget.dart';
@@ -37,6 +38,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       child: Scaffold(
         key: scaffoldKey,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           elevation: 0,
           centerTitle: false,
           title: Text(S.of(context).profile),
@@ -193,7 +195,17 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         Navigator.pushNamed(context, '/my-ticket');
                       },
                     ),
-                    
+                    OptionsWidget(
+                      icon: Icons.thumb_up,
+                      text: "Đánh giá sự kiện",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const EventReviewPage()),
+                        );
+                      },
+                    ),
                     Padding(
                       padding:
                           const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),

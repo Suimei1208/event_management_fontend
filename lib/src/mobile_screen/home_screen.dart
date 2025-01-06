@@ -17,21 +17,6 @@ import 'package:event_management/src/mobile_screen/profile.dart';
 import 'package:event_management/generated/l10n.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-extension EventQRCode on Event {
-  static final Map<String, String?> _qrCodeMap = {};
-  static final Map<String, String?> _statusMap = {};
-
-  // Getter và Setter cho QR Code
-  // ignore: collection_methods_unrelated_type
-  String? get qrCode => _qrCodeMap[id];
-  set qrCode(String? value) => _qrCodeMap[id.toString()] = value;
-
-  // Getter và Setter cho Status
-  // ignore: collection_methods_unrelated_type
-  String? get statusTicket => _statusMap[id];
-  set statusTicket(String? value) => _statusMap[id.toString()] = value;
-}
-
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home';
 
@@ -83,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     for (var event in listEvents) {
       final ticket = await getQrTicket(event.id);
-      event.qrCode = ticket['qr'];
       if (ticket['statusTicket'] == "Cancelled") {
         toRemove.add(event);
       }
@@ -267,6 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: _currentIndex == 0
           ? AppBar(
+              automaticallyImplyLeading: false,
               elevation: 0,
               centerTitle: false,
               title: Text(S.of(context).welcome_back),
@@ -461,7 +446,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               ? ElevatedButton.styleFrom(
                                   backgroundColor: Colors.purple)
                               : null,
-                          onPressed: () => _viewQRCode(context, event.qrCode),
+                          onPressed: () async {
+                            Map<String, dynamic> qrCode =
+                                await getQrTicket(event.id);
+                            // ignore: use_build_context_synchronously
+                            _viewQRCode(context, qrCode['qr']);
+                          },
                           child: const Text('View your ticket'),
                         )
                 ],
@@ -476,7 +466,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _viewQRCode(BuildContext context, String? qrCode) {
+  void _viewQRCode(BuildContext context, String qrCode) {
     final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     final trimmedTimestamp = timestamp.length > 8
         ? timestamp.substring(timestamp.length - 8)
