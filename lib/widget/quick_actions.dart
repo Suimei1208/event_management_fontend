@@ -1,9 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:event_management/src/mobile_screen/add_special_participants.dart';
 import 'package:event_management/src/mobile_screen/existed_participants.dart';
 import 'package:event_management/src/mobile_screen/list_users_cancel.dart';
 import 'package:event_management/src/mobile_screen/qr_scanner.dart';
+import 'package:event_management/src/mobile_screen/share_role.dart';
 import 'package:event_management/src/mobile_screen/spending_overview.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
@@ -15,6 +16,7 @@ class QuickActions extends StatefulWidget {
   final bool access;
   final bool allowSelectSchedule;
   final String status;
+  final String userRole;
 
   const QuickActions({
     super.key,
@@ -23,10 +25,10 @@ class QuickActions extends StatefulWidget {
     required this.allowSelectSchedule,
     required this.status,
     required this.event,
+    required this.userRole,
   });
 
   @override
-  // ignore: library_private_types_in_public_api
   _QuickActionsState createState() => _QuickActionsState();
 }
 
@@ -43,10 +45,13 @@ class _QuickActionsState extends State<QuickActions> {
 
   @override
   Widget build(BuildContext context) {
+    // Check if the userRole is "Host-${widget.eventId}"
+    bool isHost = widget.userRole == "Host-${widget.eventId}";
+    bool isStaff = widget.userRole == "Staff-${widget.eventId}";
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        // color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -57,148 +62,157 @@ class _QuickActionsState extends State<QuickActions> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-
-          // Add Speaker and Guest Action Buttons
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildActionButton(Icons.edit, "Điều chỉnh khách mời", () {
-                      Navigator.push(
+          if (isHost)
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildActionButton(Icons.edit, "Điều chỉnh khách mời",
+                          () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SpecialParticipantsPage(
+                                    eventId: widget.eventId)));
+                      }),
+                      _buildActionButton(Icons.person, "Danh sách tham gia",
+                          () {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => SpecialParticipantsPage(
-                                  eventId: widget.eventId)));
-                    }),
-                    _buildActionButton(Icons.person, "Danh sách tham gia", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                ExistedParticipants(id: widget.eventId)),
-                      );
-                    }),
-                  ],
-                ),
-              ],
+                              builder: (context) =>
+                                  ExistedParticipants(id: widget.eventId)),
+                        );
+                      }),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
           const SizedBox(height: 16),
-
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
+          if (isHost)
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      widget.status != "Cancelled"
+                          ? _buildActionButton(Icons.cancel, "Hủy sự kiện",
+                              () async {
+                              cancelEvent(widget.eventId, context);
+                            })
+                          : _buildActionButton(
+                              Icons.repeat_outlined, "Mở lại sự kiện", () {
+                              resetEvent(widget.eventId, context);
+                            }),
+                      _buildActionButton(Icons.share, "Phân quyền", () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ShareRolePage(event: widget.event)),
+                        );
+                      }),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    widget.status != "Cancelled"
-                        ? _buildActionButton(Icons.cancel, "Hủy sự kiện",
-                            () async {
-                            cancelEvent(widget.eventId, context);
-                          })
-                        : _buildActionButton(
-                            Icons.repeat_outlined, "Mở lại sự kiện", () {
-                            resetEvent(widget.eventId, context);
-                          }),
-                    _buildActionButton(Icons.share, "Phân quyền", () {}),
-                  ],
-                ),
-              ],
-            ),
-          ),
           const SizedBox(height: 16),
-
-          // Remove Speaker and Guest Action Buttons
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildActionButton(
-                        Icons.description, "Documents", () async {}),
-                    _buildActionButton(Icons.login, "Scan CheckIn", () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QRScannerPage(
-                            onQRScanned: (qrCode) async {
-                              await checkIn(widget.eventId, qrCode);
-                            },
+          if (isHost || isStaff)
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildActionButton(
+                          Icons.description, "Documents", () async {}),
+                      _buildActionButton(Icons.login, "Scan CheckIn", () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QRScannerPage(
+                              onQRScanned: (qrCode) async {
+                                await checkIn(widget.eventId, qrCode);
+                              },
+                            ),
                           ),
-                        ),
-                      );
-                    }),
-                    _buildActionButton(Icons.logout, "Scan CheckOut", () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QRScannerPage(
-                            onQRScanned: (qrCode) async {
-                              await checkOut(widget.eventId, qrCode);
-                            },
+                        );
+                      }),
+                      _buildActionButton(Icons.logout, "Scan CheckOut",
+                          () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QRScannerPage(
+                              onQRScanned: (qrCode) async {
+                                await checkOut(widget.eventId, qrCode);
+                              },
+                            ),
                           ),
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ],
+                        );
+                      }),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
           const SizedBox(height: 16),
-
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
+          if (isHost || isStaff)
+            Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildActionButton(Icons.money_outlined, "Chi Tiêu",
+                          () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SpendingOverviewPage(
+                                    eventId: widget.eventId,
+                                    event: widget.event,
+                                  )),
+                        );
+                      }),
+                      _buildActionButton(
+                          Icons.cancel_presentation, "Dữ liệu hủy tham gia",
+                          () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CancelledUsersScreen(
+                                    eventID: widget.eventId,
+                                  )),
+                        );
+                      }),
+                      _buildActionButton(Icons.analytics, "Statistics", () {}),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildActionButton(Icons.money_outlined, "Chi Tiêu",
-                        () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SpendingOverviewPage(
-                                  eventId: widget.eventId,
-                                  event: widget.event,
-                                )),
-                      );
-                    }),
-                    _buildActionButton(
-                        Icons.cancel_presentation, "Dữ liệu hủy tham gia", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CancelledUsersScreen(
-                                  eventID: widget.eventId,
-                                )),
-                      );
-                    }),
-                    _buildActionButton(Icons.analytics, "Statistics", () {}),
-                  ],
-                ),
-              ],
-            ),
-          ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(8.0),

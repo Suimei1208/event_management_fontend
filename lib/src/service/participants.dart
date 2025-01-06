@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:event_management/config.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
@@ -47,29 +49,31 @@ Future<bool> approveParticipant(
   }
 }
 
-Future<void> addParticipant(
-    List<Map<String, dynamic>> members, int eventId, String role) async {
+Future<void> addParticipant(String userId, int eventId, String role) async {
   try {
+    // Ensure the user is logged in
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception('No user logged in');
     }
 
+    // Prepare the participant data
     List<Map<String, dynamic>> participants = [];
 
     String? idToken = await user.getIdToken();
 
-    for (var member in members) {
-      participants.add({
-        "id": 0,
-        'userId': member['id'],
-        'eventId': eventId,
-        'registration_Date': DateTime.now().toIso8601String(),
-        'status': 'Approved',
-        'role': role,
-      });
-    }
-    LoggerService.logger.i(participants);
+    participants.add({
+      "id": 0,
+      'userId': userId,
+      'eventId': eventId,
+      'registration_Date': DateTime.now().toIso8601String(),
+      'status': 'Approved',
+      'role': role, // Ensure role is passed correctly
+    });
+
+    LoggerService.logger.i('Participant Data: $participants');
+
+    // Send a POST request to add the participant
     final response = await http.post(
       Uri.parse('${Config.baseUrl}/event-service/add'),
       headers: {
@@ -79,6 +83,7 @@ Future<void> addParticipant(
       body: jsonEncode(participants),
     );
 
+    // Handle response
     if (response.statusCode == 200) {
       LoggerService.logger.i('Participant added successfully.');
     } else {
@@ -86,7 +91,7 @@ Future<void> addParticipant(
           'Failed to add participant: ${response.body}, status: ${response.statusCode}');
     }
   } catch (e) {
-    // Log lỗi nếu có
+    // Log any errors that occur during the process
     LoggerService.logger.w('Failed to add participant: $e');
   }
 }
@@ -117,7 +122,6 @@ Future<List<Map<String, dynamic>>> fetchParticipants(int eventId) async {
   }
 }
 
-// ignore: non_constant_identifier_names
 Future<void> UserRegisterEvent(int eventid, String status, String role) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
@@ -213,8 +217,6 @@ Future<void> unregisterEvent(String eventId) async {
     LoggerService.logger.w('Failed to unregister: $e');
   }
 }
-
-
 
 Future<void> addParticipantToSchedule(int scheduleId, String userId) async {
   try {

@@ -602,7 +602,54 @@ Future<List<Participant>> fetchParticipantsByEventIdAndRole(
   }
 }
 
-Future<List<Participant>> getStatusParticipants(int id, String status) async {
+Future<Participant?> fetchParticipantRoleByUserIdAndEventId(int eventId) async {
+  try {
+    // Get the current user and their ID token
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/particpant/get-role?userId=${user.uid}&eventId=$eventId'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData['success'] == true) {
+        final participantData = responseData['data'];
+        LoggerService.logger.i(participantData);
+        if (participantData != null) {
+          Participant participant = Participant.fromJson(participantData);
+          return participant;
+        }
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Failed to fetch participant role');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to fetch participant role: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to fetch participant role');
+    }
+  } catch (e) {
+    LoggerService.logger.w('Error fetching participant role: $e');
+    throw Exception('Failed to fetch participant role');
+  }
+  return null;
+}
+
+Future<List<Participant>> getParticipants(int id, String status, String role) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -616,7 +663,7 @@ Future<List<Participant>> getStatusParticipants(int id, String status) async {
 
     final response = await http.get(
       Uri.parse(
-          '${Config.baseUrl}/event-service/event/$id/participants-status/$status'),
+          '${Config.baseUrl}/event-service/event/$id/participants-status/$status/role/$role'),
       headers: {
         'Authorization': 'Bearer $idToken',
       },

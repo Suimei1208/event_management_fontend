@@ -1,8 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
+import 'dart:io';
+
+import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SpecialParticipantsPage extends StatefulWidget {
   final int eventId;
@@ -104,6 +108,20 @@ class _SpecialParticipantsPageState extends State<SpecialParticipantsPage> {
     }
   }
 
+  void _addSpecialParticipant() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => AddSpecialParticipantFormWithImage(
+        onParticipantAdded: (participant) {
+          setState(() {
+            specialParticipants.add(participant);
+          });
+        },
+        eventId: widget.eventId,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,6 +134,12 @@ class _SpecialParticipantsPageState extends State<SpecialParticipantsPage> {
           ),
           onChanged: _searchUsers,
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _addSpecialParticipant,
+          ),
+        ],
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -332,6 +356,156 @@ class _AddSpecialParticipantFormState extends State<AddSpecialParticipantForm> {
                 }
                 return null;
               },
+            ),
+            const SizedBox(height: 20),
+            _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : ElevatedButton(
+                    onPressed: _submit,
+                    child: const Text('Add Participant'),
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AddSpecialParticipantFormWithImage extends StatefulWidget {
+  final Function(Map<String, dynamic>) onParticipantAdded;
+  final int eventId;
+
+  const AddSpecialParticipantFormWithImage({
+    super.key,
+    required this.onParticipantAdded,
+    required this.eventId,
+  });
+
+  @override
+  _AddSpecialParticipantFormWithImageState createState() =>
+      _AddSpecialParticipantFormWithImageState();
+}
+
+class _AddSpecialParticipantFormWithImageState
+    extends State<AddSpecialParticipantFormWithImage> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  File? _selectedImage;
+  bool _isLoading = false;
+  final List<String> _roles = ['Speaker', 'Special Guest'];
+  String? _selectedRole;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate() || _selectedImage == null) {
+      return;
+    }
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final fileName =
+          '${_nameController.text}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final photoUrl = await uploadImageEventToImageKit(
+          _selectedImage!, widget.eventId, fileName);
+      final participant = {
+        'name': _nameController.text,
+        'role': _selectedRole!,
+        'description': _descriptionController.text,
+        'photoUrl': photoUrl,
+        'registration_Date': DateTime.now().toIso8601String(),
+      };
+      await addSpecialParticipant(
+        eventId: widget.eventId,
+        name: _nameController.text,
+        role: _selectedRole!,
+        description: _descriptionController.text,
+        photoUrl: photoUrl,
+      );
+      widget.onParticipantAdded(participant);
+      Navigator.of(context).pop();
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add participant: $error')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          children: [
+            TextFormField(
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a name';
+                }
+                return null;
+              },
+            ),
+            DropdownButtonFormField<String>(
+              value: _selectedRole,
+              hint: const Text('Select Role'),
+              decoration: const InputDecoration(labelText: 'Role'),
+              items: _roles.map((role) {
+                return DropdownMenuItem(
+                  value: role,
+                  child: Text(role),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedRole = value;
+                });
+              },
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please select a role';
+                }
+                return null;
+              },
+            ),
+            TextFormField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(labelText: 'Description'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a description';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 20),
+            _selectedImage != null
+                ? Image.file(
+                    _selectedImage!,
+                    height: 150,
+                  )
+                : const SizedBox.shrink(),
+            TextButton.icon(
+              onPressed: _pickImage,
+              icon: const Icon(Icons.image),
+              label: const Text('Pick Image'),
             ),
             const SizedBox(height: 20),
             _isLoading

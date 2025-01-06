@@ -32,8 +32,9 @@ class _ExistedParticipantsState extends State<ExistedParticipants> {
 
   void _loadParticipants() {
     setState(() {
-      _approvedParticipants = getStatusParticipants(widget.id, "Approved");
-      _addedParticipants = getStatusParticipants(widget.id, "Added");
+      _approvedParticipants =
+          getParticipants(widget.id, "Approved", "Participant");
+      _addedParticipants = getParticipants(widget.id, "Added", "Participant");
     });
   }
 

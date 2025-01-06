@@ -25,7 +25,8 @@ class _RequestPageState extends State<RequestPage> {
 
   void _loadPendingParticipants() {
     setState(() {
-      _pendingParticipants = getStatusParticipants(widget.id, "Pending");
+      _pendingParticipants =
+          getParticipants(widget.id, "Pending", "Participant");
     });
   }
 
