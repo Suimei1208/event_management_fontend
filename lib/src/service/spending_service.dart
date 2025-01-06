@@ -19,7 +19,8 @@ Future<void> addSpending(
     }
 
     final response = await http.post(
-      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/spending/add'),
+      Uri.parse(
+          '${Config.baseUrl}/event-finance-service/event/$eventId/spending/add'),
       headers: {
         'Authorization': 'Bearer $idToken',
         'Content-Type': 'application/json',
@@ -63,7 +64,8 @@ Future<List<Map<String, dynamic>>> fetchSpendings(int eventId) async {
     }
 
     final response = await http.get(
-      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/spending'),
+      Uri.parse(
+          '${Config.baseUrl}/event-finance-service/event/$eventId/spending'),
       headers: {
         'Authorization': 'Bearer $idToken',
         'Content-Type': 'application/json',
@@ -102,7 +104,8 @@ Future<Map<String, double>> fetchSpendingData(int eventId) async {
     }
 
     final response = await http.get(
-      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/spending'),
+      Uri.parse(
+          '${Config.baseUrl}/event-finance-service/event/$eventId/spending'),
       headers: <String, String>{
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -146,7 +149,7 @@ Future<void> updateSpending(
 
     final response = await http.put(
       Uri.parse(
-          '${Config.baseUrl}/event-service/event/$eventId/spending/update/$spendingId'),
+          '${Config.baseUrl}/event-finance-service/event/$eventId/spending/update/$spendingId'),
       headers: {
         'Authorization': 'Bearer $idToken',
         'Content-Type': 'application/json',
@@ -183,7 +186,7 @@ Future<void> deleteSpending(int eventId, int id) async {
   try {
     final response = await http.delete(
       Uri.parse(
-          '${Config.baseUrl}/event-service/event/$eventId/spending/delete/$id'),
+          '${Config.baseUrl}/event-finance-service/event/$eventId/spending/delete/$id'),
       headers: {
         'Authorization': 'Bearer $idToken',
         'Content-Type': 'application/json',

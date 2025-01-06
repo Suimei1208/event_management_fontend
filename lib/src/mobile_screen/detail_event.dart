@@ -5,6 +5,7 @@ import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/request.dart';
 import 'package:event_management/src/mobile_screen/schedules.dart';
 import 'package:event_management/src/mobile_screen/update_event.dart';
+import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -43,6 +44,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   String registered = '';
   String speakers = '';
   String sessions = '';
+  String userRole = "";
 
   @override
   void initState() {
@@ -69,6 +71,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
     await _fetchUserId();
     await _loadEventData();
+    await _loadUserRole();
 
     if (!mounted) return;
     setState(() {
@@ -111,6 +114,28 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       LoggerService.logger.e("No file selected.");
     }
     return studentIds;
+  }
+
+  Future<void> _loadUserRole() async {
+    try {
+      Participant? participant =
+          await fetchParticipantRoleByUserIdAndEventId(widget.event.id);
+
+      if (participant != null) {
+        setState(() {
+          userRole = participant.role;
+        });
+      } else {
+        setState(() {
+          userRole = "";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        userRole = "";
+      });
+      LoggerService.logger.e("Error fetching user role: $e");
+    }
   }
 
   Future<void> _loadEventData() async {
@@ -205,7 +230,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         // foregroundColor: Colors.black,
         elevation: 0,
         actions: [
-          if (userId == widget.event.idCreate)
+          if (userRole == "Host-${widget.event.id}" ||
+              userRole == "Staff-${widget.event.id}")
             IconButton(
               icon: const Icon(
                 Icons.insert_invitation_sharp,
@@ -218,14 +244,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 );
               },
             ),
-          if (userId == widget.event.idCreate)
+          if (userRole == "Host-${widget.event.id}" ||
+              userRole == "Staff-${widget.event.id}")
             IconButton(
               icon: const Icon(Icons.file_copy),
               onPressed: () {
                 handleExcelUpload(eventId, eventName);
               },
             ),
-          if (userId == widget.event.idCreate)
+          if (userRole == "Host-${widget.event.id}" ||
+              userRole == "Staff-${widget.event.id}")
             IconButton(
               icon: const Icon(Icons.more_vert),
               onPressed: () {
@@ -233,6 +261,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   isScrollControlled: true,
                   context: context,
                   builder: (context) => QuickActions(
+                    userRole: userRole,
                     eventId: widget.event.id,
                     access: access,
                     allowSelectSchedule: allowSelectSchedule,
@@ -285,8 +314,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   _buildEventStats(registered, speakers, sessions),
                   const SizedBox(height: 24),
                   _buildSpecialParticipantsSection(widget.event.id),
-                  // const SizedBox(height: 8),
-                  // _buildFeaturedParticipant("Guest"),
                   const SizedBox(height: 24),
                   Center(
                     child: ElevatedButton(
@@ -345,19 +372,19 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         // color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Column(
+      child: const Column(
         children: [
-          const Text(
+          Text(
             "Event Stats",
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildStat(registered, "Registered"),
-              _buildStat(speakers, "Special Participants"),
-              _buildStat(sessions, "Sessions"),
+              // _buildStat(registered, "Registered"),
+              // _buildStat(speakers, "Special Participants"),
+              // _buildStat(sessions, "Sessions"),
             ],
           ),
         ],
@@ -466,16 +493,16 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  Widget _buildStat(String value, String label) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-      ],
-    );
-  }
+  // Widget _buildStat(String value, String label) {
+  //   return Column(
+  //     children: [
+  //       Text(
+  //         value,
+  //         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  //       ),
+  //       const SizedBox(height: 8),
+  //       Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+  //     ],
+  //   );
+  // }
 }
