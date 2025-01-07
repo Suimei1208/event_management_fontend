@@ -1,9 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/widget/dialog_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class TicketCancellationForm extends StatefulWidget {
   final int eventId;
@@ -17,16 +21,50 @@ class TicketCancellationForm extends StatefulWidget {
 class _TicketCancellationFormState extends State<TicketCancellationForm> {
   final _formKey = GlobalKey<FormState>();
   String? _cancellationReason;
+  File? _selectedImage;
+  User? user = FirebaseAuth.instance.currentUser;
 
-  void _submitRequest(BuildContext context) async {
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      LoggerService.logger.e("Error picking image: $e");
+    }
+  }
+
+  Future<void> _submitRequest(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
-      // Handle form submission logic here
+      String? imageUrl;
+      if (_selectedImage != null) {
+        try {
+          imageUrl = await uploadImageEventToImageKit(
+            _selectedImage!,
+            widget.eventId,
+            'ticket_cancellation_${user?.uid}_${widget.eventId}',
+          );
+        } catch (e) {
+          LoggerService.logger.e("Image upload failed: $e");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to upload image")),
+          );
+          return;
+        }
+      }
+
       LoggerService.logger.e('Cancellation Reason: $_cancellationReason');
-      // You can also implement image upload functionality here
       await createTicketCancellationRequest(
-          widget.eventId,
-          _cancellationReason!,
-          'https://upload-os-bbs.hoyolab.com/upload/2024/10/01/427373429/617690b2c1bd3807e719d4b27eab2b5b_4733504345886202071.jpg?x-oss-process=image%2Fresize%2Cs_1000%2Fauto-orient%2C0%2Finterlace%2C1%2Fformat%2Cwebp%2Fquality%2Cq_70');
+        widget.eventId,
+        _cancellationReason!,
+        imageUrl ?? '',
+      );
+
       if (mounted) {
         showDialog(
           context: context,
@@ -81,27 +119,26 @@ class _TicketCancellationFormState extends State<TicketCancellationForm> {
               ),
               const SizedBox(height: 20),
               GestureDetector(
-                onTap: () {
-                  // Implement image upload functionality here
-                  LoggerService.logger.i('Upload images');
-                },
+                onTap: _pickImage,
                 child: Container(
-                  height: 100,
+                  height: 150,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.add_a_photo, color: Colors.grey),
-                        SizedBox(height: 8),
-                        Text('Upload Images'),
-                        Text('Tap to add proof images'),
-                      ],
-                    ),
-                  ),
+                  child: _selectedImage != null
+                      ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                      : const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_a_photo, color: Colors.grey),
+                              SizedBox(height: 8),
+                              Text('Upload Images'),
+                              Text('Tap to add proof images'),
+                            ],
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 20),

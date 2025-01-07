@@ -1,5 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-import 'package:event_management/src/mobile_screen/forgot_password.dart';
+import 'package:event_management/src/mobile_screen/auth/forgot_password.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:flutter/material.dart';
 
@@ -144,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         ElevatedButton.icon(
                           onPressed: () async {
-                            await signInWithGoogle(context);
+                            await loginWithGoogle(context);
                           },
                           icon: const Icon(Icons.g_mobiledata),
                           label: const Text('Continue with Google'),
@@ -158,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(width: 10),
                         ElevatedButton.icon(
                           onPressed: () async {
-                            await signInWithFacebook(context);
+                            await loginWithFacebook(context);
                           },
                           icon: const Icon(Icons.facebook),
                           label: const Text('Continue with Facebook'),

@@ -1,18 +1,18 @@
-import 'package:event_management/src/mobile_screen/create_event.dart';
-import 'package:event_management/src/mobile_screen/edit_profile.dart';
-import 'package:event_management/src/mobile_screen/forgot_password.dart';
-import 'package:event_management/src/mobile_screen/home_screen.dart';
-import 'package:event_management/src/mobile_screen/manage_ticket.dart';
-import 'package:event_management/src/mobile_screen/register.dart';
+import 'package:event_management/src/mobile_screen/event/create_event.dart';
+import 'package:event_management/src/mobile_screen/user/edit_profile.dart';
+import 'package:event_management/src/mobile_screen/auth/forgot_password.dart';
+import 'package:event_management/src/mobile_screen/event/home_screen.dart';
+import 'package:event_management/src/mobile_screen/ticket/manage_ticket.dart';
+import 'package:event_management/src/mobile_screen/auth/register.dart';
 import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
-import 'package:event_management/src/mobile_screen/user_event.dart';
+import 'package:event_management/src/mobile_screen/event/user_event.dart';
 import 'package:event_management/src/service/notification_service.dart';
 import 'package:event_management/src/settings/settings_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:event_management/src/mobile_screen/language.dart';
-import 'package:event_management/src/mobile_screen/login.dart';
-import 'package:event_management/src/mobile_screen/profile.dart';
+import 'package:event_management/src/mobile_screen/setting/language.dart';
+import 'package:event_management/src/mobile_screen/auth/login.dart';
+import 'package:event_management/src/mobile_screen/user/profile.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'settings/settings_controller.dart';
@@ -71,7 +71,7 @@ class _MyAppState extends State<MyApp> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) {
-                return const HomeScreen();
+                return const LoginScreen();
               } else {
                 return const LoginScreen();
               }

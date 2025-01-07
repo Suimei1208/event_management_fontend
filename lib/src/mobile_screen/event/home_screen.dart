@@ -1,9 +1,9 @@
 // ignore_for_file: unnecessary_null_comparison
 
-import 'package:event_management/src/mobile_screen/detail_event.dart';
-import 'package:event_management/src/mobile_screen/forum_screen.dart';
-import 'package:event_management/src/mobile_screen/register_events.dart';
-import 'package:event_management/src/mobile_screen/user_event.dart';
+import 'package:event_management/src/mobile_screen/event/detail_event.dart';
+import 'package:event_management/src/mobile_screen/forum/forum_screen.dart';
+import 'package:event_management/src/mobile_screen/event/register_events.dart';
+import 'package:event_management/src/mobile_screen/event/user_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -13,7 +13,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
-import 'package:event_management/src/mobile_screen/profile.dart';
+import 'package:event_management/src/mobile_screen/user/profile.dart';
 import 'package:event_management/generated/l10n.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 

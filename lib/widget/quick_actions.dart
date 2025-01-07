@@ -1,13 +1,13 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
-import 'package:event_management/src/mobile_screen/add_special_participants.dart';
-import 'package:event_management/src/mobile_screen/document_page.dart';
-import 'package:event_management/src/mobile_screen/event_analystic.dart';
-import 'package:event_management/src/mobile_screen/existed_participants.dart';
-import 'package:event_management/src/mobile_screen/list_users_cancel.dart';
-import 'package:event_management/src/mobile_screen/qr_scanner.dart';
-import 'package:event_management/src/mobile_screen/share_role.dart';
-import 'package:event_management/src/mobile_screen/spending_overview.dart';
+import 'package:event_management/src/mobile_screen/participants/add_special_participants.dart';
+import 'package:event_management/src/mobile_screen/document/document_page.dart';
+import 'package:event_management/src/mobile_screen/event/event_analystic.dart';
+import 'package:event_management/src/mobile_screen/participants/existed_participants.dart';
+import 'package:event_management/src/mobile_screen/feeback/list_users_cancel.dart';
+import 'package:event_management/src/mobile_screen/event/qr_scanner.dart';
+import 'package:event_management/src/mobile_screen/event/share_role.dart';
+import 'package:event_management/src/mobile_screen/spending/spending_overview.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:flutter/material.dart';

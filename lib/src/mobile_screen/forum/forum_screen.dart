@@ -1,4 +1,4 @@
-import 'package:event_management/src/mobile_screen/detil_post_forum.dart';
+import 'package:event_management/src/mobile_screen/forum/detil_post_forum.dart';
 import 'package:flutter/material.dart';
 
 class CommunityForumScreen extends StatelessWidget {

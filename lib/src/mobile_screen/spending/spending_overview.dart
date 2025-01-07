@@ -40,7 +40,7 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this); // Updated to 3 tabs
+    _tabController = TabController(length: 3, vsync: this);
     _loadSpendingData(widget.eventId);
   }
 
