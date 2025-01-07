@@ -1,4 +1,4 @@
-import 'package:event_management/src/mobile_screen/review_event.dart';
+import 'package:event_management/src/mobile_screen/event/review_event.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:event_management/widget/options_widget.dart';

@@ -2,9 +2,9 @@
 import 'dart:io';
 
 import 'package:event_management/generated/l10n.dart';
-import 'package:event_management/src/mobile_screen/request.dart';
-import 'package:event_management/src/mobile_screen/schedules.dart';
-import 'package:event_management/src/mobile_screen/update_event.dart';
+import 'package:event_management/src/mobile_screen/event/request.dart';
+import 'package:event_management/src/mobile_screen/event/schedules.dart';
+import 'package:event_management/src/mobile_screen/event/update_event.dart';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';

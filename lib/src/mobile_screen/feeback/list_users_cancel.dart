@@ -1,4 +1,4 @@
-import 'package:event_management/src/mobile_screen/setting_feed_back_cancel_event.dart';
+import 'package:event_management/src/mobile_screen/feeback/setting_feed_back_cancel_event.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/widget/list_cancel_user.dart';

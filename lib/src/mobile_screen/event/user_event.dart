@@ -1,5 +1,5 @@
-import 'package:event_management/src/mobile_screen/create_event.dart';
-import 'package:event_management/src/mobile_screen/detail_event.dart';
+import 'package:event_management/src/mobile_screen/event/create_event.dart';
+import 'package:event_management/src/mobile_screen/event/detail_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';

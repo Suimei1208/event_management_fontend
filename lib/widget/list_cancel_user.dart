@@ -92,12 +92,14 @@ class _CancelledUsersPageState extends State<CancelledUsersPage> {
                                   color: Colors.grey[600],
                                   fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              "${user["reason"] ?? "No reason provided"}",
-                              style: TextStyle(color: Colors.grey[600]),
-                              softWrap: true,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                            Expanded(
+                              child: Text(
+                                "${user["reason"] ?? "No reason provided"}",
+                                style: TextStyle(color: Colors.grey[600]),
+                                softWrap: true,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                           ],
                         ),
@@ -117,7 +119,8 @@ class _CancelledUsersPageState extends State<CancelledUsersPage> {
                           onPressed: () async {
                             await updateCancelTicketStatus(
                                 [user["uid"] as String], "Accepted");
-                            widget.refreshData(); // Làm mới dữ liệu sau khi cập nhật
+                            widget
+                                .refreshData(); // Làm mới dữ liệu sau khi cập nhật
                           },
                         ),
                         IconButton(
@@ -125,7 +128,8 @@ class _CancelledUsersPageState extends State<CancelledUsersPage> {
                           onPressed: () async {
                             await updateCancelTicketStatus(
                                 [user["uid"] as String], "Rejected");
-                            widget.refreshData(); // Làm mới dữ liệu sau khi cập nhật
+                            widget
+                                .refreshData(); // Làm mới dữ liệu sau khi cập nhật
                           },
                         ),
                       ],

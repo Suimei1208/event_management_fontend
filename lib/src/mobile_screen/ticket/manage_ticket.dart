@@ -1,5 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api
-import 'package:event_management/src/mobile_screen/form_cancel_ticket.dart';
+import 'package:event_management/src/mobile_screen/ticket/form_cancel_ticket.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/widget/dialog_widget.dart';

@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:event_management/generated/l10n.dart';
-import 'package:event_management/src/mobile_screen/detail_event.dart';
+import 'package:event_management/src/mobile_screen/event/detail_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';

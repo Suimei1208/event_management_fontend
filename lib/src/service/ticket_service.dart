@@ -208,21 +208,20 @@ Future<List<Ticket>> fetchTickets() async {
               }
 
               final responseCancel = await http.get(
-            Uri.parse(
-                '${Config.baseUrl}/ticket-service/feedback/user-cancel/get/status?eventid=${ticket.eventId}&uid=${user.uid}'),
-            headers: {
-              'Authorization': 'Bearer $idToken',
-              'Content-Type': 'application/json',
-            },
-          );
-          if (responseCancel.statusCode == 200) {
-              Map<String, dynamic> dataCancel = json.decode(responseCancel.body);
-              if (dataCancel['success'] == true) {
-                ticket.cancel_status = dataCancel['data'] ?? "None";
+                Uri.parse(
+                    '${Config.baseUrl}/ticket-service/feedback/user-cancel/get/status?eventid=${ticket.eventId}&uid=${user.uid}'),
+                headers: {
+                  'Authorization': 'Bearer $idToken',
+                  'Content-Type': 'application/json',
+                },
+              );
+              if (responseCancel.statusCode == 200) {
+                Map<String, dynamic> dataCancel =
+                    json.decode(responseCancel.body);
+                if (dataCancel['success'] == true) {
+                  ticket.cancel_status = dataCancel['data'] ?? "None";
+                }
               }
-            }
-
-
             }
           }
         } catch (e) {
@@ -254,7 +253,8 @@ Future<void> updateCancelTicketStatus(List<String> uid, String status) async {
       return;
     }
     final response = await http.put(
-      Uri.parse('${Config.baseUrl}/ticket-service/feedback/user-cancel/put/list-user/$status'),
+      Uri.parse(
+          '${Config.baseUrl}/ticket-service/feedback/user-cancel/put/list-user/$status'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
@@ -273,7 +273,7 @@ Future<void> updateCancelTicketStatus(List<String> uid, String status) async {
   }
 }
 
-Future<Map<String,dynamic>> getQrTicket(int eventid) async {
+Future<Map<String, dynamic>> getQrTicket(int eventid) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -286,7 +286,8 @@ Future<Map<String,dynamic>> getQrTicket(int eventid) async {
       throw Exception('Token not found');
     }
     final response = await http.get(
-      Uri.parse('${Config.baseUrl}/ticket-service/tickets/${user.uid}/qr/$eventid'),
+      Uri.parse(
+          '${Config.baseUrl}/ticket-service/tickets/${user.uid}/qr/$eventid'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
@@ -298,7 +299,8 @@ Future<Map<String,dynamic>> getQrTicket(int eventid) async {
       return data['data'];
     } else {
       LoggerService.logger.e('Failed to fetch QR ticket');
-      throw Exception('Failed to fetch QR ticket');
+      throw Exception(
+          'Failed to fetch QR ticket. ${response.body}. ${response.statusCode}');
     }
   } catch (e) {
     LoggerService.logger.e('Error: $e');
