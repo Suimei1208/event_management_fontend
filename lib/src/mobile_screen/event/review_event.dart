@@ -1,7 +1,11 @@
+import 'package:event_management/src/service/event_service.dart';
 import 'package:flutter/material.dart';
 
 class EventReviewPage extends StatefulWidget {
-  const EventReviewPage({super.key});
+  final int eventId;
+  final String eventName;
+  const EventReviewPage(
+      {super.key, required this.eventId, required this.eventName});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -9,13 +13,14 @@ class EventReviewPage extends StatefulWidget {
 }
 
 class _EventReviewPageState extends State<EventReviewPage> {
-  double _rating = 0;
+  int _rating = 0;
   bool _recommend = false;
+  final TextEditingController _textController1 = TextEditingController();
 
-  void _submitReview() {
-    // Xử lý gửi đánh giá ở đây
-
-    // Thực hiện các hành động khác như gửi dữ liệu đến server
+  void _submitReview() async {
+    await addReview(widget.eventId, _textController1.text, _rating);
+    // ignore: use_build_context_synchronously
+    Navigator.of(context).pop();
   }
 
   @override
@@ -29,10 +34,11 @@ class _EventReviewPageState extends State<EventReviewPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Center(
+            Center(
               child: Text(
-                "Tên Event",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                widget.eventName,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
               ),
             ),
             const SizedBox(height: 20),
@@ -52,7 +58,7 @@ class _EventReviewPageState extends State<EventReviewPage> {
                   ),
                   onPressed: () {
                     setState(() {
-                      _rating = index + 1.0;
+                      _rating = index + 1;
                     });
                   },
                 );
@@ -73,6 +79,7 @@ class _EventReviewPageState extends State<EventReviewPage> {
               onChanged: (value) {
                 setState(() {});
               },
+              controller: _textController1,
             ),
             const SizedBox(height: 20),
             const Text(

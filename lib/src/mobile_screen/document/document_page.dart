@@ -1,3 +1,6 @@
+import 'package:event_management/src/service/drive_api.dart';
+import 'package:event_management/src/service/logger_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class EventResourcesPage extends StatefulWidget {
@@ -72,10 +75,20 @@ class _EventResourcesPageState extends State<EventResourcesPage> {
               ),
               const SizedBox(height: 10),
               ElevatedButton(
-                onPressed: () {
-                  // Thêm tài liệu mới
-                  addDocument(
-                      'Tài liệu mới.docx', 'Jan 06, 2025', '1.2 MB'); // Ví dụ
+                onPressed: () async {
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles();
+
+                  if (result != null) {
+                    // Nếu người dùng chọn file, lấy đường dẫn file
+                    String localFilePath = result.files.single.path!;
+
+                    // Thực hiện tải lên Google Drive
+                    authenticateAndUpload("test", localFilePath);
+                  } else {
+                    // Nếu không có file nào được chọn
+                    LoggerService.logger.e('Không có file nào được chọn');
+                  }
                 },
                 child: const Text('Tải Tài Liệu Mới'),
               ),

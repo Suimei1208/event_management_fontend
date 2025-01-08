@@ -38,6 +38,8 @@ dependencies:
   qr_code_scanner: ^1.0.1
   url_launcher: ^6.3.1
   fl_chart: ^0.69.2
+  googleapis: ^13.2.0
+  googleapis_auth: ^1.6.0
 
   
 dev_dependencies:
@@ -58,6 +60,7 @@ flutter:
     - assets/images/gmail_logo.png
     - assets/images/event-management.png
     - assets/images/apply.png
+    - assets/json/client_secret.json
 
 flutter_intl:
   enabled: true

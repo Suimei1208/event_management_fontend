@@ -43,6 +43,12 @@ class CommunityForumScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Forum'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
