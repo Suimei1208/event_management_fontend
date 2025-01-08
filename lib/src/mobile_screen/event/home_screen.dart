@@ -91,10 +91,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final DateTime now = DateTime.now();
-    final nextEvent = events.isNotEmpty
-        ? events.firstWhere((event) => event.startDate.isAfter(now),
-            orElse: () => events.first)
-        : null;
+    final filteredEvents =
+        events.where((event) => event.startDate.isAfter(now));
+    final nextEvent = filteredEvents.isNotEmpty ? filteredEvents.first : null;
+    LoggerService.logger.i("$filteredEvents");
     final Duration timeUntilNextEvent =
         nextEvent != null ? nextEvent.startDate.difference(now) : Duration.zero;
     Event? ongoingEvents;
@@ -163,19 +163,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                ElevatedButton(
-                                    style: Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.purple)
-                                        : null,
-                                    onPressed: () {
-                                      setState(() {
-                                        LoggerService.logger.i(
-                                            "Event clicked ticket ${ongoingEvents?.id}");
-                                      });
-                                    },
-                                    child: const Text('View your ticket'))
+                                user?.uid == ongoingEvents.idCreate
+                                    ? const Text("")
+                                    : ElevatedButton(
+                                        style: Theme.of(context).brightness ==
+                                                Brightness.dark
+                                            ? ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.purple)
+                                            : null,
+                                        onPressed: () {
+                                          setState(() {
+                                            LoggerService.logger.i(
+                                                "Event clicked ticket ${ongoingEvents?.id}");
+                                          });
+                                        },
+                                        child: const Text('View your ticket'))
                               ],
                             ),
                           ],

@@ -109,6 +109,14 @@ class _QuickActionsState extends State<QuickActions> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      _buildActionButton(Icons.description, "Documents",
+                          () async {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const EventResourcesPage()),
+                        );
+                      }),
                       widget.status != "Cancelled"
                           ? _buildActionButton(Icons.cancel, "Hủy sự kiện",
                               () async {
@@ -143,14 +151,8 @@ class _QuickActionsState extends State<QuickActions> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildActionButton(Icons.description, "Documents",
-                          () async {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const EventResourcesPage()),
-                        );
-                      }),
+                      // _buildActionButton(Icons.data_exploration_outlined,
+                      //     "Dữ liệu ra vào", () {}),
                       _buildActionButton(Icons.login, "Scan CheckIn", () async {
                         Navigator.push(
                           context,

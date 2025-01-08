@@ -518,6 +518,59 @@ Future<List<Map<String, dynamic>>> fetchEventCanRegister() async {
   }
 }
 
+Future<List<Map<String, dynamic>>> fetchEventCompleted() async {
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  try {
+    final response = await http.get(
+        Uri.parse(
+            '${Config.baseUrl}/event-service/review/get-event?uid=${user.uid}'),
+        headers: {
+          'Authorization': 'Bearer $idToken',
+        });
+    final isRegistered = await fetchStatusEventRegister(user.uid);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseBody = json.decode(response.body);
+
+      if (responseBody['success'] == true) {
+        List<Map<String, dynamic>> data =
+            List<Map<String, dynamic>>.from(responseBody['data']);
+        for (var i in data) {
+          final userData = await getUserData(i['idCreate']);
+          i['user'] = {
+            'name': userData['name'].toString(),
+            // 'role': userData['role'].toString(),
+            'photoUrl': userData['photoUrl'].toString(),
+          };
+          if (isRegistered.isNotEmpty) {
+            for (var user in isRegistered) {
+              if (user['id'].toString() == i['id'].toString()) {
+                i['isRegistered'] = user['status'];
+              }
+            }
+          }
+        }
+        return data;
+      } else {
+        throw Exception(responseBody['message'] ?? 'Failed to fetch schedules');
+      }
+    } else {
+      LoggerService.logger
+          .e('Failed to fetch schedules: ${response.reasonPhrase}');
+      throw Exception('Failed to fetch : ${response.reasonPhrase}');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Error fetching data: $e');
+    throw Exception('$e');
+  }
+}
+
 Future<void> deleteParticipantsFromEvent(
     int eventId, int participantId, String role) async {
   try {
@@ -1122,5 +1175,52 @@ Future<Map<String, dynamic>> checkOut(int eventId, String qrCode) async {
   } catch (error) {
     LoggerService.logger.e('Error during check-out: $error', error: error);
     throw Exception('Error during check-out: $error');
+  }
+}
+
+Future<void> addReview(int eventid, String content, int rating) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.post(
+      Uri.parse('${Config.baseUrl}/event-service/review/add'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'id':0,
+        'eventid': eventid,
+        'uid': user.uid,
+        'rate': rating,
+        'review': content,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData['success'] == true) {
+        LoggerService.logger.i('Review added successfully');
+      } else {
+        LoggerService.logger
+            .w('Failed to add review: ${responseData['message']}');
+        throw Exception('Failed to add review');
+      }
+    } else {
+      LoggerService.logger.w(
+          'HTTP error: ${response.body}, status: ${response.statusCode}');
+      throw Exception('Failed to add review');
+    }
+  } catch (error) {
+    LoggerService.logger.w('Error: $error');
+    throw Exception('Failed to add review');
   }
 }

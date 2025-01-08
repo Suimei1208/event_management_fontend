@@ -71,7 +71,7 @@ class _MyAppState extends State<MyApp> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) {
-                return const LoginScreen();
+                return const HomeScreen();
               } else {
                 return const LoginScreen();
               }

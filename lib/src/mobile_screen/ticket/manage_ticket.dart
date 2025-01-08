@@ -64,10 +64,10 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
           }
 
           final tickets = snapshot.data!;
-          // for (var ticket in tickets) {
-          //   LoggerService.logger.i(ticket.cancel_status);
-          //   LoggerService.logger.i(ticket.status);
-          // }
+          for (var ticket in tickets) {
+            LoggerService.logger.i(ticket.cancel_status);
+            LoggerService.logger.i(ticket.status);
+          }
           final upcomingTickets = tickets
               .where((ticket) =>
                   ticket.eventStatus == 'Upcoming' ||
@@ -265,7 +265,18 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
                             children: [
                               const Text(""),
                               ElevatedButton(
-                                onPressed: null,
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return const DialogWidget(
+                                        message:
+                                            'Vui lòng liên hệ Admin qua email để hủy vé!',
+                                        title: 'Notification',
+                                      );
+                                    },
+                                  );
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red[300],
                                   shape: RoundedRectangleBorder(

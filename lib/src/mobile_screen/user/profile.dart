@@ -1,4 +1,5 @@
-import 'package:event_management/src/mobile_screen/event/review_event.dart';
+
+import 'package:event_management/src/mobile_screen/feeback/list_event_finished.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:event_management/widget/options_widget.dart';
@@ -202,7 +203,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const EventReviewPage()),
+                              builder: (context) =>
+                                  const EventFinishedScreen()),
                         );
                       },
                     ),
