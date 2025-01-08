@@ -1076,6 +1076,68 @@ Future<void> resetEvent(int eventId, BuildContext context) async {
   }
 }
 
+// Function to fetch checked-in and checked-out participants
+Future<List<Map<String, dynamic>>> getCheckedInAndCheckedOutParticipants(
+    int eventId) async {
+  LoggerService.logger.i(
+      'Entering getCheckedInAndCheckedOutParticipants function with eventId: $eventId');
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  if (idToken == null) {
+    LoggerService.logger.e('Failed to retrieve ID token');
+    throw Exception('Failed to retrieve ID token');
+  }
+
+  final url =
+      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/participants');
+  LoggerService.logger.i('Making GET request to URL: $url');
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    LoggerService.logger
+        .i('Received response: ${response.statusCode} - ${response.body}');
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      LoggerService.logger.i('Response data: $responseData');
+      if (responseData['success']) {
+        List<Map<String, dynamic>> participants =
+            List<Map<String, dynamic>>.from(responseData['data']);
+
+        for (var participant in participants) {
+          final userData = await getUserData(participant['userId']);
+
+          participant['name'] = userData['name'];
+        }
+        LoggerService.logger.i(participants);
+        return participants;
+      } else {
+        throw Exception(
+            'Failed to fetch participants: ${responseData['message']}');
+      }
+    } else {
+      throw Exception('Failed to fetch participants: ${response.body}');
+    }
+  } catch (error) {
+    LoggerService.logger
+        .e('Error during fetching participants: $error', error: error);
+    throw Exception('Error during fetching participants: $error');
+  }
+}
+
 Future<Map<String, dynamic>> checkIn(int eventId, String qrCode) async {
   LoggerService.logger.i(
       'Entering checkIn function with eventId: $eventId and qrCode: $qrCode');
@@ -1197,7 +1259,7 @@ Future<void> addReview(int eventid, String content, int rating) async {
         'Content-Type': 'application/json',
       },
       body: json.encode({
-        'id':0,
+        'id': 0,
         'eventid': eventid,
         'uid': user.uid,
         'rate': rating,
@@ -1215,8 +1277,8 @@ Future<void> addReview(int eventid, String content, int rating) async {
         throw Exception('Failed to add review');
       }
     } else {
-      LoggerService.logger.w(
-          'HTTP error: ${response.body}, status: ${response.statusCode}');
+      LoggerService.logger
+          .w('HTTP error: ${response.body}, status: ${response.statusCode}');
       throw Exception('Failed to add review');
     }
   } catch (error) {

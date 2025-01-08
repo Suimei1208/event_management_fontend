@@ -40,6 +40,8 @@ dependencies:
   fl_chart: ^0.69.2
   googleapis: ^13.2.0
   googleapis_auth: ^1.6.0
+  pdf: ^3.11.1
+  permission_handler: ^11.3.1
 
   
 dev_dependencies:
