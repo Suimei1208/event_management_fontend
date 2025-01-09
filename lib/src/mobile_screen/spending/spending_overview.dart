@@ -66,7 +66,6 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
           expenseData[item['category']] = item['amount'].toDouble();
         }
 
-        // Store item in history
         history.add({
           'id': item['id'],
           'type': item['type'],
@@ -93,7 +92,7 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
   void _showAddSpendingDialog() {
     final TextEditingController categoryController = TextEditingController();
     final TextEditingController amountController = TextEditingController();
-    String selectedType = "Expense"; // Default type is Expense
+    String selectedType = "Expense";
 
     showDialog(
       context: context,
@@ -371,13 +370,12 @@ class SpendingPieChart extends StatelessWidget {
             ),
           ),
         ),
-        _buildLegend(dataMap), // Move the legend here inside the tab
+        _buildLegend(dataMap),
       ],
     );
   }
 
   List<PieChartSectionData> _buildPieChartSections() {
-    // Generate unique colors based on the length of the dataMap
     final colors = List.generate(dataMap.length, (index) {
       return Color(0xFF000000 + index * 123456);
     });
@@ -397,12 +395,10 @@ class SpendingPieChart extends StatelessWidget {
     }).toList();
   }
 
-  // Moved the _buildLegend function here
   Widget _buildLegend(Map<String, double> dataMap) {
     final totalAmount =
         dataMap.values.isEmpty ? 0 : dataMap.values.reduce((a, b) => a + b);
 
-    // Generate unique colors based on the length of the dataMap
     final colors = List.generate(dataMap.length, (index) {
       return Color(0xFF000000 + index * 111111);
     });
@@ -413,10 +409,8 @@ class SpendingPieChart extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: dataMap.entries.map((entry) {
         final percentage = (entry.value / totalAmount * 100).toStringAsFixed(1);
-        final amount =
-            formatCurrency(entry.value); // Format the amount in currency
+        final amount = formatCurrency(entry.value);
 
-        // Use the color from the pie chart sections
         final sectionColor = colors[colorIndex++ % colors.length];
 
         return Row(

@@ -11,6 +11,7 @@ import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/notification_service.dart';
 import 'package:event_management/src/service/participants.dart';
+import 'package:event_management/src/service/spending_service.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:event_management/widget/quick_actions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -44,7 +45,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   String registered = '';
   String speakers = '';
   String sessions = '';
+  String averageParticipationTime = '';
+  String participationPercentage = '';
   String userRole = "";
+  Map<String, double> _incomeData = {};
+  Map<String, double> _expenseData = {};
 
   @override
   void initState() {
@@ -67,11 +72,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       registered = '';
       speakers = '';
       sessions = '';
+      averageParticipationTime = '';
+      participationPercentage = '';
     });
 
     await _fetchUserId();
     await _loadEventData();
     await _loadUserRole();
+    _loadSpendingData(widget.event.id);
 
     if (!mounted) return;
     setState(() {
@@ -142,6 +150,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     try {
       final eventData = await getEventData(widget.event.id);
       final stats = await getStats(widget.event.id);
+      final attendanceStats = await getEventAttendanceStats(widget.event.id);
+      LoggerService.logger.i(attendanceStats);
       if (!mounted) return;
       setState(() {
         access = eventData['data']['access'];
@@ -157,6 +167,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         registered = stats['registered'].toString();
         speakers = stats['speaker'].toString();
         sessions = stats['sessions'].toString();
+        averageParticipationTime =
+            attendanceStats['averageParticipationTimeFormatted'].toString();
+        participationPercentage =
+            "${attendanceStats['participationPercentage'].toString()} %";
       });
     } catch (error) {
       LoggerService.logger.e(error);
@@ -217,6 +231,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     } else {
       LoggerService.logger.e("No valid users found to add as participants.");
     }
+  }
+
+  String formatCurrency(double amount) {
+    final format = NumberFormat("#,###", "vi_VN");
+    return format.format(amount);
   }
 
   @override
@@ -311,7 +330,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     '${S.of(context).end_date}: $endDate',
                   ),
                   const SizedBox(height: 24),
-                  _buildEventStats(registered, speakers, sessions),
+                  _buildEventStats(registered, speakers, sessions,
+                      averageParticipationTime, participationPercentage),
                   const SizedBox(height: 24),
                   _buildSpecialParticipantsSection(widget.event.id),
                   const SizedBox(height: 24),
@@ -365,7 +385,50 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  Widget _buildEventStats(String registered, String speakers, String sessions) {
+  double get _totalIncome => _incomeData.values.isEmpty
+      ? 0
+      : _incomeData.values.reduce((a, b) => a + b);
+
+  double get _totalExpense => _expenseData.values.isEmpty
+      ? 0
+      : _expenseData.values.reduce((a, b) => a + b);
+
+  Future<void> _loadSpendingData(int eventId) async {
+    try {
+      final fetchedData = await fetchSpendings(eventId);
+
+      Map<String, double> incomeData = {};
+      Map<String, double> expenseData = {};
+      List<Map<String, dynamic>> history = [];
+
+      for (var item in fetchedData) {
+        if (item['type'] == 'Income') {
+          incomeData[item['category']] = item['amount'].toDouble();
+        } else if (item['type'] == 'Expense') {
+          expenseData[item['category']] = item['amount'].toDouble();
+        }
+
+        history.add({
+          'id': item['id'],
+          'type': item['type'],
+          'category': item['category'],
+          'amount': item['amount'].toDouble(),
+          'date': item['date'],
+        });
+      }
+
+      setState(() {
+        _incomeData = incomeData;
+        _expenseData = expenseData;
+      });
+    } catch (e) {
+      setState(() {});
+      LoggerService.logger.e('Error loading data: $e');
+    }
+  }
+
+  Widget _buildEventStats(String registered, String speakers, String sessions,
+      String averageParticipationTime, String participationPercentage) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -379,14 +442,24 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16.0,
+            mainAxisSpacing: 16.0,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             children: [
               _buildStat(registered, "Registered"),
               _buildStat(speakers, "Special Participants"),
               _buildStat(sessions, "Sessions"),
+              _buildStat(averageParticipationTime, "Average Participate Time"),
+              _buildStat(participationPercentage, "Participation Percent"),
+              _buildStat(formatCurrency(_totalIncome), "Total Income"),
+              _buildStat(formatCurrency(_totalExpense), "Total Expense"),
+              _buildStat(
+                  formatCurrency(_totalIncome - _totalExpense), "Profit"),
             ],
-          ),
+          )
         ],
       ),
     );
