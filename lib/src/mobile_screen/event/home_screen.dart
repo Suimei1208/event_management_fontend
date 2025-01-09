@@ -245,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       const EventRegisterScreen(),
-      CommunityForumScreen(),
+      const CommunityForumScreen(),
       const UserEvents(),
       const ProfileWidget(),
     ];

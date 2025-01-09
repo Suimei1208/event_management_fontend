@@ -1,52 +1,55 @@
-import 'package:event_management/src/mobile_screen/forum/detil_post_forum.dart';
+import 'package:event_management/src/mobile_screen/forum/create_post.dart';
+import 'package:event_management/src/mobile_screen/forum/detail_post_forum.dart';
+import 'package:event_management/src/models/info_user.dart';
+import 'package:event_management/src/service/forum_service.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class CommunityForumScreen extends StatelessWidget {
+class CommunityForumScreen extends StatefulWidget {
+  const CommunityForumScreen({super.key});
+
+  @override
+  State<CommunityForumScreen> createState() => _CommunityForumScreenState();
+}
+
+class _CommunityForumScreenState extends State<CommunityForumScreen> {
   final router = "/forums";
-  final List<Map<String, dynamic>> posts = [
-    {
-      'author': 'Sarah Johnson',
-      'time': '2 hours ago',
-      'title': 'Best practices for mobile app development?',
-      'content':
-          'I\'m starting a new mobile app project and would love to hear about best practices for architecture, state management, and testing...',
-      'comments': 24,
-      'likes': 18,
-      'type': 'Discussion',
-    },
-    {
-      'author': 'David Chen',
-      'time': '5 hours ago',
-      'title': 'How to implement authentication in Flutter?',
-      'content':
-          'Looking for recommendations on implementing secure authentication in a Flutter app. What are the best packages and approaches?',
-      'comments': 15,
-      'likes': 12,
-      'type': 'Question',
-    },
-    {
-      'author': 'Emily Wilson',
-      'time': '8 hours ago',
-      'title': 'Complete guide to state management',
-      'content':
-          'In this tutorial, I\'ll cover different state management solutions in Flutter and when to use each one...',
-      'comments': 42,
-      'likes': 28,
-      'type': 'Tutorial',
-    },
-  ];
 
-  CommunityForumScreen({super.key});
+  List<Map<String, dynamic>> posts = [];
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  void _fetchData() async {
+    final data = await getPosts();
+    setState(() {
+      posts = data;
+    });
+    // LoggerService.logger.i('Posts: $posts');
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Forum'),
+        title: const Text(
+          'Welcome to the Community',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const CreatePostScreen()),
+              );
+            },
           ),
         ],
       ),
@@ -56,19 +59,14 @@ class CommunityForumScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Welcome to the Community',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text(
               'Join discussions, share knowledge, and connect with others',
               style: TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 20),
             Wrap(
-              spacing: 8.0, // Khoảng cách ngang giữa các FilterChip
+              spacing: 8.0, 
               runSpacing:
-                  4.0, // Khoảng cách dọc giữa các FilterChip nếu xuống dòng
+                  4.0, 
               children: [
                 FilterChip(
                     label: const Text('All Topics'),
@@ -91,20 +89,28 @@ class CommunityForumScreen extends StatelessWidget {
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
-                itemCount: posts.length,
-                itemBuilder: (context, index) {
-                  final post = posts[index];
-                  return PostItem(
-                    author: post['author'],
-                    time: post['time'],
-                    title: post['title'],
-                    content: post['content'],
-                    comments: post['comments'],
-                    likes: post['likes'],
-                    type: post['type'],
-                  );
-                },
-              ),
+                  itemCount: posts.length,
+                  itemBuilder: (context, index) {
+                    final post = posts[index];
+                    final comments =
+                        int.tryParse(post['comments_count'].toString()) ?? 0;
+                    final likes =
+                        int.tryParse(post['likes'].toString()) ?? 0;
+                    final DateTime time =
+                        DateTime.parse(post['timepost']);
+                    return PostItem(
+                      id: int.parse(post['id'].toString()),
+                      author: User.fromJson(post['user']),
+                      time: time,
+                      title: post['title'].toString(),
+                      content: post['description'].toString(),
+                      comments: comments,
+                      likes: likes,
+                      type: post['category'].toString(),
+                      image: post['image'].toString(),
+                      isLike: post['isLike'],
+                    );
+                  }),
             ),
           ],
         ),
@@ -113,17 +119,22 @@ class CommunityForumScreen extends StatelessWidget {
   }
 }
 
-class PostItem extends StatelessWidget {
-  final String author;
-  final String time;
+// ignore: must_be_immutable
+class PostItem extends StatefulWidget {
+  final int id;
+  final User author;
+  final DateTime time;
   final String title;
   final String content;
   final int comments;
-  final int likes;
+  int likes;
   final String type;
+  final String image;
+  bool isLike;
 
-  const PostItem({
+  PostItem({
     super.key,
+    required this.id,
     required this.author,
     required this.time,
     required this.title,
@@ -131,7 +142,29 @@ class PostItem extends StatelessWidget {
     required this.comments,
     required this.likes,
     required this.type,
+    required this.image,
+    required this.isLike,
   });
+
+  @override
+  State<PostItem> createState() => _PostItemState();
+}
+
+class _PostItemState extends State<PostItem> {
+  String formatTime(DateTime time) {
+    final now = DateTime.now();
+    final difference = now.difference(time);
+
+    if (difference.inHours < 24) {
+      if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} minutes ago';
+      } else {
+        return '${difference.inHours} hours ago';
+      }
+    } else {
+      return DateFormat('dd/MM/yyyy hh:mm a').format(time);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +172,10 @@ class PostItem extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const ForumPostPage()),
+          MaterialPageRoute(
+              builder: (context) => ForumPostPage(
+                    idPost: widget.id,
+                  )),
         );
       },
       child: Card(
@@ -151,28 +187,104 @@ class PostItem extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(child: Text(author[0])),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(author,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(time, style: const TextStyle(color: Colors.grey)),
-                    ],
+                  InkWell(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            // title: Text(author.name),
+                            content: SizedBox(
+                              width: double.infinity,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        foregroundImage:
+                                            NetworkImage(widget.author.avtUrl),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Expanded(
+                                        child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                widget.author.name,
+                                                style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(widget.author.nameFromEmail),
+                                              Text(
+                                                widget.author.email,
+                                                softWrap: true,
+                                                overflow: TextOverflow.ellipsis,
+                                              )
+                                            ]),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
+                                },
+                                child: const Text('Close'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          foregroundImage: NetworkImage(widget.author.avtUrl),
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(widget.author.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            Text(formatTime(widget.time),
+                                style: const TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                   const Spacer(),
-                  Chip(label: Text(type)),
+                  Chip(label: Text(widget.type)),
                 ],
               ),
               const SizedBox(height: 10),
               Text(
-                title,
+                widget.title,
                 style:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 5),
-              Text(content),
+              Text(widget.content),
+              const SizedBox(height: 10),
+              Center(
+                  child: Image.network(
+                widget.image,
+                height: 200,
+                width: 200,
+              )),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -181,15 +293,32 @@ class PostItem extends StatelessWidget {
                     children: [
                       const Icon(Icons.comment, size: 16),
                       const SizedBox(width: 5),
-                      Text('$comments'),
+                      Text('${widget.comments}'),
                     ],
                   ),
-                  Row(
-                    children: [
-                      const Icon(Icons.thumb_up, size: 16),
-                      const SizedBox(width: 5),
-                      Text('$likes'),
-                    ],
+                  InkWell(
+                    onTap: () async {
+                      setState(() {
+                        widget.isLike = !widget.isLike;
+                        if (widget.isLike) {
+                          widget.likes = widget.likes + 1;
+                        } else {
+                          widget.likes = widget.likes - 1;
+                        }
+                      });
+                      await updateLike(widget.id, widget.isLike);
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                            widget.isLike
+                                ? Icons.thumb_up_alt_rounded
+                                : Icons.thumb_up_alt_outlined,
+                            size: 16),
+                        const SizedBox(width: 5),
+                        Text('${widget.likes}'),
+                      ],
+                    ),
                   ),
                 ],
               ),
