@@ -1286,3 +1286,45 @@ Future<void> addReview(int eventid, String content, int rating) async {
     throw Exception('Failed to add review');
   }
 }
+
+Future<Map<String, dynamic>> getEventAttendanceStats(int eventId) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.get(
+      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/stats'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      if (responseData['success'] == true) {
+        LoggerService.logger
+            .i('Event stats fetched successfully: ${responseData['data']}');
+        return responseData['data'];
+      } else {
+        LoggerService.logger
+            .w('Failed to fetch event stats: ${responseData['message']}');
+        throw Exception('Failed to fetch event stats');
+      }
+    } else {
+      LoggerService.logger
+          .w('HTTP error: ${response.body}, status: ${response.statusCode}');
+      throw Exception('Failed to fetch event stats');
+    }
+  } catch (error) {
+    LoggerService.logger.w('Error: $error');
+    throw Exception('Failed to fetch event stats');
+  }
+}
