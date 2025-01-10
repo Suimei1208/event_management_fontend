@@ -1,3 +1,4 @@
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/forum/create_post.dart';
 import 'package:event_management/src/mobile_screen/forum/detail_post_forum.dart';
 import 'package:event_management/src/models/info_user.dart';
@@ -34,9 +35,9 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Welcome to the Community',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        title: Text(
+          S.of(context).welcome_forum,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           softWrap: true,
           overflow: TextOverflow.ellipsis,
         ),
@@ -58,30 +59,29 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Join discussions, share knowledge, and connect with others',
-              style: TextStyle(color: Colors.grey),
+            Text(
+              S.of(context).guide_forum,
+              style: const TextStyle(color: Colors.grey),
             ),
             const SizedBox(height: 20),
             Wrap(
-              spacing: 8.0, 
-              runSpacing:
-                  4.0, 
+              spacing: 8.0,
+              runSpacing: 4.0,
               children: [
                 FilterChip(
-                    label: const Text('All Topics'),
+                    label: Text(S.of(context).all),
                     selected: true,
                     onSelected: (selected) {}),
                 FilterChip(
-                    label: const Text('Popular'),
+                    label: Text(S.of(context).popular),
                     selected: false,
                     onSelected: (selected) {}),
                 FilterChip(
-                    label: const Text('Latest'),
+                    label: Text(S.of(context).latest),
                     selected: false,
                     onSelected: (selected) {}),
                 FilterChip(
-                    label: const Text('Unanswered'),
+                    label: Text(S.of(context).unanswered),
                     selected: false,
                     onSelected: (selected) {}),
               ],
@@ -94,10 +94,8 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
                     final post = posts[index];
                     final comments =
                         int.tryParse(post['comments_count'].toString()) ?? 0;
-                    final likes =
-                        int.tryParse(post['likes'].toString()) ?? 0;
-                    final DateTime time =
-                        DateTime.parse(post['timepost']);
+                    final likes = int.tryParse(post['likes'].toString()) ?? 0;
+                    final DateTime time = DateTime.parse(post['timepost']);
                     return PostItem(
                       id: int.parse(post['id'].toString()),
                       author: User.fromJson(post['user']),

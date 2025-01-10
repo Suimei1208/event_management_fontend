@@ -87,18 +87,6 @@ class _UserEventsState extends State<UserEvents> {
         actions: [
           IconButton(
             icon: Icon(
-              Icons.filter_list_outlined,
-              color: Theme.of(context).textTheme.bodyLarge?.color,
-              size: 24,
-            ),
-            onPressed: () {
-              LoggerService.logger.i('Filter icon pressed');
-
-              /// lọc sự kiện theo trạng thái, loại sự kiện gì gì đó
-            },
-          ),
-          IconButton(
-            icon: Icon(
               Icons.tune,
               color: Theme.of(context).textTheme.bodyLarge?.color,
               size: 24,

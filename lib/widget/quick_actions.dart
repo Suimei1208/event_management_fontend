@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
-import 'package:event_management/src/mobile_screen/event/attendance_list.dart';
 import 'package:event_management/src/mobile_screen/participants/add_special_participants.dart';
 import 'package:event_management/src/mobile_screen/document/document_page.dart';
 import 'package:event_management/src/mobile_screen/event/event_analystic.dart';
@@ -154,16 +153,6 @@ class _QuickActionsState extends State<QuickActions> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildActionButton(Icons.info_rounded, "Attendance Data",
-                          () async {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                AttendanceReportPage(eventId: widget.eventId),
-                          ),
-                        );
-                      }),
                       _buildActionButton(Icons.login, "Scan CheckIn", () async {
                         Navigator.push(
                           context,
@@ -232,7 +221,9 @@ class _QuickActionsState extends State<QuickActions> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const EventAnalyticsPage()),
+                              builder: (context) => EventAnalyticsPage(
+                                    eventId: widget.eventId,
+                                  )),
                         );
                       }),
                     ],

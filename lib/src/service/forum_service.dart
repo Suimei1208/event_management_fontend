@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:event_management/config.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -124,5 +125,44 @@ Future<Map<String, dynamic>> getDetailPost(int id) async {
   } catch (e) {
     LoggerService.logger.e('Failed to get detail post: $e');
     return {};
+  }
+}
+
+Future<String> uploadImageForumToImageKit(
+    File imageFile, String postTitle) async {
+  const privateKey = 'private_F801T1Ot8g2c8BCrrN+7+y+Kvdc=';
+  final base64EncodedKey = base64Encode(utf8.encode('$privateKey:'));
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    throw Exception('User not logged in');
+  }
+
+  final request = http.MultipartRequest(
+    'POST',
+    Uri.parse('https://upload.imagekit.io/api/v1/files/upload'),
+  );
+  request.headers['Authorization'] = 'Basic $base64EncodedKey';
+  request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+  final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  request.fields['fileName'] = "${user.uid}_${postTitle}_$timestamp";
+  request.fields['useUniqueFileName'] = 'false';
+  request.fields['folder'] = '/forum_images';
+
+  final response = await request.send();
+
+  if (response.statusCode == 200) {
+    final responseData = await response.stream.bytesToString();
+    final decodedData = json.decode(responseData);
+    final imageUrl = decodedData['url'];
+
+    LoggerService.logger.i("Image uploaded successfully. URL: $imageUrl");
+
+    return imageUrl;
+  } else {
+    final responseData = await response.stream.bytesToString();
+    LoggerService.logger
+        .e('Failed to upload image: ${response.statusCode}, $responseData');
+    throw Exception('Failed to upload image ${response.statusCode}');
   }
 }

@@ -1287,7 +1287,7 @@ Future<void> addReview(int eventid, String content, int rating) async {
   }
 }
 
-Future<Map<String, dynamic>> getEventAttendanceStats(int eventId) async {
+Future<Map<String, dynamic>?> getEventAttendanceStats(int eventId) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -1316,15 +1316,13 @@ Future<Map<String, dynamic>> getEventAttendanceStats(int eventId) async {
       } else {
         LoggerService.logger
             .w('Failed to fetch event stats: ${responseData['message']}');
-        throw Exception('Failed to fetch event stats');
+        return null; // Return null if the success flag is false
       }
     } else {
-      LoggerService.logger
-          .w('HTTP error: ${response.body}, status: ${response.statusCode}');
-      throw Exception('Failed to fetch event stats');
+      return null; // Return null if the response status code is not 200
     }
   } catch (error) {
-    LoggerService.logger.w('Error: $error');
-    throw Exception('Failed to fetch event stats');
+    LoggerService.logger.e('Error fetching event stats: $error');
+    return null; // Return null in case of any error
   }
 }

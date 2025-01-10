@@ -225,8 +225,8 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text("Error: ${snapshot.error}"));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                        child: Text("No events available for registration"));
+                    return Center(
+                        child: Text(S.of(context).no_events_available));
                   }
 
                   return ListView.builder(

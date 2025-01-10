@@ -1,4 +1,3 @@
-
 import 'package:event_management/src/mobile_screen/feeback/list_event_finished.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart';
@@ -198,7 +197,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                     ),
                     OptionsWidget(
                       icon: Icons.thumb_up,
-                      text: "Đánh giá sự kiện",
+                      text: S.of(context).rate_event,
                       onTap: () {
                         Navigator.push(
                           context,
