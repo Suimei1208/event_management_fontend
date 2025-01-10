@@ -13,7 +13,7 @@ import 'package:event_management/generated/l10n.dart';
 class CreateEvent extends StatefulWidget {
   const CreateEvent({super.key});
 
-  static const routeName = '/create_event';
+  // static const routeName = '/create_event';
 
   @override
   State<CreateEvent> createState() => _CreateEventState();

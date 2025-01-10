@@ -30,6 +30,10 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
     });
     // LoggerService.logger.i('Posts: $posts');
   }
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +102,7 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
                     final DateTime time = DateTime.parse(post['timepost']);
                     return PostItem(
                       id: int.parse(post['id'].toString()),
-                      author: User.fromJson(post['user']),
+                      author: InfoUser.fromJson(post['user']),
                       time: time,
                       title: post['title'].toString(),
                       content: post['description'].toString(),
@@ -120,7 +124,7 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
 // ignore: must_be_immutable
 class PostItem extends StatefulWidget {
   final int id;
-  final User author;
+  final InfoUser author;
   final DateTime time;
   final String title;
   final String content;

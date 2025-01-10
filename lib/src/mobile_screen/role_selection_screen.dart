@@ -2,7 +2,7 @@ import 'package:event_management/src/service/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class RoleSelectionScreen extends StatefulWidget {
-  static const routeName = '/role';
+  // static const routeName = '/role';
 
   const RoleSelectionScreen({super.key});
 

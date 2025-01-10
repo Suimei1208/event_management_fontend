@@ -166,3 +166,67 @@ Future<String> uploadImageForumToImageKit(
     throw Exception('Failed to upload image ${response.statusCode}');
   }
 }
+
+Future<void> createComment(String comment, int postId) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User not logged in');
+    }
+    String? idToken = await user.getIdToken();
+    final response = await http.post(
+      Uri.parse('${Config.baseUrl}/forum-service/forum/create-comment'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id': 0,
+        'uid': user.uid,
+        'comment': comment,
+        'timePost': DateTime.now().toIso8601String(),
+        'likes': 0,
+        'postId': postId,
+      }),
+    );
+    if (response.statusCode == 200) {
+      LoggerService.logger.i('Create comment request successful');
+    } else {
+      LoggerService.logger.e('Failed to create comment: ${response.body}');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Failed to create comment: $e');
+  }
+}
+
+Future<void> createReplyComment(String comment, int commentId) async{
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User not logged in');
+    }
+    String? idToken = await user.getIdToken();
+    final response = await http.post(
+      Uri.parse('${Config.baseUrl}/forum-service/forum/create-reply-comment'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id': 0,
+        'uid': user.uid,
+        'commentId': commentId,
+        'timePost': DateTime.now().toIso8601String(),
+        'likes': 0,
+        'comment': comment,
+      }),
+    );
+    if (response.statusCode == 200) {
+      LoggerService.logger.i('Create reply comment request successful');
+    } else {
+      LoggerService.logger.e('Failed to create reply comment: ${response.body}');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Failed to create reply comment: $e');
+  }
+}

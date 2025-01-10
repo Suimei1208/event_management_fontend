@@ -1,12 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 import 'package:event_management/src/mobile_screen/auth/forgot_password.dart';
+import 'package:event_management/src/mobile_screen/auth/register.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
-  static const routeName = '/login';
+  // static const routeName = '/login';
 
   @override
   // ignore: library_private_types_in_public_api
@@ -172,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 20),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/register');
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisterScreen()));
                           },
                           // ignore: sort_child_properties_last
                           child: Text(
