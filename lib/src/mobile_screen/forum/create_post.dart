@@ -86,6 +86,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             isLoading = false;
           });
         });
+        Navigator.pop(context);
       }
     }
   }

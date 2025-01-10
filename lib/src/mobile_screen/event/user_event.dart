@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:event_management/generated/l10n.dart';
 
 class UserEvents extends StatefulWidget {
-  static const routeName = '/user-events';
+  // static const routeName = '/user-events';
   const UserEvents({super.key});
 
   @override
@@ -48,7 +48,10 @@ class _UserEventsState extends State<UserEvents> {
   }
 
   Future<void> _navigateToCreateEvent(BuildContext context) async {
-    await Navigator.pushNamed(context, CreateEvent.routeName);
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CreateEvent()),
+    );
     _loadEvents();
   }
 

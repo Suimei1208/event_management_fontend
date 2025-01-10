@@ -1,18 +1,13 @@
-import 'package:event_management/src/mobile_screen/event/create_event.dart';
-import 'package:event_management/src/mobile_screen/user/edit_profile.dart';
-import 'package:event_management/src/mobile_screen/auth/forgot_password.dart';
 import 'package:event_management/src/mobile_screen/event/home_screen.dart';
-import 'package:event_management/src/mobile_screen/ticket/manage_ticket.dart';
-import 'package:event_management/src/mobile_screen/auth/register.dart';
-import 'package:event_management/src/mobile_screen/role_selection_screen.dart';
-import 'package:event_management/src/mobile_screen/event/user_event.dart';
+
 import 'package:event_management/src/service/notification_service.dart';
 import 'package:event_management/src/settings/settings_view.dart';
+import 'package:event_management/src/web-screen/login.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/mobile_screen/setting/language.dart';
 import 'package:event_management/src/mobile_screen/auth/login.dart';
-import 'package:event_management/src/mobile_screen/user/profile.dart';
+
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'settings/settings_controller.dart';
@@ -73,7 +68,7 @@ class _MyAppState extends State<MyApp> {
               if (snapshot.hasData) {
                 return const HomeScreen();
               } else {
-                return const LoginScreen();
+                return !kIsWeb ? const LoginScreen() : const LoginScreenWeb();
               }
             },
           ),
@@ -86,24 +81,8 @@ class _MyAppState extends State<MyApp> {
                     case '/language':
                       return LanguageSelectionPage(
                           settingsController: widget.settingsController);
-                    case LoginScreen.routeName:
-                      return const LoginScreen();
-                    case RoleSelectionScreen.routeName:
-                      return const RoleSelectionScreen();
-                    case RegisterScreen.routeName:
-                      return const RegisterScreen();
-                    case ProfileWidget.routeName:
-                      return const ProfileWidget();
-                    case ForgotPasswordScreen.routeName:
-                      return const ForgotPasswordScreen();
-                    case EditProfileScreen.routeName:
-                      return const EditProfileScreen();
-                    case CreateEvent.routeName:
-                      return const CreateEvent();
-                    case UserEvents.routeName:
-                      return const UserEvents();
-                    case MyTicketsPage.routeName:
-                      return const MyTicketsPage();
+                    case LoginScreenWeb.routeName:
+                      return const LoginScreenWeb();
                     case SettingsView.routeName:
                       return SettingsView(
                         controller: widget.settingsController,
@@ -115,13 +94,26 @@ class _MyAppState extends State<MyApp> {
                   }
                 },
               );
+            } else {
+              return MaterialPageRoute<void>(
+                settings: routeSettings,
+                builder: (BuildContext context) {
+                  switch (routeSettings.name) {
+                    case '/language':
+                      return LanguageSelectionPage(
+                          settingsController: widget.settingsController);
+                    case LoginScreenWeb.routeName:
+                      return const LoginScreenWeb();
+                    case SettingsView.routeName:
+                      return SettingsView(
+                        controller: widget.settingsController,
+                      );
+                    default:
+                      return const LoginScreenWeb();
+                  }
+                },
+              );
             }
-            return MaterialPageRoute<void>(
-              settings: routeSettings,
-              builder: (BuildContext context) {
-                return const LoginScreen();
-              },
-            );
           },
         );
       },

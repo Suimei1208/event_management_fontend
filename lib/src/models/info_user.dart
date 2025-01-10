@@ -1,11 +1,11 @@
-class User {
+class InfoUser {
   final String id;
   final String name;
   final String nameFromEmail;
   final String email;
   final String avtUrl;
 
-  User({
+  InfoUser({
     required this.id,
     required this.name,
     required this.nameFromEmail,
@@ -13,8 +13,8 @@ class User {
     required this.avtUrl,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return User(
+  factory InfoUser.fromJson(Map<String, dynamic> json) {
+    return InfoUser(
       id: json['id'],
       name: json['name'],
       nameFromEmail: json['nameFromEmail'],

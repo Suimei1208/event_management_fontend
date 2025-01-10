@@ -1,4 +1,6 @@
 import 'package:event_management/src/mobile_screen/feeback/list_event_finished.dart';
+import 'package:event_management/src/mobile_screen/ticket/manage_ticket.dart';
+import 'package:event_management/src/mobile_screen/user/edit_profile.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:event_management/widget/options_widget.dart';
@@ -9,7 +11,7 @@ import 'package:event_management/generated/l10n.dart';
 class ProfileWidget extends StatefulWidget {
   const ProfileWidget({super.key});
 
-  static const routeName = '/profile';
+  // static const routeName = '/profile';
 
   @override
   State<ProfileWidget> createState() => _ProfileWidgetState();
@@ -185,14 +187,21 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       icon: Icons.account_circle_outlined,
                       text: S.of(context).editProfile,
                       onTap: () {
-                        Navigator.pushNamed(context, '/edit_profile');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const EditProfileScreen()));
                       },
                     ),
                     OptionsWidget(
                       icon: Icons.confirmation_num,
                       text: S.of(context).myTicket,
                       onTap: () {
-                        Navigator.pushNamed(context, '/my-ticket');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MyTicketsPage()));
                       },
                     ),
                     OptionsWidget(

@@ -10,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
-  static const routeName = '/register';
+  // static const routeName = '/register';
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
