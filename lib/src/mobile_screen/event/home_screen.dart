@@ -9,7 +9,6 @@ import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/src/service/user_service.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -32,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late List<Event> events = [];
   int _currentIndex = 0;
   String userName = "";
-  List<String> notifications = [];
+  // List<String> notifications = [];
 
   @override
   void initState() {
@@ -40,18 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
     userProfileUrl = user?.photoURL ?? "";
     fetchEvents();
     _fetchUserName();
-    _configureFCM();
-  }
-
-  void _configureFCM() {
-    FirebaseMessaging.instance.subscribeToTopic('event-updates');
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.notification != null) {
-        setState(() {
-          notifications.add(message.notification!.body!);
-        });
-      }
-    });
   }
 
   Future<void> _fetchUserName() async {
@@ -123,8 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("On-going Event",
-                                style: TextStyle(
+                            Text(S.of(context).ongoing_event,
+                                style: const TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 10),
                             Row(
@@ -142,11 +129,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                 const SizedBox(
                                   width: 8,
                                 ),
-                                const Chip(
-                                  label: Text("Ongoing",
-                                      style: TextStyle(color: Colors.white)),
+                                Chip(
+                                  label: Text(S.of(context).Ongoing,
+                                      style:
+                                          const TextStyle(color: Colors.white)),
                                   backgroundColor:
-                                      Color.fromARGB(255, 245, 203, 18),
+                                      const Color.fromARGB(255, 245, 203, 18),
                                 ),
                               ],
                             ),
@@ -262,12 +250,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.only(right: 16.0),
                   child: Row(
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.notifications),
-                        onPressed: () {
-                          _showNotificationsDialog(context);
-                        },
-                      ),
+                      // IconButton(
+                      //   icon: const Icon(Icons.notifications),
+                      //   onPressed: () {
+                      //     _showNotificationsDialog(context);
+                      //   },
+                      // ),
                       Text(
                         userName,
                         style: const TextStyle(
@@ -338,36 +326,36 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showNotificationsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Notifications"),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: notifications.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                  title: Text(notifications[index]),
-                );
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // void _showNotificationsDialog(BuildContext context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: const Text("Notifications"),
+  //         content: SizedBox(
+  //           width: double.maxFinite,
+  //           child: ListView.builder(
+  //             shrinkWrap: true,
+  //             itemCount: notifications.length,
+  //             itemBuilder: (BuildContext context, int index) {
+  //               return ListTile(
+  //                 title: Text(notifications[index]),
+  //               );
+  //             },
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             child: const Text("Close"),
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   Widget buildEventCard(Event event) {
     // String? qr;

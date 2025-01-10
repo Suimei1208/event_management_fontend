@@ -589,6 +589,216 @@ class S {
       args: [],
     );
   }
+
+  /// `Rate Event`
+  String get rate_event {
+    return Intl.message(
+      'Rate Event',
+      name: 'rate_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `On-going Event`
+  String get ongoing_event {
+    return Intl.message(
+      'On-going Event',
+      name: 'ongoing_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ongoing`
+  String get Ongoing {
+    return Intl.message(
+      'Ongoing',
+      name: 'Ongoing',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No Event Available`
+  String get no_events_available {
+    return Intl.message(
+      'No Event Available',
+      name: 'no_events_available',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Welcome to the Community`
+  String get welcome_forum {
+    return Intl.message(
+      'Welcome to the Community',
+      name: 'welcome_forum',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Create Post`
+  String get create_post {
+    return Intl.message(
+      'Create Post',
+      name: 'create_post',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `All`
+  String get all {
+    return Intl.message(
+      'All',
+      name: 'all',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Popular`
+  String get popular {
+    return Intl.message(
+      'Popular',
+      name: 'popular',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `latest`
+  String get latest {
+    return Intl.message(
+      'latest',
+      name: 'latest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unanswered`
+  String get unanswered {
+    return Intl.message(
+      'Unanswered',
+      name: 'unanswered',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Join discussions, share informations, and connect with others`
+  String get guide_forum {
+    return Intl.message(
+      'Join discussions, share informations, and connect with others',
+      name: 'guide_forum',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Post Title`
+  String get post_title {
+    return Intl.message(
+      'Post Title',
+      name: 'post_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Share Your Thoughts...`
+  String get share_thought {
+    return Intl.message(
+      'Share Your Thoughts...',
+      name: 'share_thought',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Category`
+  String get category {
+    return Intl.message(
+      'Category',
+      name: 'category',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Discussion`
+  String get discussion {
+    return Intl.message(
+      'Discussion',
+      name: 'discussion',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Questions`
+  String get questions {
+    return Intl.message(
+      'Questions',
+      name: 'questions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Tips & Tricks`
+  String get tips_tricks {
+    return Intl.message(
+      'Tips & Tricks',
+      name: 'tips_tricks',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Feedback`
+  String get feedback {
+    return Intl.message(
+      'Feedback',
+      name: 'feedback',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Attachments`
+  String get attachments {
+    return Intl.message(
+      'Attachments',
+      name: 'attachments',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Photo`
+  String get add_photo {
+    return Intl.message(
+      'Add Photo',
+      name: 'add_photo',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Post`
+  String get post {
+    return Intl.message(
+      'Post',
+      name: 'post',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

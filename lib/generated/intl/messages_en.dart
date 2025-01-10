@@ -22,20 +22,27 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "Ongoing": MessageLookupByLibrary.simpleMessage("Ongoing"),
         "account": MessageLookupByLibrary.simpleMessage("Account"),
         "add_member": MessageLookupByLibrary.simpleMessage("Add member"),
+        "add_photo": MessageLookupByLibrary.simpleMessage("Add Photo"),
         "add_speaker": MessageLookupByLibrary.simpleMessage("Add Speaker"),
         "add_special_guest":
             MessageLookupByLibrary.simpleMessage("Add Special Guest"),
         "added_participants":
             MessageLookupByLibrary.simpleMessage("Added Participants"),
+        "all": MessageLookupByLibrary.simpleMessage("All"),
         "approved": MessageLookupByLibrary.simpleMessage("Approved"),
         "approved_participants":
             MessageLookupByLibrary.simpleMessage("Approved Participants"),
+        "attachments": MessageLookupByLibrary.simpleMessage("Attachments"),
         "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+        "category": MessageLookupByLibrary.simpleMessage("Category"),
         "create_event": MessageLookupByLibrary.simpleMessage("Create Event"),
+        "create_post": MessageLookupByLibrary.simpleMessage("Create Post"),
         "desc": MessageLookupByLibrary.simpleMessage("Description"),
         "describe": MessageLookupByLibrary.simpleMessage("Describe"),
+        "discussion": MessageLookupByLibrary.simpleMessage("Discussion"),
         "editProfile": MessageLookupByLibrary.simpleMessage("Edit Profile"),
         "end_date": MessageLookupByLibrary.simpleMessage("End Date"),
         "english": MessageLookupByLibrary.simpleMessage("English"),
@@ -46,14 +53,18 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Existed Participant"),
         "facebook_sign_in":
             MessageLookupByLibrary.simpleMessage("Sign in with Facebook"),
+        "feedback": MessageLookupByLibrary.simpleMessage("Feedback"),
         "forum": MessageLookupByLibrary.simpleMessage("Forum"),
         "general": MessageLookupByLibrary.simpleMessage("General"),
         "gmail_sign_in":
             MessageLookupByLibrary.simpleMessage("Sign in with Gmail"),
         "guide_create_event": MessageLookupByLibrary.simpleMessage(
             "Fill in the details below to create your new event"),
+        "guide_forum": MessageLookupByLibrary.simpleMessage(
+            "Join discussions, share informations, and connect with others"),
         "home": MessageLookupByLibrary.simpleMessage("Home"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
+        "latest": MessageLookupByLibrary.simpleMessage("latest"),
         "location": MessageLookupByLibrary.simpleMessage("Location"),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
         "logout": MessageLookupByLibrary.simpleMessage("Logout"),
@@ -62,10 +73,18 @@ class MessageLookup extends MessageLookupByLibrary {
         "myTicket": MessageLookupByLibrary.simpleMessage("My Ticket"),
         "next_event": MessageLookupByLibrary.simpleMessage("Next Event"),
         "next_events": MessageLookupByLibrary.simpleMessage("Next Events"),
+        "no_events_available":
+            MessageLookupByLibrary.simpleMessage("No Event Available"),
         "obj": MessageLookupByLibrary.simpleMessage("Event Objectives"),
+        "ongoing_event": MessageLookupByLibrary.simpleMessage("On-going Event"),
         "pending_request":
             MessageLookupByLibrary.simpleMessage("Pending Request"),
+        "popular": MessageLookupByLibrary.simpleMessage("Popular"),
+        "post": MessageLookupByLibrary.simpleMessage("Post"),
+        "post_title": MessageLookupByLibrary.simpleMessage("Post Title"),
         "profile": MessageLookupByLibrary.simpleMessage("Profile"),
+        "questions": MessageLookupByLibrary.simpleMessage("Questions"),
+        "rate_event": MessageLookupByLibrary.simpleMessage("Rate Event"),
         "register": MessageLookupByLibrary.simpleMessage("Register"),
         "register_account":
             MessageLookupByLibrary.simpleMessage("Register Account"),
@@ -80,15 +99,21 @@ class MessageLookup extends MessageLookupByLibrary {
         "select_time": MessageLookupByLibrary.simpleMessage("Selelct Time"),
         "setting": MessageLookupByLibrary.simpleMessage("Setting"),
         "share_role": MessageLookupByLibrary.simpleMessage("Share Role"),
+        "share_thought":
+            MessageLookupByLibrary.simpleMessage("Share Your Thoughts..."),
         "speaker": MessageLookupByLibrary.simpleMessage("Speaker"),
         "special_guest": MessageLookupByLibrary.simpleMessage("Special Guest"),
         "start_date": MessageLookupByLibrary.simpleMessage("Start Date"),
+        "tips_tricks": MessageLookupByLibrary.simpleMessage("Tips & Tricks"),
         "title": MessageLookupByLibrary.simpleMessage("Event Management"),
+        "unanswered": MessageLookupByLibrary.simpleMessage("Unanswered"),
         "vietnamese": MessageLookupByLibrary.simpleMessage("Vietnamese"),
         "view_detail": MessageLookupByLibrary.simpleMessage("View Detail"),
         "view_schedule": MessageLookupByLibrary.simpleMessage("View Schedule"),
         "welcome": MessageLookupByLibrary.simpleMessage(
             "Welcome to the Event Management app!"),
-        "welcome_back": MessageLookupByLibrary.simpleMessage("Welcome Back")
+        "welcome_back": MessageLookupByLibrary.simpleMessage("Welcome Back"),
+        "welcome_forum":
+            MessageLookupByLibrary.simpleMessage("Welcome to the Community")
       };
 }

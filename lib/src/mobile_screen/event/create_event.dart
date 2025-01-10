@@ -878,7 +878,7 @@ class _CreateEventState extends State<CreateEvent> {
                             endDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS')
                                 .parse(_combineDateTime(endDateController.text,
                                     endTimeController.text)),
-                            banner: "https://placehold.jp/150x150.png",
+                            banner: "https://placehold.jp/400x200.png",
                             status: "Upcoming",
                             idCreate: "",
                             access: false,

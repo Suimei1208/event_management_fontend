@@ -31,7 +31,7 @@ class _QRScannerPageState extends State<QRScannerPage> {
           IconButton(
             icon: const Icon(Icons.restart_alt),
             onPressed: () {
-              controller?.resumeCamera(); // Resume the camera if needed
+              controller?.resumeCamera();
             },
           ),
         ],
@@ -64,9 +64,9 @@ class _QRScannerPageState extends State<QRScannerPage> {
     controller.scannedDataStream.listen((scanData) async {
       if (scanData.code != null && scanData.code!.isNotEmpty) {
         try {
-          await controller.pauseCamera(); // Pause to avoid repeated scans
+          await controller.pauseCamera();
           widget.onQRScanned(scanData.code!);
-          Navigator.pop(context); // Close the scanner
+          Navigator.pop(context);
         } catch (e) {
           debugPrint('Error during QR scanning: $e');
         }
