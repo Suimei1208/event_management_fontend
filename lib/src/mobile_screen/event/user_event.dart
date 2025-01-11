@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:event_management/src/mobile_screen/event/create_event.dart';
 import 'package:event_management/src/mobile_screen/event/detail_event.dart';
 import 'package:event_management/src/models/events.dart';
@@ -9,18 +11,16 @@ import 'package:intl/intl.dart';
 import 'package:event_management/generated/l10n.dart';
 
 class UserEvents extends StatefulWidget {
-  // static const routeName = '/user-events';
+  static const routeName = '/user-events';
   const UserEvents({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _UserEventsState createState() => _UserEventsState();
 }
 
 class _UserEventsState extends State<UserEvents> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // late Future<List<Event>> _eventsFuture;
   bool _isGridView = false;
   List<Event> _allEvents = [];
   List<Event> _filteredEvents = [];
@@ -31,17 +31,13 @@ class _UserEventsState extends State<UserEvents> {
     _loadEvents();
   }
 
-  // Load events and initialize filtered events
   Future<void> _loadEvents() async {
     try {
       final events = await fetchEvents();
       setState(() {
         _allEvents = events;
-        _filteredEvents = events; // Initially, all events are shown
+        _filteredEvents = events;
       });
-      // for (var event in events) {
-      //   LoggerService.logger.i('Event: ${event.status}');
-      // }
     } catch (error) {
       LoggerService.logger.e('Error loading events: $error');
     }
@@ -132,7 +128,6 @@ class _UserEventsState extends State<UserEvents> {
                   ),
                 ),
               ),
-              // Event list
               Expanded(
                 child: _filteredEvents.isEmpty
                     ? Center(

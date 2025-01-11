@@ -48,8 +48,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   String averageParticipationTime = '';
   String participationPercentage = '';
   String userRole = "";
-  // Map<String, double> _incomeData = {};
-  // Map<String, double> _expenseData = {};
 
   @override
   void initState() {
@@ -149,8 +147,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   Future<void> _loadEventData() async {
     try {
       final eventData = await getEventData(widget.event.id);
-      // final stats = await getStats(widget.event.id);
-      // final attendanceStats = await getEventAttendanceStats(widget.event.id);
       if (!mounted) return;
       setState(() {
         access = eventData['data']['access'];
@@ -163,13 +159,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             "${DateFormat.jm().format(DateTime.parse(eventData['data']['startDate']))} - ${DateTime.parse(eventData['data']['startDate']).day}/${DateTime.parse(eventData['data']['startDate']).month}/${DateTime.parse(eventData['data']['startDate']).year}";
         endDate =
             "${DateFormat.jm().format(DateTime.parse(eventData['data']['endDate']))} - ${DateTime.parse(eventData['data']['endDate']).day}/${DateTime.parse(eventData['data']['endDate']).month}/${DateTime.parse(eventData['data']['endDate']).year}";
-        // registered = stats['registered'].toString();
-        // speakers = stats['speaker'].toString();
-        // sessions = stats['sessions'].toString();
-        // averageParticipationTime =
-        //     attendanceStats['averageParticipationTimeFormatted'].toString();
-        // participationPercentage =
-        //     "${attendanceStats['participationPercentage'].toString()} %";
       });
     } catch (error) {
       LoggerService.logger.e(error);
@@ -244,8 +233,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(eventName),
-        // backgroundColor: Colors.white,
-        // foregroundColor: Colors.black,
         elevation: 0,
         actions: [
           if (userRole == "Host-${widget.event.id}" ||
@@ -284,7 +271,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     access: access,
                     allowSelectSchedule: allowSelectSchedule,
                     status: widget.event.status,
-                    event: widget.event,
                   ),
                 );
               },
@@ -329,8 +315,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     '${S.of(context).end_date}: $endDate',
                   ),
                   const SizedBox(height: 24),
-                  // _buildEventStats(registered, speakers, sessions,
-                  //     averageParticipationTime, participationPercentage),
                   const SizedBox(height: 24),
                   _buildSpecialParticipantsSection(widget.event.id),
                   const SizedBox(height: 24),
@@ -384,14 +368,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  // double get _totalIncome => _incomeData.values.isEmpty
-  //     ? 0
-  //     : _incomeData.values.reduce((a, b) => a + b);
-
-  // double get _totalExpense => _expenseData.values.isEmpty
-  //     ? 0
-  //     : _expenseData.values.reduce((a, b) => a + b);
-
   Future<void> _loadSpendingData(int eventId) async {
     try {
       final fetchedData = await fetchSpendings(eventId);
@@ -415,54 +391,11 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           'date': item['date'],
         });
       }
-
-      // setState(() {
-      //   _incomeData = incomeData;
-      //   _expenseData = expenseData;
-      // });
     } catch (e) {
       setState(() {});
       LoggerService.logger.e('Error loading data: $e');
     }
   }
-
-  // Widget _buildEventStats(String registered, String speakers, String sessions,
-  //     String averageParticipationTime, String participationPercentage) {
-  //   return Container(
-  //     padding: const EdgeInsets.all(16),
-  //     decoration: BoxDecoration(
-  //       // color: Colors.grey.shade100,
-  //       borderRadius: BorderRadius.circular(12),
-  //     ),
-  //     child: Column(
-  //       children: [
-  //         const Text(
-  //           "Event Stats",
-  //           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //         ),
-  //         const SizedBox(height: 16),
-  //         GridView.count(
-  //           crossAxisCount: 2,
-  //           crossAxisSpacing: 16.0,
-  //           mainAxisSpacing: 16.0,
-  //           shrinkWrap: true,
-  //           physics: const NeverScrollableScrollPhysics(),
-  //           children: [
-  //             _buildStat(registered, "Registered"),
-  //             _buildStat(speakers, "Special Participants"),
-  //             _buildStat(sessions, "Sessions"),
-  //             _buildStat(averageParticipationTime, "Average Participate Time"),
-  //             _buildStat(participationPercentage, "Participation Percent"),
-  //             _buildStat(formatCurrency(_totalIncome), "Total Income"),
-  //             _buildStat(formatCurrency(_totalExpense), "Total Expense"),
-  //             _buildStat(
-  //                 formatCurrency(_totalIncome - _totalExpense), "Profit"),
-  //           ],
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildSpecialParticipantsSection(int eventId) {
     return FutureBuilder<List<Map<String, dynamic>>>(
@@ -564,17 +497,4 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       },
     );
   }
-
-  // Widget _buildStat(String value, String label) {
-  //   return Column(
-  //     children: [
-  //       Text(
-  //         value,
-  //         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-  //       ),
-  //       const SizedBox(height: 8),
-  //       Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-  //     ],
-  //   );
-  // }
 }

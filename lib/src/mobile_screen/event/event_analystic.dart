@@ -90,7 +90,6 @@ class _EventAnalyticsPageState extends State<EventAnalyticsPage> {
             .format(DateTime.parse(eventData['data']['endDate']));
         registered = stats['registered'].toString();
         checkIns = attendanceStats?['checkedInParticipants'] ?? 0;
-
         participationPercentage =
             attendanceStats?['participationPercentage']?.toString() ?? '0';
         final participationDouble =

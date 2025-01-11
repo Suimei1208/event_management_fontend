@@ -1,15 +1,14 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
 import 'package:event_management/src/models/event_with_participants.dart';
-import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/participants.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/service/user_service.dart';
 
 class ShareRolePage extends StatefulWidget {
-  final Event event;
-  const ShareRolePage({super.key, required this.event});
+  final int eventId;
+  const ShareRolePage({super.key, required this.eventId});
 
   @override
   _ShareRolePageState createState() => _ShareRolePageState();
@@ -36,15 +35,15 @@ class _ShareRolePageState extends State<ShareRolePage> {
       });
 
       final hostParticipants = await getParticipants(
-        widget.event.id,
+        widget.eventId,
         'Approved',
-        'Host-${widget.event.id}',
+        'Host-${widget.eventId}',
       );
 
       final staffParticipants = await getParticipants(
-        widget.event.id,
+        widget.eventId,
         'Approved',
-        'Staff-${widget.event.id}',
+        'Staff-${widget.eventId}',
       );
 
       setState(() {
@@ -64,7 +63,7 @@ class _ShareRolePageState extends State<ShareRolePage> {
 
   Future<void> _assignRole(String userId, String role) async {
     try {
-      await addParticipant(userId, widget.event.id, role);
+      await addParticipant(userId, widget.eventId, role);
       await _fetchParticipants();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Role assigned successfully')),
@@ -78,7 +77,7 @@ class _ShareRolePageState extends State<ShareRolePage> {
 
   Future<void> _removeRole(int participantId) async {
     try {
-      final success = await removeParticipant(widget.event.id, participantId);
+      final success = await removeParticipant(widget.eventId, participantId);
       if (success) {
         await _fetchParticipants();
         ScaffoldMessenger.of(context).showSnackBar(
@@ -132,14 +131,14 @@ class _ShareRolePageState extends State<ShareRolePage> {
               ListTile(
                 title: const Text('Host'),
                 onTap: () {
-                  _assignRole(user['id'], 'Host-${widget.event.id}');
+                  _assignRole(user['id'], 'Host-${widget.eventId}');
                   Navigator.of(context).pop();
                 },
               ),
               ListTile(
                 title: const Text('Staff'),
                 onTap: () {
-                  _assignRole(user['id'], 'Staff-${widget.event.id}');
+                  _assignRole(user['id'], 'Staff-${widget.eventId}');
                   Navigator.of(context).pop();
                 },
               ),
@@ -163,7 +162,7 @@ class _ShareRolePageState extends State<ShareRolePage> {
                 title: const Text('Make Host'),
                 onTap: () {
                   _removeRole(participant.id);
-                  _assignRole(participant.userId, 'Host-${widget.event.id}');
+                  _assignRole(participant.userId, 'Host-${widget.eventId}');
                   Navigator.of(context).pop();
                 },
               ),
@@ -171,7 +170,7 @@ class _ShareRolePageState extends State<ShareRolePage> {
                 title: const Text('Make Staff'),
                 onTap: () {
                   _removeRole(participant.id);
-                  _assignRole(participant.userId, 'Staff-${widget.event.id}');
+                  _assignRole(participant.userId, 'Staff-${widget.eventId}');
                   Navigator.of(context).pop();
                 },
               ),

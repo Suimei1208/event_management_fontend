@@ -5,11 +5,11 @@ import 'dart:convert';
 import 'package:event_management/config.dart';
 import 'package:event_management/src/mobile_screen/auth/login.dart';
 import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/web-screen/login.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 String uri = '${Config.baseUrl}/user-services';
 
@@ -70,23 +70,21 @@ Future<void> loginWithFacebook(BuildContext context) async {
 
 Future<void> loginWithGoogle(BuildContext context) async {
   try {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
+    // Trigger the Google Sign-In flow
+    final GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
-    final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-
+    // Use Firebase's sign-in method
     final UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithCredential(credential);
+        await FirebaseAuth.instance.signInWithPopup(googleProvider);
+
+    // Get ID token to send to your backend
     String? idToken = await userCredential.user?.getIdToken();
 
     if (idToken == null) {
       throw Exception("Failed to get ID token.");
     }
 
+    // Send the ID token to your backend
     final response = await http.post(
       Uri.parse(
           '${Config.baseUrl}/user-services/api/Users/register-via-social'),
@@ -101,6 +99,7 @@ Future<void> loginWithGoogle(BuildContext context) async {
     );
 
     if (response.statusCode == 200) {
+      // After registering, login via backend
       final response = await http.get(
         Uri.parse(
             '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
@@ -112,7 +111,8 @@ Future<void> loginWithGoogle(BuildContext context) async {
           Navigator.pushReplacementNamed(context, '/home');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Failed to login: ${responseData['message']}')));
+            content: Text('Failed to login: ${responseData['message']}'),
+          ));
         }
       }
     } else {
@@ -271,6 +271,20 @@ Future<void> logout(BuildContext context) async {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error during logout: $e')),
+    );
+  }
+}
+
+Future<void> logoutWeb(BuildContext context) async {
+  try {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const WebLoginScreen()),
     );
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
