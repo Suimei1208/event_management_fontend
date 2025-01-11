@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_web_libraries_in_flutter
 
 import 'dart:html' as html;
+import 'package:event_management/src/service/user_service_web.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/service/user_service.dart';

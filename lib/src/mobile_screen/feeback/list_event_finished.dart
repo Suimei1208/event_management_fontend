@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 class EventFinishedScreen extends StatefulWidget {
   const EventFinishedScreen({super.key});
 
-  static const routeName = "/register_events";
 
   @override
   State<EventFinishedScreen> createState() => _EventFinishedScreenState();

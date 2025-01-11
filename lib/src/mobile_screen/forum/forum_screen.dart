@@ -30,6 +30,7 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
     });
     // LoggerService.logger.i('Posts: $posts');
   }
+
   @override
   void dispose() {
     super.dispose();
@@ -84,10 +85,10 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
                     label: Text(S.of(context).latest),
                     selected: false,
                     onSelected: (selected) {}),
-                FilterChip(
-                    label: Text(S.of(context).unanswered),
-                    selected: false,
-                    onSelected: (selected) {}),
+                // FilterChip(
+                //     label: Text(S.of(context).unanswered),
+                //     selected: false,
+                //     onSelected: (selected) {}),
               ],
             ),
             const SizedBox(height: 20),
