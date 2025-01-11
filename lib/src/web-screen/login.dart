@@ -2,17 +2,17 @@ import 'package:event_management/src/mobile_screen/auth/forgot_password.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:flutter/material.dart';
 
-class LoginScreenWeb extends StatefulWidget {
-  const LoginScreenWeb({super.key});
+class WebLoginScreen extends StatefulWidget {
+  const WebLoginScreen({super.key});
 
   static const routeName = '/login';
 
   @override
   // ignore: library_private_types_in_public_api
-  _LoginScreenWebState createState() => _LoginScreenWebState();
+  _WebLoginScreenState createState() => _WebLoginScreenState();
 }
 
-class _LoginScreenWebState extends State<LoginScreenWeb> {
+class _WebLoginScreenState extends State<WebLoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;

@@ -8,12 +8,11 @@ import 'package:event_management/src/mobile_screen/feeback/list_users_cancel.dar
 import 'package:event_management/src/mobile_screen/event/qr_scanner.dart';
 import 'package:event_management/src/mobile_screen/event/share_role.dart';
 import 'package:event_management/src/mobile_screen/spending/spending_overview.dart';
-import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:flutter/material.dart';
 
 class QuickActions extends StatefulWidget {
-  final Event event;
+
   final int eventId;
   final bool access;
   final bool allowSelectSchedule;
@@ -26,7 +25,7 @@ class QuickActions extends StatefulWidget {
     required this.access,
     required this.allowSelectSchedule,
     required this.status,
-    required this.event,
+
     required this.userRole,
   });
 
@@ -133,7 +132,7 @@ class _QuickActionsState extends State<QuickActions> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  ShareRolePage(event: widget.event)),
+                                  ShareRolePage(eventId: widget.eventId)),
                         );
                       }),
                     ],
@@ -202,7 +201,6 @@ class _QuickActionsState extends State<QuickActions> {
                           MaterialPageRoute(
                               builder: (context) => SpendingOverviewPage(
                                     eventId: widget.eventId,
-                                    event: widget.event,
                                   )),
                         );
                       }),

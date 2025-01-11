@@ -1,8 +1,9 @@
-// ignore_for_file: use_build_context_synchronously, no_leading_underscores_for_local_identifiers, non_constant_identifier_names
+// ignore_for_file: use_build_context_synchronously, no_leading_underscores_for_local_identifiers, non_constant_identifier_names, avoid_web_libraries_in_flutter
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
+import 'dart:html' as html;
 import 'package:event_management/config.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -46,7 +47,7 @@ Future<Map<String, dynamic>> getUserDetails() async {
   }
 }
 
-Future<String> GetNameUser() async {
+Future<String> GetNameUser(BuildContext context) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
 
@@ -68,6 +69,10 @@ Future<String> GetNameUser() async {
             'Failed to load user data, ${response.statusCode}, id: $idToken');
       }
     } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushNamed(context, '/login');
+      });
+
       throw Exception('No user logged in');
     }
   } catch (e) {
@@ -258,6 +263,53 @@ Future<String> uploadImageToImageKit(File imageFile) async {
   }
 }
 
+Future<String> uploadImageToImageKitWebVersion(String base64ImageData) async {
+  const privateKey = 'private_F801T1Ot8g2c8BCrrN+7+y+Kvdc=';
+  final base64EncodedKey = base64Encode(utf8.encode('$privateKey:'));
+  User? user = FirebaseAuth.instance.currentUser;
+
+  // Remove the base64 prefix if it exists (data:image/jpeg;base64,)
+  String imageData = base64ImageData.replaceFirst(
+      RegExp(r"^data:image\/[a-zA-Z]+;base64,"), "");
+
+  // Create a FormData object to upload the image as multipart form data
+  final request = html.FormData();
+
+  // Convert the cleaned base64 image data to Blob
+  final imageBlob = html.Blob([base64Decode(imageData)]);
+
+  // Append the file and other fields to the request
+  request.appendBlob('file', imageBlob, 'profile_pic_${user!.uid}.jpg');
+  request.append('fileName', 'profile_pic_${user.uid}.jpg');
+  request.append('useUniqueFileName', 'false');
+  request.append('folder', '/profile_pictures');
+
+  // Create an XMLHttpRequest to send the form data
+  final xhr = html.HttpRequest();
+  final uri = Uri.parse('https://upload.imagekit.io/api/v1/files/upload');
+  xhr.open('POST', uri.toString());
+  xhr.setRequestHeader('Authorization', 'Basic $base64EncodedKey');
+
+  // Send the request and handle the response
+  final completer = Completer<String>();
+  xhr.onLoadEnd.listen((e) {
+    if (xhr.status == 200) {
+      final response = json.decode(xhr.responseText!);
+      final imageUrl = response['url'];
+      LoggerService.logger.i("Image uploaded successfully. URL: $imageUrl");
+      completer.complete(imageUrl);
+    } else {
+      LoggerService.logger
+          .e('Failed to upload image: ${xhr.status}, ${xhr.responseText}');
+      completer.completeError('Failed to upload image');
+    }
+  });
+
+  xhr.send(request);
+
+  return completer.future;
+}
+
 Future<Map<String, dynamic>> fetchUserByStudentId(String studentId) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
@@ -291,8 +343,8 @@ Future<Map<String, dynamic>> fetchUserByStudentId(String studentId) async {
             .e("Failed to fetch user data, Success flag is false.");
       }
     } else {
-      LoggerService.logger
-          .e("Failed to fetch user data, status code: ${response.statusCode}");
+      LoggerService.logger.e(
+          "Failed to fetch user data, status code: ${response.statusCode}, body: ${response.body}");
     }
   } catch (e) {
     LoggerService.logger.e("Error fetching user by student ID: $e");

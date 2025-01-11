@@ -38,12 +38,12 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     userProfileUrl = user?.photoURL ?? "";
     fetchEvents();
-    _fetchUserName();
+    _fetchUserName(context);
   }
 
-  Future<void> _fetchUserName() async {
+  Future<void> _fetchUserName(BuildContext context) async {
     try {
-      userName = await GetNameUser();
+      userName = await GetNameUser(context);
     } catch (e) {
       LoggerService.logger.e("Failed to fetch user name: $e");
     }

@@ -24,8 +24,6 @@ class _CreateEventState extends State<CreateEvent> {
   String? choiceChipsValue;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
-  // File? _imageFile;
-  // String _imageUrl = '';
 
   final TextEditingController _textController1 = TextEditingController();
   final TextEditingController _textController2 = TextEditingController();
@@ -854,17 +852,10 @@ class _CreateEventState extends State<CreateEvent> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  // Switch(value: value, onChanged: (){
-                  //   setState(() {
-                  //     value = !value;
-                  //   });
-                  // })
-                  // const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        // LoggerService.logger.w('Button pressed ...');
                         Event event = Event(
                             id: 0,
                             name: _textController1.text.toString(),
@@ -884,54 +875,7 @@ class _CreateEventState extends State<CreateEvent> {
                             access: false,
                             allowSelectSchedule: false);
                         LoggerService.logger.w(event.toJson());
-
-                        // Add event to device calendar
-                        // final device_calendar.DeviceCalendarPlugin
-                        //     deviceCalendarPlugin =
-                        //     device_calendar.DeviceCalendarPlugin();
-                        // try {
-                        //   var result =
-                        //       await deviceCalendarPlugin.requestPermissions();
-                        //   if (result.isSuccess && result.data!) {
-                        //     List<device_calendar.Calendar> calendars =
-                        //         (await deviceCalendarPlugin.retrieveCalendars())
-                        //             as List<device_calendar.Calendar>;
-                        //     if (calendars.isNotEmpty) {
-                        //       tz.initializeTimeZones();
-                        //       final location =
-                        //           tz.getLocation('Asia/Ho_Chi_Minh');
-                        //       final tzDateTimeStart =
-                        //           tz.TZDateTime.from(event.startDate, location);
-                        //       final tzDateTimeEnd =
-                        //           tz.TZDateTime.from(event.endDate, location);
-                        //       device_calendar.Calendar calendar =
-                        //           calendars.first;
-                        //       device_calendar.Event newEvent =
-                        //           device_calendar.Event(
-                        //         calendar.id,
-                        //         title: event.name,
-                        //         start: tzDateTimeStart,
-                        //         end: tzDateTimeEnd,
-                        //         description: event.description,
-                        //         location: event.location,
-                        //       );
-
-                        //       await deviceCalendarPlugin
-                        //           .createOrUpdateEvent(newEvent);
-                        //       LoggerService.logger
-                        //           .w('Event added to the calendar');
-                        //     }
-                        //   } else {
-                        //     LoggerService.logger
-                        //         .w('Calendar permission not granted');
-                        //   }
-                        // } catch (e) {
-                        //   LoggerService.logger
-                        //       .e('Error adding event to calendar: $e');
-                        // }
-
                         try {
-                          // Create the event and get the generated eventId
                           int eventId = await createEvent(event, context);
 
                           if (eventId != 0) {

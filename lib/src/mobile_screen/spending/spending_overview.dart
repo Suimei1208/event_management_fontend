@@ -5,15 +5,13 @@ import 'package:event_management/src/service/spending_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:event_management/src/service/logger_service.dart';
-import 'package:event_management/src/models/events.dart';
 import 'package:intl/intl.dart';
 
 class SpendingOverviewPage extends StatefulWidget {
   final int eventId;
-  final Event event;
 
   const SpendingOverviewPage(
-      {super.key, required this.eventId, required this.event});
+      {super.key, required this.eventId});
 
   @override
   _SpendingOverviewPageState createState() => _SpendingOverviewPageState();
@@ -222,12 +220,6 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
               ? const Center(child: CircularProgressIndicator())
               : Column(
                   children: [
-                    Text(
-                      widget.event.name,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
                     Expanded(
                       child: TabBarView(
                         controller: _tabController,
