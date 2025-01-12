@@ -230,115 +230,119 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
         children: [
           // Sidebar
           if (isHostOrStaff)
-            Container(
-              width: 350,
-              color: Colors.deepPurple.shade50,
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSidebarButton(
-                      Icons.file_copy, "Thêm người tham gia bằng excel", () {
-                    handleExcelUpload(widget.eventId, eventName);
-                  }),
-                  _buildSidebarButton(
-                      Icons.insert_invitation, "Danh sách đăng ký tham gia",
-                      () {
-                    Navigator.pushNamed(context,
-                        "/home/detail-event/${widget.eventId}/pending-requests");
-                  }),
-                  _buildSidebarButton(Icons.edit, "Điều chỉnh khách mời", () {
-                    Navigator.pushNamed(context,
-                        "/home/detail-event/${widget.eventId}/special-participants");
-                  }),
-                  _buildSidebarButton(Icons.person, "Danh sách tham gia", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ExistedParticipants(id: widget.eventId),
-                      ),
-                    );
-                  }),
-                  _buildSidebarButton(Icons.description, "Documents", () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            EventResourcesPage(eventId: widget.eventId),
-                      ),
-                    );
-                  }),
-                  _buildSidebarButton(Icons.share, "Phân quyền", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            ShareRolePage(eventId: widget.eventId),
-                      ),
-                    );
-                  }),
-                  _buildSidebarButton(Icons.money_outlined, "Chi Tiêu",
-                      () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            SpendingOverviewPage(eventId: widget.eventId),
-                      ),
-                    );
-                  }),
-                  _buildSidebarButton(Icons.analytics, "Statistics", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            EventAnalyticsPage(eventId: widget.eventId),
-                      ),
-                    );
-                  }),
-                  _buildSidebarButton(
-                      Icons.cancel_presentation, "Dữ liệu hủy tham gia", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            CancelledUsersScreen(eventID: widget.eventId),
-                      ),
-                    );
-                  }),
-                  _buildSidebarButton(Icons.login, "Scan CheckIn", () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            QRScannerPage(onQRScanned: (qrCode) async {
-                          await checkIn(widget.eventId, qrCode);
-                        }),
-                      ),
-                    );
-                  }),
-                  _buildSidebarButton(Icons.logout, "Scan CheckOut", () async {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            QRScannerPage(onQRScanned: (qrCode) async {
-                          await checkOut(widget.eventId, qrCode);
-                        }),
-                      ),
-                    );
-                  }),
-                  _buildSidebarButton(Icons.edit, "Update Event", () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            UpdateEvent(eventId: widget.eventId),
-                      ),
-                    );
-                  }),
-                ],
+            Card(
+              child: Container(
+                width: 350,
+                // color: Colors.deepPurple.shade50,
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSidebarButton(
+                        Icons.file_copy, "Thêm người tham gia bằng excel", () {
+                      handleExcelUpload(widget.eventId, eventName);
+                    }),
+                    _buildSidebarButton(
+                        Icons.insert_invitation, "Danh sách đăng ký tham gia",
+                        () {
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/pending-requests");
+                    }),
+                    _buildSidebarButton(Icons.edit, "Điều chỉnh khách mời", () {
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/special-participants");
+                    }),
+                    _buildSidebarButton(Icons.person, "Danh sách tham gia", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ExistedParticipants(id: widget.eventId),
+                        ),
+                      );
+                    }),
+                    _buildSidebarButton(Icons.description, "Documents",
+                        () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EventResourcesPage(eventId: widget.eventId),
+                        ),
+                      );
+                    }),
+                    _buildSidebarButton(Icons.share, "Phân quyền", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ShareRolePage(eventId: widget.eventId),
+                        ),
+                      );
+                    }),
+                    _buildSidebarButton(Icons.money_outlined, "Chi Tiêu",
+                        () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              SpendingOverviewPage(eventId: widget.eventId),
+                        ),
+                      );
+                    }),
+                    _buildSidebarButton(Icons.analytics, "Statistics", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EventAnalyticsPage(eventId: widget.eventId),
+                        ),
+                      );
+                    }),
+                    _buildSidebarButton(
+                        Icons.cancel_presentation, "Dữ liệu hủy tham gia", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              CancelledUsersScreen(eventID: widget.eventId),
+                        ),
+                      );
+                    }),
+                    _buildSidebarButton(Icons.login, "Scan CheckIn", () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              QRScannerPage(onQRScanned: (qrCode) async {
+                            await checkIn(widget.eventId, qrCode);
+                          }),
+                        ),
+                      );
+                    }),
+                    _buildSidebarButton(Icons.logout, "Scan CheckOut",
+                        () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              QRScannerPage(onQRScanned: (qrCode) async {
+                            await checkOut(widget.eventId, qrCode);
+                          }),
+                        ),
+                      );
+                    }),
+                    _buildSidebarButton(Icons.edit, "Update Event", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              UpdateEvent(eventId: widget.eventId),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
 
@@ -359,7 +363,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                           borderRadius:
                               BorderRadius.circular(16), // Rounded corners
                           child: Image.network(
-                            photoUrl,
+                            "https://cors-anywhere.herokuapp.com/$photoUrl",
                             width: double.infinity, // Make it responsive
                             height: 250, // Adjusted height
                             fit: BoxFit
@@ -385,8 +389,6 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                       '${S.of(context).desc} $description',
                       style: const TextStyle(
                         fontSize: 18,
-                        color: Colors
-                            .black54, // Slightly softer color for readability
                       ),
                     ),
                     const SizedBox(height: 15),
@@ -396,7 +398,6 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                       '${S.of(context).location}: $location',
                       style: const TextStyle(
                         fontSize: 18,
-                        color: Colors.black54,
                       ),
                     ),
                     const SizedBox(height: 15),
@@ -406,7 +407,6 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                       '${S.of(context).start_date}: $startDate',
                       style: const TextStyle(
                         fontSize: 18,
-                        color: Colors.black54,
                       ),
                     ),
                     const SizedBox(height: 15),
@@ -416,7 +416,6 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                       '${S.of(context).end_date}: $endDate',
                       style: const TextStyle(
                         fontSize: 18,
-                        color: Colors.black54,
                       ),
                     ),
                     const SizedBox(height: 30),

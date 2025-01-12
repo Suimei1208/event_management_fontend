@@ -1,36 +1,40 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'dart:io';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/service/forum_service.dart';
 import 'package:event_management/widget/dialog_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
-class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({super.key});
+class CreatePostScreenWeb extends StatefulWidget {
+  const CreatePostScreenWeb({super.key});
+
+  // static const routeName = 'create-post';
 
   @override
-  State<CreatePostScreen> createState() => _CreatePostScreenState();
+  State<CreatePostScreenWeb> createState() => _CreatePostScreenWebState();
 }
 
-class _CreatePostScreenState extends State<CreatePostScreen> {
+class _CreatePostScreenWebState extends State<CreatePostScreenWeb> {
   String? selectedCategory;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  File? _imageFile;
+  html.File? _imageFile;
   bool isLoading = false;
 
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+  // For web, using file input for image upload
+  void _pickImage() async {
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+    uploadInput.accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) async {
+      final files = uploadInput.files;
+      if (files?.isEmpty ?? true) return;
       setState(() {
-        _imageFile = File(pickedFile.path);
+        _imageFile = files!.first;
       });
-    }
+    });
   }
 
   void _handlePost() {
@@ -49,31 +53,18 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         isLoading = true;
       });
       if (_imageFile != null) {
-        uploadImageForumToImageKit(_imageFile!, _titleController.text)
-            .then((imageUrl) {
-          createPost(
-            _titleController.text,
-            _descriptionController.text,
-            selectedCategory!,
-            imageUrl,
-          ).then((_) {
-            setState(() {
-              isLoading = false;
-            });
-          });
-        }).catchError((error) {
+        // Simulate uploading image
+        String imageUrl =
+            'https://example.com/path/to/uploaded/image.jpg'; // replace with real upload logic
+        createPost(
+          _titleController.text,
+          _descriptionController.text,
+          selectedCategory!,
+          imageUrl,
+        ).then((_) {
           setState(() {
             isLoading = false;
           });
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const DialogWidget(
-                message: 'Failed to upload image.',
-                title: 'Error',
-              );
-            },
-          );
         });
       } else {
         createPost(
@@ -86,7 +77,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             isLoading = false;
           });
         });
-        Navigator.pop(context);
       }
     }
   }
@@ -160,12 +150,8 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   ),
                   if (_imageFile != null) ...[
                     const SizedBox(height: 16.0),
-                    Image.file(
-                      _imageFile!,
-                      height: 150,
-                      width: 150,
-                      fit: BoxFit.cover,
-                    ),
+                    // Replace this with a way to show an image from a File for web
+                    Text(_imageFile!.name),
                   ],
                   const SizedBox(height: 16.0),
                 ],

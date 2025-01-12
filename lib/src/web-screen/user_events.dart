@@ -226,110 +226,124 @@ class EventCard extends StatelessWidget {
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Increased font size for event name
-                        Text(
-                          event.name,
-                          style: const TextStyle(
-                            fontSize: 18, // Increased font size
-                            fontWeight: FontWeight.bold,
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Increased font size for event name
+                          Text(
+                            event.name,
+                            style: const TextStyle(
+                              fontSize: 18, // Increased font size
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          overflow: TextOverflow.ellipsis,
+                          const SizedBox(height: 12),
+                          // Increased font size for date and time
+                          Text(
+                            DateFormat('MMMM d, yyyy • h:mm a')
+                                .format(event.startDate),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(fontSize: 16), // Increased font size
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.color,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  event.location,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                          fontSize: 16), // Increased font size
+                                  softWrap: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.network(
+                          "https://cors-anywhere.herokuapp.com/${event.banner}",
+                          width: 200,
+                          height: 200,
                         ),
-                        const SizedBox(height: 12),
-                        // Increased font size for date and time
-                        Text(
-                          DateFormat('MMMM d, yyyy • h:mm a')
-                              .format(event.startDate),
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
-                              ?.copyWith(fontSize: 16), // Increased font size
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
+                        const SizedBox(width: 50),
+                        Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.location_on,
-                              color:
-                                  Theme.of(context).textTheme.bodySmall?.color,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                event.location,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium
-                                    ?.copyWith(
-                                        fontSize: 16), // Increased font size
-                                softWrap: true,
+                            Container(
+                              decoration: BoxDecoration(
+                                color: statusColor,
+                                borderRadius: BorderRadius.circular(12),
                               ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 4, vertical: 8),
+                                child: Text(
+                                  event.status,
+                                  style: TextStyle(
+                                    color: statusTextColor,
+                                    fontSize: 18, // Increased font size
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Color(0xFFFF6F00),
+                                size: 30,
+                              ),
+                              onPressed: () {
+                                if (event.status == 'Cancelled') {
+                                  deleteEvent(event.id, context)
+                                      .then((_) => loadEvents());
+                                } else {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return const DialogWidget(
+                                        message:
+                                            'Cannot delete events that are upcoming or in progress!',
+                                        title: 'Notification',
+                                      );
+                                    },
+                                  );
+                                }
+                              },
                             ),
                           ],
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 20),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: statusColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 4, vertical: 8),
-                          child: Text(
-                            event.status,
-                            style: TextStyle(
-                              color: statusTextColor,
-                              fontSize: 18, // Increased font size
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete_outline,
-                          color: Color(0xFFFF6F00),
-                          size: 30,
-                        ),
-                        onPressed: () {
-                          if (event.status == 'Cancelled') {
-                            deleteEvent(event.id, context)
-                                .then((_) => loadEvents());
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const DialogWidget(
-                                  message:
-                                      'Cannot delete events that are upcoming or in progress!',
-                                  title: 'Notification',
-                                );
-                              },
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

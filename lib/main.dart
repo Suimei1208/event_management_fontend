@@ -1,11 +1,11 @@
 import 'package:event_management/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:event_management/generated/l10n.dart';
-import 'package:event_management/src/mobile_app.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/settings/settings_controller.dart';
 import 'package:event_management/src/settings/settings_service.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+import 'utils.dart';
 
 void main() async {
   LoggerService.logger.i('Application is starting');
@@ -23,6 +23,7 @@ void main() async {
 
   LoggerService.logger
       .i("Current Platform: ${DefaultFirebaseOptions.currentPlatform}");
- 
-  runApp(MyMobileApp(settingsController: settingsController));
+
+  runApp(getApp(settingsController));
 }
+

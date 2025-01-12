@@ -1,5 +1,4 @@
 import 'package:event_management/src/service/logger_service.dart';
-import 'package:event_management/src/service/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +31,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
 
   Future<void> _fetchUserName(BuildContext context) async {
     try {
-      userName = await GetNameUser(context);
+      userName = user?.displayName ?? "";
     } catch (e) {
       LoggerService.logger.e("Failed to fetch user name: $e");
     }
@@ -77,34 +76,37 @@ class _CustomAppBarState extends State<CustomAppBar> {
               style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
-          TextButton(
-            onPressed: () => Navigator.pushNamed(context, '/profile'),
-            child: const Text(
-              'Profile', // Replace with localization
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ),
+          // TextButton(
+          //   onPressed: () => Navigator.pushNamed(context, '/profile'),
+          //   child: const Text(
+          //     'Profile', // Replace with localization
+          //     style: TextStyle(color: Colors.white, fontSize: 16),
+          //   ),
+          // ),
         ],
       ),
       actions: [
-        Row(
-          children: [
-            Text(
-              userName,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            const SizedBox(width: 10),
-            CircleAvatar(
-              radius: 20,
-              backgroundImage: (userProfileUrl.isNotEmpty)
-                  ? NetworkImage(userProfileUrl)
-                  : null,
-              child: (userProfileUrl.isEmpty)
-                  ? const Icon(Icons.person, size: 20, color: Colors.white)
-                  : null,
-            ),
-            const SizedBox(width: 20),
-          ],
+        InkWell(
+          onTap: () => Navigator.pushNamed(context, '/profile'),
+          child: Row(
+            children: [
+              Text(
+                userName,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(width: 10),
+              CircleAvatar(
+                radius: 20,
+                backgroundImage: (userProfileUrl.isNotEmpty)
+                    ? NetworkImage(userProfileUrl)
+                    : null,
+                child: (userProfileUrl.isEmpty)
+                    ? const Icon(Icons.person, size: 20, color: Colors.white)
+                    : null,
+              ),
+              const SizedBox(width: 20),
+            ],
+          ),
         ),
       ],
       backgroundColor: Colors.lightBlueAccent,

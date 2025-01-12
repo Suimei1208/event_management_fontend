@@ -3,6 +3,7 @@
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/models/info_user.dart';
 import 'package:event_management/src/service/forum_service.dart';
+import 'package:event_management/src/web-screen/create_post_forum.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -38,27 +39,29 @@ class _WebCommunityForumScreenState extends State<WebCommunityForumScreen> {
       body: Row(
         children: [
           // Sidebar for navigation
-          Container(
+          SizedBox(
             width: 250,
-            color: Colors.grey[200],
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.home),
-                  title: Text(S.of(context).home),
-                  onTap: () {},
-                ),
-                ListTile(
-                  leading: const Icon(Icons.trending_up),
-                  title: Text(S.of(context).popular),
-                  onTap: () {},
-                ),
-                ListTile(
-                  leading: const Icon(Icons.new_releases),
-                  title: Text(S.of(context).latest),
-                  onTap: () {},
-                ),
-              ],
+            // color: Colors.grey[200],
+            child: Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.home),
+                    title: Text(S.of(context).home),
+                    onTap: () {},
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.trending_up),
+                    title: Text(S.of(context).popular),
+                    onTap: () {},
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.new_releases),
+                    title: Text(S.of(context).latest),
+                    onTap: () {},
+                  ),
+                ],
+              ),
             ),
           ),
           // Main content area
@@ -71,11 +74,11 @@ class _WebCommunityForumScreenState extends State<WebCommunityForumScreen> {
                     alignment: Alignment.centerRight,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => const CreatePostScreen()),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CreatePostScreenWeb()),
+                        );
                       },
                       icon: const Icon(Icons.add),
                       label: const Text('Create Post'),

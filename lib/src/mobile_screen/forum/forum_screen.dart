@@ -42,7 +42,7 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
       appBar: AppBar(
         title: Text(
           S.of(context).welcome_forum,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 24),
           softWrap: true,
           overflow: TextOverflow.ellipsis,
         ),
