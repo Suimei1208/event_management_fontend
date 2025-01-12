@@ -1,7 +1,6 @@
 // lib/src/web_app.dart
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/setting/language.dart';
-import 'package:event_management/src/service/notification_service.dart';
 import 'package:event_management/src/settings/settings_view.dart';
 import 'package:event_management/src/web-screen/add_special_participants.dart';
 import 'package:event_management/src/web-screen/forum_screen.dart';
@@ -21,7 +20,6 @@ import 'settings/settings_controller.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:event_management/src/web-screen/schedules.dart';
 import 'package:event_management/src/web-screen/detail_event.dart';
 
@@ -41,7 +39,7 @@ class _MyWebAppState extends State<MyWebApp> {
   void initState() {
     super.initState();
     // Setup Firebase Messaging cho web nếu cần
-    setupFirebaseMessaging(); // Implement nếu cần
+    // setupFirebaseMessaging(); // Implement nếu cần
   }
 
   @override
@@ -50,7 +48,14 @@ class _MyWebAppState extends State<MyWebApp> {
       listenable: widget.settingsController,
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
-          theme: ThemeData(textTheme: GoogleFonts.robotoSlabTextTheme()),
+          theme: ThemeData(
+            pageTransitionsTheme: PageTransitionsTheme(
+              builders: {
+                TargetPlatform.android: NoTransitionBuilder(),
+                TargetPlatform.iOS: NoTransitionBuilder(),
+              },
+            ),
+          ),
           restorationScopeId: 'app',
           locale: widget.settingsController.locale,
           localizationsDelegates: const [
@@ -134,6 +139,8 @@ class _MyWebAppState extends State<MyWebApp> {
                       return const EventFinishedScreenWeb();
                     case MyTicketsPageWeb.routeName:
                       return const MyTicketsPageWeb();
+                    // case CreatePostScreenWeb.routeName:
+                    //   return const CreatePostScreenWeb();
                     case SettingsView.routeName:
                       return SettingsView(
                           controller: widget.settingsController);
@@ -145,5 +152,18 @@ class _MyWebAppState extends State<MyWebApp> {
         );
       },
     );
+  }
+}
+
+class NoTransitionBuilder extends PageTransitionsBuilder {
+  @override
+  @override
+  Widget buildTransitions<T>(
+      PageRoute<T> route,
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child) {
+    return child; // Không có hiệu ứng chuyển cảnh
   }
 }

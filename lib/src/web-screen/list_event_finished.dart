@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:event_management/generated/l10n.dart';
+import 'package:event_management/src/mobile_screen/event/review_event.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:flutter/material.dart';
@@ -108,73 +109,85 @@ class _EventFinishedScreenWebState extends State<EventFinishedScreenWeb> {
   Widget _buildEventCard(Map<String, dynamic> event) {
     final user = event["user"];
 
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    event["name"],
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    softWrap: true,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: _getStatusColorType(event["type"]),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EventReviewPage(
+                    eventId: int.parse(event['id'].toString()),
+                    eventName: event["name"],
+                  )),
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
                     child: Text(
-                      event["type"],
+                      event["name"],
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      softWrap: true,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: _getStatusColorType(event["type"]),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        event["type"],
+                        style: const TextStyle(
+                          fontSize: 15,
+                        ),
                       ),
                     ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Icon(Icons.calendar_today, size: 16),
+                  const SizedBox(width: 4),
+                  Text(
+                    "${_formatDate(event["startDate"])} - ${_formatDate(event["endDate"])}",
+                    style: const TextStyle(color: Colors.grey),
                   ),
-                )
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 16),
-                const SizedBox(width: 4),
-                Text(
-                  "${_formatDate(event["startDate"])} - ${_formatDate(event["endDate"])}",
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(user["photoUrl"]),
-                  radius: 16.0,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  user["name"],
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(user["photoUrl"]),
+                    radius: 16.0,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    user["name"],
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -189,71 +202,74 @@ class _EventFinishedScreenWebState extends State<EventFinishedScreenWeb> {
         child: Row(
           children: [
             // Sidebar for Filters
-            Container(
-              width: 300,
-              padding: const EdgeInsets.all(16),
-              color: Colors.grey.shade200,
-              child: Column(
-                children: [
-                  TextField(
-                    onChanged: _filterEvents,
-                    decoration: InputDecoration(
-                      hintText: S.of(context).search_event,
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: _selectedType,
-                    items: [
-                      const DropdownMenuItem(
-                          value: '', child: Text('All Types')),
-                      ..._eventTypes.map((type) {
-                        return DropdownMenuItem(
-                          value: type,
-                          child: Text(type),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedType = value;
-                      });
-                      _filterEvents('');
-                    },
-                    decoration: InputDecoration(
-                      labelText: S.of(context).event_type,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _selectedEndDate == null
-                              ? 'Select End or Before Date'
-                              : 'End or Before Date: ${DateFormat.yMMMd().format(_selectedEndDate!)}',
+            Card(
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    TextField(
+                      onChanged: _filterEvents,
+                      decoration: InputDecoration(
+                        hintText: S.of(context).search_event,
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
+                        filled: true,
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.calendar_today),
-                        onPressed: () => _selectEndDate(context),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: _selectedType,
+                      items: [
+                        const DropdownMenuItem(
+                            value: '', child: Text('All Types')),
+                        ..._eventTypes.map((type) {
+                          return DropdownMenuItem(
+                            value: type,
+                            child: Text(type),
+                          );
+                        }),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedType = value;
+                        });
+                        _filterEvents('');
+                      },
+                      decoration: InputDecoration(
+                        labelText: S.of(context).event_type,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _selectedEndDate == null
+                                ? 'Select End or Before Date'
+                                : 'End or Before Date: ${DateFormat.yMMMd().format(_selectedEndDate!)}',
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.calendar_today),
+                          onPressed: () => _selectEndDate(context),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 16),

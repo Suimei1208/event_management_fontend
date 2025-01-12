@@ -230,7 +230,8 @@ class _CreateEventState extends State<WebCreateEvent> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSectionTitle('Event Details'),
-              _buildTextField(label: 'Event Name', controller: _nameController),
+              _buildTextField(
+                  label: 'Event Name', controller: _nameController),
               _buildTextField(
                 label: 'Description',
                 controller: _descriptionController,

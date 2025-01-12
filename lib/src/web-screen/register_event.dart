@@ -268,71 +268,75 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
         child: Row(
           children: [
             // Sidebar for Filters
-            Container(
-              width: 300,
-              padding: const EdgeInsets.all(16),
-              color: Colors.grey.shade200,
-              child: Column(
-                children: [
-                  TextField(
-                    onChanged: _filterEvents,
-                    decoration: InputDecoration(
-                      hintText: S.of(context).search_event,
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: _selectedType,
-                    items: [
-                      const DropdownMenuItem(
-                          value: '', child: Text('All Types')),
-                      ..._eventTypes.map((type) {
-                        return DropdownMenuItem(
-                          value: type,
-                          child: Text(type),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedType = value;
-                      });
-                      _filterEvents('');
-                    },
-                    decoration: InputDecoration(
-                      labelText: S.of(context).event_type,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor:
-                          Theme.of(context).colorScheme.surfaceContainerHighest,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _selectedStartDate == null
-                              ? 'Select Start or After Date'
-                              : 'Start or After Date: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
+            Card(
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.all(16),
+                // color: Colors.grey.shade200,
+                child: Column(
+                  children: [
+                    TextField(
+                      onChanged: _filterEvents,
+                      decoration: InputDecoration(
+                        hintText: S.of(context).search_event,
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
+                        filled: true,
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.calendar_today),
-                        onPressed: () => _selectStartDate(context),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: _selectedType,
+                      items: [
+                        const DropdownMenuItem(
+                            value: '', child: Text('All Types')),
+                        ..._eventTypes.map((type) {
+                          return DropdownMenuItem(
+                            value: type,
+                            child: Text(type),
+                          );
+                        }),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedType = value;
+                        });
+                        _filterEvents('');
+                      },
+                      decoration: InputDecoration(
+                        labelText: S.of(context).event_type,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest,
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            _selectedStartDate == null
+                                ? 'Select Start or After Date'
+                                : 'Start or After Date: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.calendar_today),
+                          onPressed: () => _selectStartDate(context),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 16),
