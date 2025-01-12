@@ -94,47 +94,81 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   }
 
   Widget buildEventCard(Event event) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "${DateFormat.yMMMd().format(event.startDate)} - ${DateFormat.jm().format(event.startDate)}",
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              event.name,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              event.description,
-              style: const TextStyle(fontSize: 16, color: Colors.grey),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  event.location,
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    Map<String, dynamic> qrCode = await getQrTicket(event.id);
-                    _viewQRCode(context, qrCode['qr']);
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          "/home/detail-event/${event.id}",
+        );
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  event.banner,
+                  height: 192,
+                  width: 168,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const SizedBox(
+                      height: 80,
+                      width: 80,
+                      child: Center(
+                        child: Icon(Icons.image, size: 40, color: Colors.grey),
+                      ),
+                    );
                   },
-                  child: const Text('View Ticket'),
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      event.name,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${DateFormat.yMMMd().format(event.startDate)} - ${DateFormat.jm().format(event.startDate)}",
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      event.description,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      event.location,
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  Map<String, dynamic> qrCode = await getQrTicket(event.id);
+                  _viewQRCode(context, qrCode['qr']);
+                },
+                child: const Text('View Ticket'),
+              ),
+            ],
+          ),
         ),
       ),
     );

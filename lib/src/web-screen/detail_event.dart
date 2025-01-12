@@ -4,13 +4,20 @@ import 'dart:async';
 import 'dart:html' as html;
 
 import 'package:event_management/generated/l10n.dart';
+import 'package:event_management/src/mobile_screen/document/document_page.dart';
+import 'package:event_management/src/mobile_screen/event/event_analystic.dart';
+import 'package:event_management/src/mobile_screen/event/qr_scanner.dart';
+import 'package:event_management/src/mobile_screen/event/share_role.dart';
 import 'package:event_management/src/mobile_screen/event/update_event.dart';
+import 'package:event_management/src/mobile_screen/feeback/list_users_cancel.dart';
+import 'package:event_management/src/mobile_screen/participants/existed_participants.dart';
+import 'package:event_management/src/mobile_screen/spending/spending_overview.dart';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/src/service/user_service.dart';
-import 'package:event_management/widget/quick_actions.dart';
+import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:excel/excel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -104,6 +111,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
       if (participant != null) {
         setState(() {
           userRole = participant.role;
+          LoggerService.logger.i("Role: $userRole");
         });
       } else {
         setState(() {
@@ -118,7 +126,6 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
     }
   }
 
-  // Replace file picker for web with a file input element
   Future<void> handleExcelUpload(int eventId, String eventName) async {
     final result = await _pickFile();
     if (result != null) {
@@ -151,10 +158,9 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
     }
   }
 
-  // Handle file picking for web
   Future<html.File?> _pickFile() async {
     final input = html.FileUploadInputElement();
-    input.accept = '.xlsx'; // Only accept .xlsx files
+    input.accept = '.xlsx';
     input.click();
     final completer = Completer<html.File>();
     input.onChange.listen((e) {
@@ -164,7 +170,6 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
         return;
       }
 
-      // Read the selected file and create a File instance
       final reader = html.FileReader();
       reader.readAsArrayBuffer(files[0]);
 
@@ -216,146 +221,265 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
 
   @override
   Widget build(BuildContext context) {
+    bool isHostOrStaff = userRole == "Host-${widget.eventId}" ||
+        userRole == "Staff-${widget.eventId}";
+
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Text(eventName,
-            style: const TextStyle(fontSize: 24)), // Larger title font size
-        elevation: 0,
-        actions: [
-          if (userRole == "Host-${widget.eventId}" ||
-              userRole == "Staff-${widget.eventId}")
-            IconButton(
-              icon: const Icon(Icons.insert_invitation_sharp,
-                  size: 30), // Larger icon size
-              onPressed: () {
-                // Navigator.pushNamed(
-                //   context,
-                //   WebRequestPage.routeName,
-                // );
-              },
+      appBar: const CustomAppBar(),
+      body: Row(
+        children: [
+          // Sidebar
+          if (isHostOrStaff)
+            Container(
+              width: 350,
+              color: Colors.deepPurple.shade50,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSidebarButton(
+                      Icons.file_copy, "Thêm người tham gia bằng excel", () {
+                    handleExcelUpload(widget.eventId, eventName);
+                  }),
+                  _buildSidebarButton(
+                      Icons.insert_invitation, "Danh sách đăng ký tham gia",
+                      () {
+                    Navigator.pushNamed(context,
+                        "/home/detail-event/${widget.eventId}/pending-requests");
+                  }),
+                  _buildSidebarButton(Icons.edit, "Điều chỉnh khách mời", () {
+                    Navigator.pushNamed(context,
+                        "/home/detail-event/${widget.eventId}/special-participants");
+                  }),
+                  _buildSidebarButton(Icons.person, "Danh sách tham gia", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ExistedParticipants(id: widget.eventId),
+                      ),
+                    );
+                  }),
+                  _buildSidebarButton(Icons.description, "Documents", () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EventResourcesPage(eventId: widget.eventId),
+                      ),
+                    );
+                  }),
+                  _buildSidebarButton(Icons.share, "Phân quyền", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ShareRolePage(eventId: widget.eventId),
+                      ),
+                    );
+                  }),
+                  _buildSidebarButton(Icons.money_outlined, "Chi Tiêu",
+                      () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            SpendingOverviewPage(eventId: widget.eventId),
+                      ),
+                    );
+                  }),
+                  _buildSidebarButton(Icons.analytics, "Statistics", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EventAnalyticsPage(eventId: widget.eventId),
+                      ),
+                    );
+                  }),
+                  _buildSidebarButton(
+                      Icons.cancel_presentation, "Dữ liệu hủy tham gia", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            CancelledUsersScreen(eventID: widget.eventId),
+                      ),
+                    );
+                  }),
+                  _buildSidebarButton(Icons.login, "Scan CheckIn", () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            QRScannerPage(onQRScanned: (qrCode) async {
+                          await checkIn(widget.eventId, qrCode);
+                        }),
+                      ),
+                    );
+                  }),
+                  _buildSidebarButton(Icons.logout, "Scan CheckOut", () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            QRScannerPage(onQRScanned: (qrCode) async {
+                          await checkOut(widget.eventId, qrCode);
+                        }),
+                      ),
+                    );
+                  }),
+                  _buildSidebarButton(Icons.edit, "Update Event", () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            UpdateEvent(eventId: widget.eventId),
+                      ),
+                    );
+                  }),
+                ],
+              ),
             ),
-          if (userRole == "Host-${widget.eventId}" ||
-              userRole == "Staff-${widget.eventId}")
-            IconButton(
-              icon: const Icon(Icons.file_copy, size: 30), // Larger icon size
-              onPressed: () {
-                handleExcelUpload(widget.eventId, eventName);
-              },
-            ),
-          if (userRole == "Host-${widget.eventId}" ||
-              userRole == "Staff-${widget.eventId}")
-            IconButton(
-              icon: const Icon(Icons.more_vert, size: 30), // Larger icon size
-              onPressed: () {
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  context: context,
-                  builder: (context) => QuickActions(
-                    userRole: userRole,
-                    eventId: widget.eventId,
-                    access: access,
-                    allowSelectSchedule: allowSelectSchedule,
-                    status: status,
-                  ),
-                );
-              },
-            ),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 40, vertical: 40), // Larger padding
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (photoUrl.isNotEmpty)
-                  Center(
-                    child: Image.network(
-                      photoUrl,
-                      width: 800, // Larger image width
-                      height: 400, // Larger image height
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                const SizedBox(height: 20), // Increase spacing
-                Text(
-                  '${S.of(context).event_name}: $eventName',
-                  style: const TextStyle(fontSize: 24), // Larger text size
-                ),
-                const SizedBox(height: 20), // Increase spacing
-                Text(
-                  '${S.of(context).desc} $description',
-                  style: const TextStyle(fontSize: 20), // Larger text size
-                ),
-                const SizedBox(height: 20), // Increase spacing
-                Text(
-                  '${S.of(context).location}: $location',
-                  style: const TextStyle(fontSize: 20), // Larger text size
-                ),
-                const SizedBox(height: 20), // Increase spacing
-                Text(
-                  '${S.of(context).start_date}: $startDate',
-                  style: const TextStyle(fontSize: 20), // Larger text size
-                ),
-                const SizedBox(height: 20), // Increase spacing
-                Text(
-                  '${S.of(context).end_date}: $endDate',
-                  style: const TextStyle(fontSize: 20), // Larger text size
-                ),
-                const SizedBox(height: 30), // Increase spacing
-                _buildSpecialParticipantsSection(widget.eventId),
-                const SizedBox(height: 30), // Increase spacing
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/schedules");
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 20), // Larger padding
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(12), // Rounded corners
+
+          // Main Content
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20, vertical: 20), // Adjusted padding
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Event Photo
+                    if (photoUrl.isNotEmpty)
+                      Center(
+                        child: ClipRRect(
+                          borderRadius:
+                              BorderRadius.circular(16), // Rounded corners
+                          child: Image.network(
+                            photoUrl,
+                            width: double.infinity, // Make it responsive
+                            height: 250, // Adjusted height
+                            fit: BoxFit
+                                .contain, // Make the image fill its container
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 20),
+
+                    // Event Name
+                    Text(
+                      '${S.of(context).event_name}: $eventName',
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple, // Enhanced color
                       ),
                     ),
-                    child: Text(
-                      S.of(context).view_schedule,
+                    const SizedBox(height: 15),
+
+                    // Event Description
+                    Text(
+                      '${S.of(context).desc} $description',
                       style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.white), // Larger font size
+                        fontSize: 18,
+                        color: Colors
+                            .black54, // Slightly softer color for readability
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 15),
+
+                    // Event Location
+                    Text(
+                      '${S.of(context).location}: $location',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+
+                    // Event Start Date
+                    Text(
+                      '${S.of(context).start_date}: $startDate',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+
+                    // Event End Date
+                    Text(
+                      '${S.of(context).end_date}: $endDate',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+
+                    // Special Participants Section
+                    _buildSpecialParticipantsSection(widget.eventId),
+                    const SizedBox(height: 30),
+
+                    // View Schedule Button
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            "/home/detail-event/${widget.eventId}/schedules",
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 5, // Add shadow for depth
+                            backgroundColor: Colors.purple),
+                        child: Text(
+                          S.of(context).view_schedule,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color:
+                                Colors.white, // Ensuring text color is legible
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          )
+        ],
       ),
-      floatingActionButton: userRole == "Host-${widget.eventId}"
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          UpdateEvent(eventId: widget.eventId)),
-                );
-                _initializeData();
-              },
-              backgroundColor: const Color.fromARGB(255, 142, 106, 199),
-              child: const Icon(Icons.edit, size: 35), // Larger icon size
-            )
-          : null,
     );
   }
 
-  // Build the special participants section
+  // Helper method for creating sidebar buttons
+  Widget _buildSidebarButton(IconData icon, String label, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Icon(icon, size: 28, color: Colors.deepPurple),
+            const SizedBox(width: 16),
+            Text(label, style: const TextStyle(fontSize: 16)),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSpecialParticipantsSection(int eventId) {
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: fetchSpecialParticipants(eventId),
@@ -371,12 +495,10 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Special Participants",
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold)), // Larger text size
-              SizedBox(height: 20), // Increase spacing
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              SizedBox(height: 20),
               Text('No special participants available for this event.',
-                  style: TextStyle(fontSize: 20)), // Larger text size
+                  style: TextStyle(fontSize: 20)),
             ],
           );
         } else {
@@ -385,10 +507,8 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text("Special Participants",
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold)), // Larger text size
-              const SizedBox(height: 20), // Increase spacing
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -421,11 +541,9 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
         backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
         child: photoUrl == null ? const Icon(Icons.person) : null,
       ),
-      title:
-          Text(name, style: const TextStyle(fontSize: 22)), // Larger text size
-      subtitle:
-          Text(role, style: const TextStyle(fontSize: 20)), // Larger text size
-      trailing: const Icon(Icons.info, size: 30), // Larger icon size
+      title: Text(name, style: const TextStyle(fontSize: 22)),
+      subtitle: Text(role, style: const TextStyle(fontSize: 20)),
+      trailing: const Icon(Icons.info, size: 30),
       onTap: () {
         _showDescriptionDialog(description);
       },
@@ -438,16 +556,14 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Special participant description",
-              style: TextStyle(fontSize: 24)), // Larger title size
-          content: Text(description,
-              style: const TextStyle(fontSize: 20)), // Larger content size
+              style: TextStyle(fontSize: 24)),
+          content: Text(description, style: const TextStyle(fontSize: 20)),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Close',
-                  style: TextStyle(fontSize: 20)), // Larger button text
+              child: const Text('Close', style: TextStyle(fontSize: 20)),
             ),
           ],
         );

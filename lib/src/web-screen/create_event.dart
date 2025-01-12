@@ -140,7 +140,8 @@ class _CreateEventState extends State<WebCreateEvent> {
           type: _eventType!,
           startDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS').parse(startDateTime),
           endDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS').parse(endDateTime),
-          banner: "https://placehold.jp/400x200.png",
+          banner:
+              "https://ik.imagekit.io/9nhhlzjgp/event_images/placeholder.webp?updatedAt=1736652778905",
           status: "Upcoming",
           idCreate: "",
           access: false,
@@ -171,12 +172,16 @@ class _CreateEventState extends State<WebCreateEvent> {
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 24,
+              color: Colors.deepPurple,
+            ),
+      ),
     );
   }
 
@@ -188,25 +193,28 @@ class _CreateEventState extends State<WebCreateEvent> {
     IconData? suffixIcon,
     int maxLines = 1,
   }) {
-    return TextFormField(
-      controller: controller,
-      readOnly: readOnly,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        readOnly: readOnly,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          contentPadding: const EdgeInsets.all(16),
         ),
-        contentPadding: const EdgeInsets.all(16),
+        onTap: onTap,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'This field cannot be empty';
+          }
+          return null;
+        },
       ),
-      onTap: onTap,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'This field cannot be empty';
-        }
-        return null;
-      },
     );
   }
 
@@ -214,22 +222,30 @@ class _CreateEventState extends State<WebCreateEvent> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
         child: Form(
           key: _formKey,
-          child: ListView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSectionTitle('Event Details'),
-              const SizedBox(height: 16),
               _buildTextField(label: 'Event Name', controller: _nameController),
-              const SizedBox(height: 16),
               _buildTextField(
                 label: 'Description',
                 controller: _descriptionController,
                 maxLines: 4,
               ),
-              const SizedBox(height: 16),
+              _buildTextField(
+                label: 'Location',
+                controller: _locationController,
+                maxLines: 4,
+              ),
+              _buildTextField(
+                label: 'Objective',
+                controller: _objectivesController,
+                maxLines: 4,
+              ),
               DropdownButtonFormField<String>(
                 value: _eventType,
                 items: ['Seminar', 'Workshop', 'Conference', 'Competition']
@@ -255,9 +271,7 @@ class _CreateEventState extends State<WebCreateEvent> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
-              _buildSectionTitle('Schedule'),
-              const SizedBox(height: 16),
+              _buildSectionTitle('Event Date'),
               Row(
                 children: [
                   Expanded(
@@ -281,7 +295,6 @@ class _CreateEventState extends State<WebCreateEvent> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
@@ -306,9 +319,19 @@ class _CreateEventState extends State<WebCreateEvent> {
                 ],
               ),
               const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: _createEvent,
-                child: const Text('Create Event'),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _createEvent,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 16),
+                    textStyle: const TextStyle(fontSize: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text('Create Event'),
+                ),
               ),
             ],
           ),
