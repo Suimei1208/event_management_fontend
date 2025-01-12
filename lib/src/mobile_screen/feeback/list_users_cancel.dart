@@ -97,8 +97,8 @@ class _CancelledUsersScreenState extends State<CancelledUsersScreen> {
       ),
       body: Column(
         children: [
-          Container(
-            color: Theme.of(context).colorScheme.primary,
+          Card(
+            // color: Theme.of(context).colorScheme.primary,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [

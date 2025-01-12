@@ -134,116 +134,120 @@ class _EventAnalyticsPageState extends State<EventAnalyticsPage> {
   }
 
   Widget _buildStatistics() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.grey[200],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              eventName,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              startDate,
-              style: const TextStyle(color: Colors.grey),
-            ),
-            const Text(
-              "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _",
-              style: TextStyle(color: Colors.grey),
-            ),
-            Text(
-              endDate,
-              style: const TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    const Text('Total Registrations',
-                        style: TextStyle(fontSize: 18)),
-                    Text(registered,
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                Column(
-                  children: [
-                    const Text('Check-ins', style: TextStyle(fontSize: 18)),
-                    Text(checkIns.toString(),
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ],
-            ),
-          ],
+    return Card(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          // color: Colors.grey[200],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                eventName,
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                startDate,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              const Text(
+                "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _",
+                style: TextStyle(color: Colors.grey),
+              ),
+              Text(
+                endDate,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      const Text('Total Registrations',
+                          style: TextStyle(fontSize: 18)),
+                      Text(registered,
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      const Text('Check-ins', style: TextStyle(fontSize: 18)),
+                      Text(checkIns.toString(),
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildAttendanceRate(String participationPercentage, double noShows) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Colors.grey[200],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Text('Attendance Rate',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  children: [
-                    Text('Attendance - $participationPercentage%',
-                        style: const TextStyle(color: Colors.blue)),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Text('No-show-up - ${noShows.toStringAsFixed(1)}%',
-                        style: const TextStyle(color: Colors.red)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AttendanceReportPage(
-                                    eventId: widget.eventId,
-                                  )),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        textStyle: const TextStyle(fontSize: 16),
+    return Card(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text('Attendance Rate',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    children: [
+                      Text('Attendance - $participationPercentage%',
+                          style: const TextStyle(color: Colors.blue)),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Text('No-show-up - ${noShows.toStringAsFixed(1)}%',
+                          style: const TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AttendanceReportPage(
+                                      eventId: widget.eventId,
+                                    )),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          textStyle: const TextStyle(fontSize: 16),
+                        ),
+                        child: const Text('Detail'),
                       ),
-                      child: const Text('Detail'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -283,7 +287,7 @@ class _EventAnalyticsPageState extends State<EventAnalyticsPage> {
         LinearProgressIndicator(
           value: value.abs() / _totalIncome.clamp(1, double.infinity),
           color: color,
-          backgroundColor: Colors.grey[300],
+          // backgroundColor: Colors.grey[300],
         ),
         const SizedBox(height: 4),
         Text('$displayValue VND',

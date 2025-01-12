@@ -13,7 +13,7 @@ class SettingCancelEvent extends StatefulWidget {
 }
 
 class _SettingCancelEventState extends State<SettingCancelEvent> {
-  bool selectReason = false;
+  bool selectReason = true;
   bool addExternalLink = false;
   TextEditingController externalLinkController = TextEditingController();
   DateTime? startDate;
@@ -92,7 +92,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
               onChanged: (value) {
                 setState(() {
                   selectReason = value;
-                  addExternalLink = false;
+                  addExternalLink = !addExternalLink;
                 });
               },
             ),
@@ -105,49 +105,42 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
               onChanged: (value) {
                 setState(() {
                   selectReason = value;
-                  addExternalLink = false;
+                  addExternalLink = !addExternalLink;
                 });
               },
             ),
             const SizedBox(height: 10),
 
-            // Show date pickers if selectReason is true
-            // if (selectReason)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Select start date'),
-                    TextButton(
-                      onPressed: () => _selectDate(context, true),
-                      child: Text(
-                        startDate != null
-                            ? '${startDate!.toLocal()}'.split(' ')[0]
-                            : 'Pick a date',
-                      ),
-                    ),
-                  ],
+                const Text('Select start date'),
+                TextButton(
+                  onPressed: () => _selectDate(context, true),
+                  child: Text(
+                    startDate != null
+                        ? '${startDate!.toLocal()}'.split(' ')[0]
+                        : 'Pick a date',
+                  ),
                 ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text('Select end date'),
-                    TextButton(
-                      onPressed: () => _selectDate(context, false),
-                      child: Text(
-                        endDate != null
-                            ? '${endDate!.toLocal()}'.split(' ')[0]
-                            : 'Pick a date',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
               ],
             ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Select end date'),
+                TextButton(
+                  onPressed: () => _selectDate(context, false),
+                  child: Text(
+                    endDate != null
+                        ? '${endDate!.toLocal()}'.split(' ')[0]
+                        : 'Pick a date',
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
 
             // Add External Link
             Column(
@@ -160,7 +153,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
                   onChanged: (value) {
                     setState(() {
                       addExternalLink = value;
-                      selectReason = false;
+                      selectReason = !selectReason;
                     });
                   },
                 ),

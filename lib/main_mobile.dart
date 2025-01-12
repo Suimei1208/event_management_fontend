@@ -1,6 +1,6 @@
 import 'package:event_management/firebase_options.dart';
 import 'package:event_management/generated/l10n.dart';
-import 'package:event_management/src/app.dart';
+import 'package:event_management/src/mobile_app.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/settings/settings_controller.dart';
 import 'package:event_management/src/settings/settings_service.dart';
@@ -23,6 +23,6 @@ void main() async {
 
   LoggerService.logger
       .i("Current Platform: ${DefaultFirebaseOptions.currentPlatform}");
-
-  runApp(MyApp(settingsController: settingsController));
+ 
+  runApp(MyMobileApp(settingsController: settingsController));
 }

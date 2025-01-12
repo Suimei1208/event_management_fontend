@@ -140,8 +140,6 @@ class _SpecialParticipantsPageState extends State<SpecialParticipantsPage> {
             onPressed: _addSpecialParticipant,
           ),
         ],
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
         elevation: 0,
       ),
       body: Column(

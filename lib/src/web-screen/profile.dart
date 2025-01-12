@@ -1,8 +1,8 @@
-import 'package:event_management/src/mobile_screen/feeback/list_event_finished.dart';
 import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:event_management/src/web-screen/edit_profile.dart';
+import 'package:event_management/src/web-screen/list_event_finished.dart';
 import 'package:event_management/src/web-screen/manager_ticket.dart';
 import 'package:event_management/widget/options_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -201,12 +201,8 @@ class _ProfileWebScreenState extends State<ProfileWebScreen> {
                       icon: Icons.thumb_up,
                       text: S.of(context).rate_event,
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const EventFinishedScreen()),
-                        );
+                        Navigator.pushNamed(
+                            context, EventFinishedScreenWeb.routeName);
                       },
                     ),
                     Padding(

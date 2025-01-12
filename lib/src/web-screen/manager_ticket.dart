@@ -2,6 +2,7 @@
 
 import 'package:event_management/src/mobile_screen/ticket/form_cancel_ticket.dart';
 import 'package:event_management/src/service/ticket_service.dart';
+import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -13,7 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 class MyTicketsPageWeb extends StatefulWidget {
   const MyTicketsPageWeb({super.key});
 
-  static const routeName = '/home/my-ticket';
+  static const routeName = '/my-ticket';
 
   @override
   _MyTicketsPageWebState createState() => _MyTicketsPageWebState();
@@ -43,10 +44,7 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Tickets'),
-        backgroundColor: Colors.deepPurple,
-      ),
+      appBar: const CustomAppBar(),
       body: FutureBuilder<List<Ticket>>(
         future: _ticketsFuture,
         builder: (context, snapshot) {

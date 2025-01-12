@@ -1,13 +1,15 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_web_libraries_in_flutter
 
 import 'dart:html' as html;
+import 'package:event_management/src/service/user_service_web.dart';
+import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/service/user_service.dart';
 
 class WebEditProfileScreen extends StatefulWidget {
   const WebEditProfileScreen({super.key});
-  static const routeName = "/profile/edit-profile";
+  static const routeName = "/edit-profile";
 
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
@@ -66,7 +68,6 @@ class _EditProfileScreenState extends State<WebEditProfileScreen> {
       final reader = html.FileReader();
       reader.readAsDataUrl(files![0]);
 
-      // Once file is loaded, handle the image upload
       reader.onLoadEnd.listen((e) async {
         final base64ImageData = reader.result as String;
         try {
@@ -77,11 +78,8 @@ class _EditProfileScreenState extends State<WebEditProfileScreen> {
           setState(() {
             _uploadedImageUrl = updatedImageUrl;
           });
-
-          // Update the user's photo URL in Firebase
           await currentUser!.updatePhotoURL(updatedImageUrl);
 
-          // Refresh the current user details after update
           setState(() {
             currentUser = FirebaseAuth.instance.currentUser;
           });
@@ -113,15 +111,7 @@ class _EditProfileScreenState extends State<WebEditProfileScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Edit Profile'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ),
+        appBar: const CustomAppBar(),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -177,11 +167,9 @@ class _EditProfileScreenState extends State<WebEditProfileScreen> {
                                 labelText: 'Full Name',
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(
-                                    vertical: 50.0,
-                                    horizontal: 300.0), // Increased height
+                                    vertical: 20.0, horizontal: 10.0),
                               ),
-                              style: const TextStyle(
-                                  fontSize: 20), // Increase font size
+                              style: const TextStyle(fontSize: 20),
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'Please enter your full name';
@@ -199,8 +187,8 @@ class _EditProfileScreenState extends State<WebEditProfileScreen> {
                                 labelText: 'Email Address',
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(
-                                    vertical: 50.0,
-                                    horizontal: 300.0), // Increased height
+                                    vertical: 20.0,
+                                    horizontal: 10.0), // Increased height
                               ),
                               style: const TextStyle(
                                   fontSize: 20), // Increase font size
@@ -221,8 +209,8 @@ class _EditProfileScreenState extends State<WebEditProfileScreen> {
                                 labelText: 'Phone Number',
                                 border: OutlineInputBorder(),
                                 contentPadding: EdgeInsets.symmetric(
-                                    vertical: 50.0,
-                                    horizontal: 300.0), // Increased height
+                                    vertical: 29.0,
+                                    horizontal: 10.0), // Increased height
                               ),
                               style: const TextStyle(
                                   fontSize: 20), // Increase font size

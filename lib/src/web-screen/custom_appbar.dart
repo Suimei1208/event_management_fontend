@@ -45,7 +45,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       title: Row(
         children: [
           const Text(
-            'Welcome Back', // Replace with localization if needed
+            'Welcome to Event Management', // Replace with localization if needed
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const Spacer(),
@@ -57,7 +57,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
             ),
           ),
           TextButton(
-            onPressed: () => Navigator.pushNamed(context, '/register-event'),
+            onPressed: () => Navigator.pushNamed(context, '/register-events'),
             child: const Text(
               'Register Event', // Replace with localization
               style: TextStyle(color: Colors.white, fontSize: 16),

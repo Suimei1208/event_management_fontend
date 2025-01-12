@@ -80,8 +80,6 @@ class _ExistedParticipantsState extends State<ExistedParticipants> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Existed Participants"),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
         elevation: 0,
         actions: [
           IconButton(

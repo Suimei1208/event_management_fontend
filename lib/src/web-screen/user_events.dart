@@ -73,7 +73,7 @@ class _UserEventsWebState extends State<WebUserEvents> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              const SizedBox(width: 20),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -82,6 +82,7 @@ class _UserEventsWebState extends State<WebUserEvents> {
                     icon: const Icon(Icons.tune),
                     label: const Text("Toggle View"),
                   ),
+                  const SizedBox(width: 20),
                   ElevatedButton.icon(
                     onPressed: () => Navigator.pushNamed(
                       context,

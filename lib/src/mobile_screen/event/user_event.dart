@@ -75,9 +75,9 @@ class _UserEventsState extends State<UserEvents> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        // backgroundColor: Theme.of(context).colorScheme.surface,
         automaticallyImplyLeading: false,
         title: Text(
           S.of(context).manage_event,
@@ -190,7 +190,7 @@ class EventCard extends StatelessWidget {
   Color? _getStatusColor(String status) {
     switch (status) {
       case 'Upcoming':
-        return const Color(0xFFE8F5E9);
+        return const Color.fromARGB(255, 154, 187, 177);
       case 'Cancelled':
         return Colors.red[300];
       case 'Completed':
@@ -215,6 +215,7 @@ class EventCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final brightness = Theme.of(context).brightness;
     final statusColor = _getStatusColor(event.status);
     final statusTextColor = _getStatusTextColor(event.status, context);
 
@@ -233,6 +234,7 @@ class EventCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(8),
               child: Card(
+                // color: brightness == Brightness.dark ? Colors.grey[600] : null,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -350,17 +352,12 @@ class EventCard extends StatelessWidget {
               ),
             );
           },
-          child: Material(
-            color: Colors.transparent,
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
+          child: Card(
             child: Container(
               width: MediaQuery.sizeOf(context).width,
               decoration: BoxDecoration(
                 border: Border.all(width: 0.3),
-                color: Theme.of(context).cardColor,
+                // color: brightness == Brightness.dark ? Colors.grey[600] : null,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Padding(
