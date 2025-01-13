@@ -288,7 +288,7 @@ class EventCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.network(
-                          "https://cors-anywhere.herokuapp.com/${event.banner}",
+                          event.banner,
                           width: 200,
                           height: 200,
                         ),

@@ -2,21 +2,22 @@
 
 import 'dart:async';
 import 'package:event_management/src/service/spending_service.dart';
+import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:intl/intl.dart';
 
-class SpendingOverviewPage extends StatefulWidget {
+class WebSpendingOverviewPage extends StatefulWidget {
   final int eventId;
-
-  const SpendingOverviewPage({super.key, required this.eventId});
+  static const routeName = "/home/detail-event/spending";
+  const WebSpendingOverviewPage({super.key, required this.eventId});
 
   @override
   _SpendingOverviewPageState createState() => _SpendingOverviewPageState();
 }
 
-class _SpendingOverviewPageState extends State<SpendingOverviewPage>
+class _SpendingOverviewPageState extends State<WebSpendingOverviewPage>
     with SingleTickerProviderStateMixin {
   Map<String, double> _incomeData = {};
   Map<String, double> _expenseData = {};
@@ -200,66 +201,120 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Quản lý chi tiêu"),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: "Chi tiêu"),
-            Tab(text: "Thu nhập"),
-            Tab(text: "Tổng quan"),
-          ],
-        ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: _reloadData,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
-                  children: [
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
+      appBar: const CustomAppBar(),
+      body: Row(
+        children: [
+          // Sidebar with icons and text
+          NavigationRail(
+            selectedIndex: _tabController.index,
+            onDestinationSelected: (index) {
+              _tabController.animateTo(index);
+              setState(() {
+                index = index;
+              });
+            },
+            labelType: NavigationRailLabelType.all,
+            backgroundColor: Colors.white, // Set background color for rail
+            selectedLabelTextStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.blue, // Set color for selected label
+            ),
+            unselectedLabelTextStyle: const TextStyle(
+              fontWeight: FontWeight.normal,
+              color: Colors.grey, // Set color for unselected label
+            ),
+            selectedIconTheme: const IconThemeData(
+              color: Colors.blue, // Set color for selected icon
+              size: 30, // Adjust icon size when selected
+            ),
+            unselectedIconTheme: const IconThemeData(
+              color: Colors.grey, // Set color for unselected icon
+              size: 24, // Adjust icon size when unselected
+            ),
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.remove_circle_outline),
+                label: Text("Chi tiêu"),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.add_circle_outline),
+                label: Text("Thu nhập"),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.pie_chart),
+                label: Text("Tổng quan"),
+              ),
+            ],
+          ),
+          // Main content area
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _reloadData,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          SpendingPieChart(
-                            title: "Chi tiêu",
-                            dataMap: _expenseData,
-                            isExpense: true,
+                          Text(
+                            "Tổng quan sự kiện",
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
-                          SpendingPieChart(
-                            title: "Thu nhập",
-                            dataMap: _incomeData,
-                            isExpense: false,
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: TabBarView(
+                              controller: _tabController,
+                              children: [
+                                SpendingPieChart(
+                                  title: "Chi tiêu",
+                                  dataMap: _expenseData,
+                                  isExpense: true,
+                                ),
+                                SpendingPieChart(
+                                  title: "Thu nhập",
+                                  dataMap: _incomeData,
+                                  isExpense: false,
+                                ),
+                                HistoryOverviewTab(
+                                  history: _history,
+                                  onDelete: _deleteSpending,
+                                ),
+                              ],
+                            ),
                           ),
-                          HistoryOverviewTab(
-                            // History tab to show all transactions
-                            history: _history,
-                            onDelete: _deleteSpending,
+                          const SizedBox(height: 16),
+                          Text(
+                            "Tổng thu nhập: ${formatCurrency(_totalIncome)}",
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Tổng chi tiêu: ${formatCurrency(_totalExpense)}",
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Số dư còn lại: ${formatCurrency(_remainingBalance)}",
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          const SizedBox(height: 16),
+                          // Add Button
+                          ElevatedButton.icon(
+                            onPressed: _showAddSpendingDialog,
+                            icon: const Icon(Icons.add),
+                            label: const Text("Thêm thu/chi"),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 24,
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text("Tổng thu nhập: ${formatCurrency(_totalIncome)}"),
-                    const SizedBox(height: 8),
-                    Text("Tổng chi tiêu: ${formatCurrency(_totalExpense)}"),
-                    const SizedBox(height: 8),
-                    Text("Số dư còn lại: ${formatCurrency(_remainingBalance)}"),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-        ),
-      ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            heroTag: "addIncome",
-            onPressed: () => _showAddSpendingDialog(),
-            tooltip: "Thêm thu nhập",
-            child: const Icon(Icons.add),
+              ),
+            ),
           ),
         ],
       ),
@@ -429,7 +484,7 @@ class SpendingPieChart extends StatelessWidget {
     return Column(
       children: [
         Text(title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
         Expanded(
           child: PieChart(
             PieChartData(

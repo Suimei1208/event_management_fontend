@@ -33,6 +33,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
     try {
       userName = user?.displayName ?? "";
     } catch (e) {
+      Navigator.pushNamed(context, "/login");
       LoggerService.logger.e("Failed to fetch user name: $e");
     }
   }
