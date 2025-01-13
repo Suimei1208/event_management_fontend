@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class SettingCancelEvent extends StatefulWidget {
-  String eventId;
+  int eventId;
   SettingCancelEvent({super.key, required this.eventId});
 
   @override
@@ -50,7 +50,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
   }
 
   void _fetchFeedbackData() async {
-    final data = await getCancellationPeriods(int.parse(widget.eventId));
+    final data = await getCancellationPeriods(widget.eventId);
     // Update the state synchronously
     setState(() {
       feedbackData = data;
@@ -184,7 +184,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
                       if (addExternalLink) {
                         if (externalLinkController.text.isNotEmpty) {
                           createFeedbackCancel(
-                            int.parse(widget.eventId),
+                            widget.eventId,
                             startDate,
                             startDate,
                             false,
@@ -194,7 +194,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
                         }
                       } else {
                         createFeedbackCancel(
-                          int.parse(widget.eventId),
+                          widget.eventId,
                           startDate!,
                           endDate!,
                           selectReason,
@@ -208,7 +208,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
                         // if (externalLinkController.text.isNotEmpty) {
                         updateFeedbackCancel(
                             feedbackData['data']['id'],
-                            int.parse(widget.eventId),
+                            widget.eventId,
                             startDate!,
                             endDate!,
                             false,
@@ -220,7 +220,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
                         // LoggerService.logger.i('Feedback updated');
                         updateFeedbackCancel(
                             feedbackData['data']['id'],
-                            int.parse(widget.eventId),
+                            widget.eventId,
                             startDate!,
                             endDate!,
                             true,

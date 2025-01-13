@@ -842,13 +842,20 @@ Future<Map<String, dynamic>> getEventData(int eventId) async {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       return data;
-    } else {
+    } else if (response.statusCode == 404) {
+      throw EventNotFoundException ('Event not found');
+    }else {
       throw Exception(
           'Failed to load event data: ${response.body}, status: ${response.statusCode}');
     }
   } catch (e) {
     throw Exception('Error fetching event data: $e');
   }
+}
+
+class EventNotFoundException implements Exception {
+  final String message;
+  EventNotFoundException(this.message);
 }
 
 Future<String> uploadImageEventToImageKit(

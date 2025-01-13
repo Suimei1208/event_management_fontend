@@ -87,7 +87,7 @@ class _CancelledUsersScreenState extends State<CancelledUsersScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => SettingCancelEvent(
-                    eventId: widget.eventID.toString(),
+                    eventId: widget.eventID,
                   ),
                 ),
               );

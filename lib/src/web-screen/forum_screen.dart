@@ -77,7 +77,8 @@ class _WebCommunityForumScreenState extends State<WebCommunityForumScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const CreatePostScreenWeb()),
+                              builder: (context) =>
+                                  const CreatePostScreenWeb()),
                         );
                       },
                       icon: const Icon(Icons.add),

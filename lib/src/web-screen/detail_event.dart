@@ -4,14 +4,7 @@ import 'dart:async';
 import 'dart:html' as html;
 
 import 'package:event_management/generated/l10n.dart';
-import 'package:event_management/src/mobile_screen/document/document_page.dart';
-import 'package:event_management/src/mobile_screen/event/event_analystic.dart';
 import 'package:event_management/src/mobile_screen/event/qr_scanner.dart';
-import 'package:event_management/src/mobile_screen/event/share_role.dart';
-import 'package:event_management/src/mobile_screen/event/update_event.dart';
-import 'package:event_management/src/mobile_screen/feeback/list_users_cancel.dart';
-import 'package:event_management/src/mobile_screen/participants/existed_participants.dart';
-import 'package:event_management/src/mobile_screen/spending/spending_overview.dart';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -67,9 +60,8 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
       access = false;
       allowSelectSchedule = false;
     });
-
-    await _loadEventData();
     await _loadUserRole();
+    await _loadEventData();
 
     if (!mounted) return;
     setState(() {
@@ -253,61 +245,29 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                           "/home/detail-event/${widget.eventId}/special-participants");
                     }),
                     _buildSidebarButton(Icons.person, "Danh sách tham gia", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ExistedParticipants(id: widget.eventId),
-                        ),
-                      );
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/existed-participants");
                     }),
-                    _buildSidebarButton(Icons.description, "Documents",
-                        () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              EventResourcesPage(eventId: widget.eventId),
-                        ),
-                      );
+                    _buildSidebarButton(Icons.description, "Documents", () {
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/documents");
                     }),
                     _buildSidebarButton(Icons.share, "Phân quyền", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ShareRolePage(eventId: widget.eventId),
-                        ),
-                      );
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/share-roles");
                     }),
-                    _buildSidebarButton(Icons.money_outlined, "Chi Tiêu",
-                        () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              SpendingOverviewPage(eventId: widget.eventId),
-                        ),
-                      );
+                    _buildSidebarButton(Icons.money_outlined, "Chi Tiêu", () {
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/spending");
                     }),
                     _buildSidebarButton(Icons.analytics, "Statistics", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              EventAnalyticsPage(eventId: widget.eventId),
-                        ),
-                      );
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/event-analystics");
                     }),
                     _buildSidebarButton(
                         Icons.cancel_presentation, "Dữ liệu hủy tham gia", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              CancelledUsersScreen(eventID: widget.eventId),
-                        ),
-                      );
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/list-cancelled-users");
                     }),
                     _buildSidebarButton(Icons.login, "Scan CheckIn", () async {
                       Navigator.push(
@@ -333,13 +293,8 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                       );
                     }),
                     _buildSidebarButton(Icons.edit, "Update Event", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              UpdateEvent(eventId: widget.eventId),
-                        ),
-                      );
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/edit-event");
                     }),
                   ],
                 ),
@@ -363,7 +318,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                           borderRadius:
                               BorderRadius.circular(16), // Rounded corners
                           child: Image.network(
-                            "https://cors-anywhere.herokuapp.com/$photoUrl",
+                            photoUrl,
                             width: double.infinity, // Make it responsive
                             height: 250, // Adjusted height
                             fit: BoxFit

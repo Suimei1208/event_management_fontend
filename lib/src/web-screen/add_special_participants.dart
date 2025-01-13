@@ -19,10 +19,16 @@ class WebSpecialParticipantsPage extends StatefulWidget {
 }
 
 class _SpecialParticipantsPageState extends State<WebSpecialParticipantsPage> {
+  String userRole = "";
   final List<Map<String, dynamic>> _participants = [];
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> searchResults = [];
   bool _isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void _addUserToParticipants(Map<String, dynamic> user) {
     showModalBottomSheet(

@@ -18,6 +18,7 @@ class RequestPageWeb extends StatefulWidget {
 
 class _RequestPageWebState extends State<RequestPageWeb> {
   Future<List<Participant>>? _pendingParticipants;
+  String userRole = "";
 
   @override
   void initState() {
