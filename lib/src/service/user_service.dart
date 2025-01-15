@@ -207,6 +207,7 @@ Future<Map<String, dynamic>> getUserData(String userId) async {
         return {
           'name': user['userRecord']['displayName'] ?? 'Unknown',
           'role': user['role'] ?? 'Unknown',
+          'email': user['userRecord']['email'] ?? 'Unknown',
           'photoUrl': user['userRecord']['photoUrl'] ??
               'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png',
         };
@@ -261,8 +262,6 @@ Future<String> uploadImageToImageKit(File imageFile) async {
     throw Exception('Failed to upload image ${response.statusCode}');
   }
 }
-
-
 
 Future<Map<String, dynamic>> fetchUserByStudentId(String studentId) async {
   try {

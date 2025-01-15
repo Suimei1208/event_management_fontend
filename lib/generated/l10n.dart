@@ -799,6 +799,136 @@ class S {
       args: [],
     );
   }
+
+  /// `View Ticket`
+  String get view_ticket {
+    return Intl.message(
+      'View Ticket',
+      name: 'view_ticket',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Participant via Excel`
+  String get add_via_excel {
+    return Intl.message(
+      'Add Participant via Excel',
+      name: 'add_via_excel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Registration List`
+  String get registration_list {
+    return Intl.message(
+      'Registration List',
+      name: 'registration_list',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit Special Participants`
+  String get edit_special_participants {
+    return Intl.message(
+      'Edit Special Participants',
+      name: 'edit_special_participants',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Participant List`
+  String get participant_list {
+    return Intl.message(
+      'Participant List',
+      name: 'participant_list',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Document`
+  String get document {
+    return Intl.message(
+      'Document',
+      name: 'document',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Spending`
+  String get spending {
+    return Intl.message(
+      'Spending',
+      name: 'spending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Statistics`
+  String get stat {
+    return Intl.message(
+      'Statistics',
+      name: 'stat',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel List`
+  String get cancel_list {
+    return Intl.message(
+      'Cancel List',
+      name: 'cancel_list',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit Event`
+  String get edit_event {
+    return Intl.message(
+      'Edit Event',
+      name: 'edit_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Re-open Event`
+  String get reopen {
+    return Intl.message(
+      'Re-open Event',
+      name: 'reopen',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel Event`
+  String get cancel_event {
+    return Intl.message(
+      'Cancel Event',
+      name: 'cancel_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Toggle View`
+  String get toggle_view {
+    return Intl.message(
+      'Toggle View',
+      name: 'toggle_view',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

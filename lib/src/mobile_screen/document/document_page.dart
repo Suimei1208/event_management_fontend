@@ -109,7 +109,7 @@ class _EventResourcesPageState extends State<EventResourcesPage> {
       }
 
       try {
-        String fileUrl = await uploadFileToImageKit(file, folder, fileName);
+        String fileUrl = await uploadFileToImageKit(file, "${widget.eventId}/$folder", fileName);
 
         await uploadDocument(
             widget.eventId, fileName, fileUrl, contentType, sizeInBytes);

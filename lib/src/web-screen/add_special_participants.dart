@@ -226,7 +226,7 @@ class _AddSpecialParticipantFormWithImageState
       final fileName =
           '${_nameController.text}_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final photoUrl = await uploadImageEventToImageKit(
-          _selectedImage!, widget.eventId, fileName);
+          _selectedImage!, widget.eventId, fileName, widget.eventId.toString());
       final participant = {
         'name': _nameController.text,
         'role': _selectedRole!,

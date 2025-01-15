@@ -8,11 +8,12 @@ import 'package:event_management/src/mobile_screen/feeback/list_users_cancel.dar
 import 'package:event_management/src/mobile_screen/event/qr_scanner.dart';
 import 'package:event_management/src/mobile_screen/event/share_role.dart';
 import 'package:event_management/src/mobile_screen/spending/spending_overview.dart';
+import 'package:event_management/src/models/checkedInData.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class QuickActions extends StatefulWidget {
-
   final int eventId;
   final bool access;
   final bool allowSelectSchedule;
@@ -25,7 +26,6 @@ class QuickActions extends StatefulWidget {
     required this.access,
     required this.allowSelectSchedule,
     required this.status,
-
     required this.userRole,
   });
 
@@ -158,7 +158,13 @@ class _QuickActionsState extends State<QuickActions> {
                           MaterialPageRoute(
                             builder: (context) => QRScannerPage(
                               onQRScanned: (qrCode) async {
-                                await checkIn(widget.eventId, qrCode);
+                                await checkIn(widget.eventId, qrCode, "");
+                                getCheckedInParticipants(widget.eventId)
+                                    .then((data) {
+                                  Provider.of<CheckInData>(context,
+                                          listen: false)
+                                      .setAttendanceData(data);
+                                });
                               },
                             ),
                           ),
@@ -171,7 +177,13 @@ class _QuickActionsState extends State<QuickActions> {
                           MaterialPageRoute(
                             builder: (context) => QRScannerPage(
                               onQRScanned: (qrCode) async {
-                                await checkOut(widget.eventId, qrCode);
+                                await checkOut(widget.eventId, qrCode, "");
+                                getCheckedInParticipants(widget.eventId)
+                                    .then((data) {
+                                  Provider.of<CheckInData>(context,
+                                          listen: false)
+                                      .setAttendanceData(data);
+                                });
                               },
                             ),
                           ),

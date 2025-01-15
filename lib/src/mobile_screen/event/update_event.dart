@@ -214,7 +214,7 @@ class _UpdateEventState extends State<UpdateEvent> {
       try {
         _isLoading = true;
         String imageUrl = await uploadImageEventToImageKit(
-            _imageFile!, widget.eventId, 'event_${widget.eventId}.jpg');
+            _imageFile!, widget.eventId, 'event_${widget.eventId}.jpg', widget.eventId.toString());
         setState(() {
           _imageUrl = imageUrl;
           _isLoading = false;

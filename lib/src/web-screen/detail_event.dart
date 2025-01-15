@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:html' as html;
 
 import 'package:event_management/generated/l10n.dart';
-import 'package:event_management/src/mobile_screen/event/qr_scanner.dart';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -231,71 +230,73 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildSidebarButton(
-                        Icons.file_copy, "Thêm người tham gia bằng excel", () {
+                        Icons.file_copy, S.of(context).add_via_excel, () {
                       handleExcelUpload(widget.eventId, eventName);
                     }),
-                    _buildSidebarButton(
-                        Icons.insert_invitation, "Danh sách đăng ký tham gia",
-                        () {
+                    _buildSidebarButton(Icons.insert_invitation,
+                        S.of(context).registration_list, () {
                       Navigator.pushNamed(context,
                           "/home/detail-event/${widget.eventId}/pending-requests");
                     }),
-                    _buildSidebarButton(Icons.edit, "Điều chỉnh khách mời", () {
+                    _buildSidebarButton(
+                        Icons.edit, S.of(context).edit_special_participants,
+                        () {
                       Navigator.pushNamed(context,
                           "/home/detail-event/${widget.eventId}/special-participants");
                     }),
-                    _buildSidebarButton(Icons.person, "Danh sách tham gia", () {
+                    _buildSidebarButton(
+                        Icons.person, S.of(context).participant_list, () {
                       Navigator.pushNamed(context,
                           "/home/detail-event/${widget.eventId}/existed-participants");
                     }),
-                    _buildSidebarButton(Icons.description, "Documents", () {
+                    _buildSidebarButton(
+                        Icons.description, S.of(context).document, () {
                       Navigator.pushNamed(context,
                           "/home/detail-event/${widget.eventId}/documents");
                     }),
-                    _buildSidebarButton(Icons.share, "Phân quyền", () {
+                    _buildSidebarButton(Icons.share, S.of(context).share_role,
+                        () {
                       Navigator.pushNamed(context,
                           "/home/detail-event/${widget.eventId}/share-roles");
                     }),
-                    _buildSidebarButton(Icons.money_outlined, "Chi Tiêu", () {
+                    _buildSidebarButton(
+                        Icons.money_outlined, S.of(context).spending, () {
                       Navigator.pushNamed(context,
                           "/home/detail-event/${widget.eventId}/spending");
                     }),
-                    _buildSidebarButton(Icons.analytics, "Statistics", () {
+                    _buildSidebarButton(Icons.analytics, S.of(context).stat,
+                        () {
                       Navigator.pushNamed(context,
                           "/home/detail-event/${widget.eventId}/event-analystics");
                     }),
                     _buildSidebarButton(
-                        Icons.cancel_presentation, "Dữ liệu hủy tham gia", () {
+                        Icons.cancel_presentation, S.of(context).cancel_list,
+                        () {
                       Navigator.pushNamed(context,
                           "/home/detail-event/${widget.eventId}/list-cancelled-users");
                     }),
-                    _buildSidebarButton(Icons.login, "Scan CheckIn", () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              QRScannerPage(onQRScanned: (qrCode) async {
-                            await checkIn(widget.eventId, qrCode);
-                          }),
-                        ),
-                      );
+                    _buildSidebarButton(Icons.login, "CheckIn", () async {
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/check-in");
                     }),
-                    _buildSidebarButton(Icons.logout, "Scan CheckOut",
-                        () async {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              QRScannerPage(onQRScanned: (qrCode) async {
-                            await checkOut(widget.eventId, qrCode);
-                          }),
-                        ),
-                      );
+                    _buildSidebarButton(Icons.logout, "CheckOut", () async {
+                      Navigator.pushNamed(context,
+                          "/home/detail-event/${widget.eventId}/check-out");
                     }),
-                    _buildSidebarButton(Icons.edit, "Update Event", () {
+                    _buildSidebarButton(Icons.edit, S.of(context).edit_event,
+                        () {
                       Navigator.pushNamed(context,
                           "/home/detail-event/${widget.eventId}/edit-event");
                     }),
+                    status != "Cancelled"
+                        ? _buildSidebarButton(
+                            Icons.cancel, S.of(context).cancel_event, () async {
+                            cancelEvent(widget.eventId, context);
+                          })
+                        : _buildSidebarButton(
+                            Icons.repeat_outlined, S.of(context).reopen, () {
+                            resetEvent(widget.eventId, context);
+                          }),
                   ],
                 ),
               ),
@@ -341,7 +342,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
 
                     // Event Description
                     Text(
-                      '${S.of(context).desc} $description',
+                      '${S.of(context).desc}: $description',
                       style: const TextStyle(
                         fontSize: 18,
                       ),
@@ -445,13 +446,14 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
               child: Text('This event has no special participants',
                   style: TextStyle(fontSize: 22)));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Column(
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Special Participants",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              SizedBox(height: 20),
-              Text('No special participants available for this event.',
+              Text(S.of(context).special_guest,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 20),
+              const Text('No special participants available for this event.',
                   style: TextStyle(fontSize: 20)),
             ],
           );
@@ -509,8 +511,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Special participant description",
-              style: TextStyle(fontSize: 24)),
+          title: const Text("Info", style: TextStyle(fontSize: 24)),
           content: Text(description, style: const TextStyle(fontSize: 20)),
           actions: [
             TextButton(

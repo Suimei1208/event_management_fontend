@@ -1,3 +1,4 @@
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -44,37 +45,42 @@ class _CustomAppBarState extends State<CustomAppBar> {
       automaticallyImplyLeading: false,
       title: Row(
         children: [
-          const Text(
-            'Welcome to Event Management', // Replace with localization if needed
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
+          TextButton(
+              onPressed: () => Navigator.pushNamed(context, '/home'),
+              child: Text(
+                S.of(context).welcome_back,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold),
+              )),
           const Spacer(),
           TextButton(
             onPressed: () => Navigator.pushNamed(context, '/home'),
-            child: const Text(
-              'Home', // Replace with localization
-              style: TextStyle(color: Colors.white, fontSize: 16),
+            child: Text(
+              S.of(context).home,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pushNamed(context, '/register-events'),
-            child: const Text(
-              'Register Event', // Replace with localization
-              style: TextStyle(color: Colors.white, fontSize: 16),
+            child: Text(
+              S.of(context).register_event,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pushNamed(context, '/forum'),
-            child: const Text(
-              'Forum', // Replace with localization
-              style: TextStyle(color: Colors.white, fontSize: 16),
+            child: Text(
+              S.of(context).forum,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
           TextButton(
             onPressed: () => Navigator.pushNamed(context, '/manage-events'),
-            child: const Text(
-              'Manage Event', // Replace with localization
-              style: TextStyle(color: Colors.white, fontSize: 16),
+            child: Text(
+              S.of(context).manage_event,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
           // TextButton(

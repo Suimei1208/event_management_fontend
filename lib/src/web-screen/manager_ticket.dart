@@ -14,7 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 class MyTicketsPageWeb extends StatefulWidget {
   const MyTicketsPageWeb({super.key});
 
-  static const routeName = '/my-ticket';
+  static const routeName = '/my-tickets';
 
   @override
   _MyTicketsPageWebState createState() => _MyTicketsPageWebState();

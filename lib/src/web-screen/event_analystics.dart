@@ -1,6 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api
 
-import 'package:event_management/src/mobile_screen/event/attendance_list.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/spending_service.dart';
@@ -83,7 +82,8 @@ class _EventAnalyticsWebPageState extends State<EventAnalyticsWebPage> {
         registered = stats['registered'].toString();
         checkIns = attendanceStats?['checkedInParticipants'] ?? 0;
         participationPercentage =
-            attendanceStats?['participationPercentage']?.toString() ?? '0';
+            attendanceStats?['participationPercentage']?.toStringAsFixed(2) ??
+                '0';
         final participationDouble =
             double.tryParse(participationPercentage) ?? 0.0;
         noShowsPercentage = 100.0 - participationDouble;
@@ -157,13 +157,8 @@ class _EventAnalyticsWebPageState extends State<EventAnalyticsWebPage> {
               alignment: Alignment.centerRight,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AttendanceReportPage(
-                              eventId: widget.eventId,
-                            )),
-                  );
+                  Navigator.pushNamed(context,
+                      "/home/detail-event/${widget.eventId}/event-analystics/detail-attendance");
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,

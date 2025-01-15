@@ -27,7 +27,7 @@ class PageNotFoundPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              "Please return to the previous page.",
+              "Please return to the home page.",
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -37,30 +37,6 @@ class PageNotFoundPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12.0,
-                      horizontal: 20.0,
-                    ),
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  icon: const Icon(Icons.arrow_back, size: 20),
-                  label: const Text(
-                    "Go Back",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
                 ElevatedButton.icon(
                   onPressed: () {
                     Navigator.pushNamed(context, "/home");

@@ -843,8 +843,8 @@ Future<Map<String, dynamic>> getEventData(int eventId) async {
       final data = json.decode(response.body);
       return data;
     } else if (response.statusCode == 404) {
-      throw EventNotFoundException ('Event not found');
-    }else {
+      throw EventNotFoundException('Event not found');
+    } else {
       throw Exception(
           'Failed to load event data: ${response.body}, status: ${response.statusCode}');
     }
@@ -859,7 +859,7 @@ class EventNotFoundException implements Exception {
 }
 
 Future<String> uploadImageEventToImageKit(
-    File imageFile, int eventId, String fileName) async {
+    File imageFile, int eventId, String fileName, String foldername) async {
   const privateKey = 'private_F801T1Ot8g2c8BCrrN+7+y+Kvdc=';
   final base64EncodedKey = base64Encode(utf8.encode('$privateKey:'));
 
@@ -872,7 +872,7 @@ Future<String> uploadImageEventToImageKit(
 
   request.fields['fileName'] = fileName;
   request.fields['useUniqueFileName'] = 'false';
-  request.fields['folder'] = '/event_images';
+  request.fields['folder'] = foldername;
 
   final response = await request.send();
 
@@ -1101,8 +1101,8 @@ Future<List<Map<String, dynamic>>> getCheckedInAndCheckedOutParticipants(
     throw Exception('Failed to retrieve ID token');
   }
 
-  final url =
-      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/participants');
+  final url = Uri.parse(
+      '${Config.baseUrl}/event-service/event/$eventId/checked-in-n-out-participants');
   LoggerService.logger.i('Making GET request to URL: $url');
 
   try {
@@ -1128,6 +1128,7 @@ Future<List<Map<String, dynamic>>> getCheckedInAndCheckedOutParticipants(
           final userData = await getUserData(participant['userId']);
 
           participant['name'] = userData['name'];
+          participant['email'] = userData['email'];
         }
         LoggerService.logger.i(participants);
         return participants;
@@ -1145,7 +1146,131 @@ Future<List<Map<String, dynamic>>> getCheckedInAndCheckedOutParticipants(
   }
 }
 
-Future<Map<String, dynamic>> checkIn(int eventId, String qrCode) async {
+Future<List<Map<String, dynamic>>> getCheckedInParticipants(int eventId) async {
+  LoggerService.logger.i(
+      'Entering getCheckedInAndCheckedOutParticipants function with eventId: $eventId');
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  if (idToken == null) {
+    LoggerService.logger.e('Failed to retrieve ID token');
+    throw Exception('Failed to retrieve ID token');
+  }
+
+  final url = Uri.parse(
+      '${Config.baseUrl}/event-service/event/$eventId/checked-in-participants');
+  LoggerService.logger.i('Making GET request to URL: $url');
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    LoggerService.logger
+        .i('Received response: ${response.statusCode} - ${response.body}');
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      LoggerService.logger.i('Response data: $responseData');
+      if (responseData['success']) {
+        List<Map<String, dynamic>> participants =
+            List<Map<String, dynamic>>.from(responseData['data']);
+
+        for (var participant in participants) {
+          final userData = await getUserData(participant['userId']);
+
+          participant['name'] = userData['name'];
+          participant['email'] = userData['email'];
+        }
+        LoggerService.logger.i(participants);
+        return participants;
+      } else {
+        throw Exception(
+            'Failed to fetch participants: ${responseData['message']}');
+      }
+    } else {
+      throw Exception('Failed to fetch participants: ${response.body}');
+    }
+  } catch (error) {
+    LoggerService.logger
+        .e('Error during fetching participants: $error', error: error);
+    throw Exception('Error during fetching participants: $error');
+  }
+}
+
+Future<List<Map<String, dynamic>>> getCheckedOutParticipants(
+    int eventId) async {
+  LoggerService.logger.i(
+      'Entering getCheckedInAndCheckedOutParticipants function with eventId: $eventId');
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    LoggerService.logger.e('No user logged in');
+    throw Exception('No user logged in');
+  }
+
+  String? idToken = await user.getIdToken();
+  if (idToken == null) {
+    LoggerService.logger.e('Failed to retrieve ID token');
+    throw Exception('Failed to retrieve ID token');
+  }
+
+  final url = Uri.parse(
+      '${Config.baseUrl}/event-service/event/$eventId/checked-out-participants');
+  LoggerService.logger.i('Making GET request to URL: $url');
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    LoggerService.logger
+        .i('Received response: ${response.statusCode} - ${response.body}');
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      LoggerService.logger.i('Response data: $responseData');
+      if (responseData['success']) {
+        List<Map<String, dynamic>> participants =
+            List<Map<String, dynamic>>.from(responseData['data']);
+
+        for (var participant in participants) {
+          final userData = await getUserData(participant['userId']);
+
+          participant['name'] = userData['name'];
+          participant['email'] = userData['email'];
+        }
+        LoggerService.logger.i(participants);
+        return participants;
+      } else {
+        throw Exception(
+            'Failed to fetch participants: ${responseData['message']}');
+      }
+    } else {
+      throw Exception('Failed to fetch participants: ${response.body}');
+    }
+  } catch (error) {
+    LoggerService.logger
+        .e('Error during fetching participants: $error', error: error);
+    throw Exception('Error during fetching participants: $error');
+  }
+}
+
+Future<Map<String, dynamic>> checkIn(
+    int eventId, String qrCode, String inputName) async {
   LoggerService.logger.i(
       'Entering checkIn function with eventId: $eventId and qrCode: $qrCode');
 
@@ -1161,8 +1286,8 @@ Future<Map<String, dynamic>> checkIn(int eventId, String qrCode) async {
     throw Exception('Failed to retrieve ID token');
   }
 
-  final url =
-      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/checkin');
+  final url = Uri.parse(
+      '${Config.baseUrl}/event-service/event/$eventId/checkin/$inputName');
   LoggerService.logger.i('Making POST request to URL: $url');
 
   try {
@@ -1197,7 +1322,8 @@ Future<Map<String, dynamic>> checkIn(int eventId, String qrCode) async {
   }
 }
 
-Future<Map<String, dynamic>> checkOut(int eventId, String qrCode) async {
+Future<Map<String, dynamic>> checkOut(
+    int eventId, String qrCode, String inputName) async {
   LoggerService.logger.i(
       'Entering checkOut function with eventId: $eventId and qrCode: $qrCode');
 
@@ -1213,8 +1339,8 @@ Future<Map<String, dynamic>> checkOut(int eventId, String qrCode) async {
     throw Exception('Failed to retrieve ID token');
   }
 
-  final url =
-      Uri.parse('${Config.baseUrl}/event-service/event/$eventId/checkout');
+  final url = Uri.parse(
+      '${Config.baseUrl}/event-service/event/$eventId/checkout/$inputName');
   LoggerService.logger.i('Making POST request to URL: $url');
 
   try {
@@ -1331,5 +1457,29 @@ Future<Map<String, dynamic>?> getEventAttendanceStats(int eventId) async {
   } catch (error) {
     LoggerService.logger.e('Error fetching event stats: $error');
     return null; // Return null in case of any error
+  }
+}
+
+Future<void> deleteFolderFromImageKit(String folderPath) async {
+  const privateKey = 'private_F801T1Ot8g2c8BCrrN+7+y+Kvdc=';
+  final base64EncodedKey = base64Encode(utf8.encode('$privateKey:'));
+
+  final url = Uri.parse('https://api.imagekit.io/v1/folder');
+
+  final response = await http.delete(
+    url,
+    headers: {
+      'Authorization': 'Basic $base64EncodedKey',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({'folderPath': folderPath}),
+  );
+
+  if (response.statusCode == 204) {
+    LoggerService.logger.i('Folder deleted successfully. No content returned.');
+  } else {
+    LoggerService.logger.e(
+        'Failed to delete folder. Status code: ${response.statusCode}, Response: ${response.body}');
+    throw Exception('Failed to delete folder');
   }
 }

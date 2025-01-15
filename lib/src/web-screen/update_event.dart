@@ -5,6 +5,7 @@ import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/user_service_web.dart';
+import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -100,8 +101,8 @@ class _UpdateEventWebState extends State<UpdateEventWeb> {
         isLoading = true;
       });
 
-      String imageUrl =
-          await uploadImageToImageKitWebVersion(_uploadedBase64Data);
+      String imageUrl = await uploadImageToImageKitWebVersion(
+          _uploadedBase64Data, "${widget.eventId}");
       final updatedImageUrl = _appendUpdatedAtQuery(imageUrl);
 
       setState(() {
@@ -245,9 +246,7 @@ class _UpdateEventWebState extends State<UpdateEventWeb> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Update Event'),
-      ),
+      appBar: const CustomAppBar(),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -483,7 +482,8 @@ class _UpdateEventWebState extends State<UpdateEventWeb> {
                     ),
                     const SizedBox(height: 10),
                     if (uploadedImageUrl != null)
-                      Image.network(uploadedImageUrl!, height: 150, width: 150),
+                      Image.network(uploadedImageUrl!,
+                          height: 250, width: double.infinity),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: _updateEvent,
