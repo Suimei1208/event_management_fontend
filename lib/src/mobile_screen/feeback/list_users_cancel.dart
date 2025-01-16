@@ -76,10 +76,10 @@ class _CancelledUsersScreenState extends State<CancelledUsersScreen> {
         centerTitle: true,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.file_open),
-            onPressed: () {},
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.file_open),
+          //   onPressed: () {},
+          // ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {

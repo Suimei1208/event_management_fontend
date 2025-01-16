@@ -23,6 +23,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "Ongoing": MessageLookupByLibrary.simpleMessage("Ongoing"),
+        "accessibility": MessageLookupByLibrary.simpleMessage("Accessibility"),
         "account": MessageLookupByLibrary.simpleMessage("Account"),
         "add_member": MessageLookupByLibrary.simpleMessage("Add member"),
         "add_photo": MessageLookupByLibrary.simpleMessage("Add Photo"),
@@ -42,14 +43,22 @@ class MessageLookup extends MessageLookupByLibrary {
         "cancel_event": MessageLookupByLibrary.simpleMessage("Cancel Event"),
         "cancel_list": MessageLookupByLibrary.simpleMessage("Cancel List"),
         "category": MessageLookupByLibrary.simpleMessage("Category"),
+        "content_review": MessageLookupByLibrary.simpleMessage(
+            "Write Your Review (Optional)"),
         "create_event": MessageLookupByLibrary.simpleMessage("Create Event"),
         "create_post": MessageLookupByLibrary.simpleMessage("Create Post"),
+        "data_cancel": MessageLookupByLibrary.simpleMessage("Opt-out data"),
+        "decentralization":
+            MessageLookupByLibrary.simpleMessage("Decentralization"),
         "desc": MessageLookupByLibrary.simpleMessage("Description"),
         "describe": MessageLookupByLibrary.simpleMessage("Describe"),
+        "detail_post": MessageLookupByLibrary.simpleMessage("Detail post"),
         "discussion": MessageLookupByLibrary.simpleMessage("Discussion"),
         "document": MessageLookupByLibrary.simpleMessage("Document"),
+        "documents": MessageLookupByLibrary.simpleMessage("Documents"),
         "editProfile": MessageLookupByLibrary.simpleMessage("Edit Profile"),
         "edit_event": MessageLookupByLibrary.simpleMessage("Edit Event"),
+        "edit_guest": MessageLookupByLibrary.simpleMessage("Edit Guest"),
         "edit_special_participants":
             MessageLookupByLibrary.simpleMessage("Edit Special Participants"),
         "end_date": MessageLookupByLibrary.simpleMessage("End Date"),
@@ -71,18 +80,26 @@ class MessageLookup extends MessageLookupByLibrary {
         "guide_forum": MessageLookupByLibrary.simpleMessage(
             "Join discussions, share informations, and connect with others"),
         "home": MessageLookupByLibrary.simpleMessage("Home"),
+        "hours_ago": MessageLookupByLibrary.simpleMessage("hours ago"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
         "latest": MessageLookupByLibrary.simpleMessage("latest"),
+        "like_event_review": MessageLookupByLibrary.simpleMessage(
+            "Would you recommend this event?"),
+        "list_participants":
+            MessageLookupByLibrary.simpleMessage("Participation list"),
         "location": MessageLookupByLibrary.simpleMessage("Location"),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
         "logout": MessageLookupByLibrary.simpleMessage("Logout"),
         "manage_event":
             MessageLookupByLibrary.simpleMessage("Management Event"),
+        "minutes_ago": MessageLookupByLibrary.simpleMessage("minutes ago"),
         "myTicket": MessageLookupByLibrary.simpleMessage("My Ticket"),
         "next_event": MessageLookupByLibrary.simpleMessage("Next Event"),
         "next_events": MessageLookupByLibrary.simpleMessage("Next Events"),
         "no_events_available":
             MessageLookupByLibrary.simpleMessage("No Event Available"),
+        "no_upcoming_event":
+            MessageLookupByLibrary.simpleMessage("No upcoming event"),
         "obj": MessageLookupByLibrary.simpleMessage("Event Objectives"),
         "ongoing_event": MessageLookupByLibrary.simpleMessage("On-going Event"),
         "participant_list":
@@ -94,12 +111,15 @@ class MessageLookup extends MessageLookupByLibrary {
         "post_title": MessageLookupByLibrary.simpleMessage("Post Title"),
         "profile": MessageLookupByLibrary.simpleMessage("Profile"),
         "questions": MessageLookupByLibrary.simpleMessage("Questions"),
+        "rate": MessageLookupByLibrary.simpleMessage("Rate Your Experience"),
         "rate_event": MessageLookupByLibrary.simpleMessage("Rate Event"),
         "register": MessageLookupByLibrary.simpleMessage("Register"),
         "register_account":
             MessageLookupByLibrary.simpleMessage("Register Account"),
         "register_event":
             MessageLookupByLibrary.simpleMessage("Register Event"),
+        "register_schedule":
+            MessageLookupByLibrary.simpleMessage("Register Schedule"),
         "registration_list":
             MessageLookupByLibrary.simpleMessage("Registration List"),
         "remove_speaker":
@@ -107,8 +127,13 @@ class MessageLookup extends MessageLookupByLibrary {
         "remove_special_guest":
             MessageLookupByLibrary.simpleMessage("Remove Special Guest"),
         "reopen": MessageLookupByLibrary.simpleMessage("Re-open Event"),
+        "reopen_event":
+            MessageLookupByLibrary.simpleMessage("Reopen the event"),
+        "review_event": MessageLookupByLibrary.simpleMessage("Review Events"),
         "search_event": MessageLookupByLibrary.simpleMessage("Search Event..."),
         "select_date": MessageLookupByLibrary.simpleMessage("Select Date"),
+        "select_start_end_date":
+            MessageLookupByLibrary.simpleMessage("Select Start or After Date"),
         "select_time": MessageLookupByLibrary.simpleMessage("Selelct Time"),
         "setting": MessageLookupByLibrary.simpleMessage("Setting"),
         "share_role": MessageLookupByLibrary.simpleMessage("Share Role"),
@@ -118,7 +143,11 @@ class MessageLookup extends MessageLookupByLibrary {
         "special_guest": MessageLookupByLibrary.simpleMessage("Special Guest"),
         "spending": MessageLookupByLibrary.simpleMessage("Spending"),
         "start_date": MessageLookupByLibrary.simpleMessage("Start Date"),
+        "start_or_after_date":
+            MessageLookupByLibrary.simpleMessage("Start or After Date"),
         "stat": MessageLookupByLibrary.simpleMessage("Statistics"),
+        "statistics": MessageLookupByLibrary.simpleMessage("Statistics"),
+        "submit_review": MessageLookupByLibrary.simpleMessage("Submit Review"),
         "tips_tricks": MessageLookupByLibrary.simpleMessage("Tips & Tricks"),
         "title": MessageLookupByLibrary.simpleMessage("Event Management"),
         "toggle_view": MessageLookupByLibrary.simpleMessage("Toggle View"),

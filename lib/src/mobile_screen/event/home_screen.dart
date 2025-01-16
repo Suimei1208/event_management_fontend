@@ -190,7 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              nextEvent?.name ?? "No upcoming event",
+                              nextEvent?.name ??
+                                  S.of(context).no_upcoming_event,
                               style: const TextStyle(fontSize: 16),
                               softWrap: true,
                               maxLines: 2,
@@ -464,6 +465,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final dynamicQrData = '$qrCode-$trimmedTimestamp';
 
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -476,7 +478,10 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               const Text(
                 'Your QR Code',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
               ),
               const SizedBox(height: 16),
               Center(
@@ -488,8 +493,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),

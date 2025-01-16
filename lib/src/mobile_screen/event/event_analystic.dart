@@ -155,9 +155,9 @@ class _EventAnalyticsPageState extends State<EventAnalyticsPage> {
                 startDate,
                 style: const TextStyle(color: Colors.grey),
               ),
-              const Text(
-                "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _",
-                style: TextStyle(color: Colors.grey),
+              const Divider(
+                color: Colors.grey,
+                thickness: 1,
               ),
               Text(
                 endDate,
@@ -237,7 +237,8 @@ class _EventAnalyticsPageState extends State<EventAnalyticsPage> {
                           );
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.inversePrimary,
                           textStyle: const TextStyle(fontSize: 16),
                         ),
                         child: const Text('Detail'),

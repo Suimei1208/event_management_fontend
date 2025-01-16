@@ -190,9 +190,9 @@ class EventCard extends StatelessWidget {
   Color? _getStatusColor(String status) {
     switch (status) {
       case 'Upcoming':
-        return const Color.fromARGB(255, 154, 187, 177);
+        return Colors.green;
       case 'Cancelled':
-        return Colors.red[300];
+        return Colors.red;
       case 'Completed':
         return Colors.grey;
       default:
@@ -203,11 +203,11 @@ class EventCard extends StatelessWidget {
   Color _getStatusTextColor(String status, BuildContext context) {
     switch (status) {
       case 'Upcoming':
-        return const Color(0xFF2E7D32);
+        return Colors.white;
       case 'Cancelled':
         return Colors.white;
       case 'Completed':
-        return Theme.of(context).textTheme.bodySmall?.color ?? Colors.black;
+        return Colors.white;
       default:
         return Colors.black;
     }
@@ -417,7 +417,7 @@ class EventCard extends StatelessWidget {
                                   child: Text(
                                     event.type,
                                     style: const TextStyle(
-                                      color: Colors.black,
+                                      // color: Colors.black,
                                       fontSize: 12,
                                     ),
                                   ),

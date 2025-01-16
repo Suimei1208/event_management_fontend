@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 class EventFinishedScreen extends StatefulWidget {
   const EventFinishedScreen({super.key});
 
-
   @override
   State<EventFinishedScreen> createState() => _EventFinishedScreenState();
 }
@@ -110,7 +109,7 @@ class _EventFinishedScreenState extends State<EventFinishedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Review Events"),
+        title:  Text(S.of(context).review_event),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -172,8 +171,8 @@ class _EventFinishedScreenState extends State<EventFinishedScreen> {
                   Expanded(
                     child: Text(
                       _selectedStartDate == null
-                          ? 'Select Start or After Date'
-                          : 'Start or After Date: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
+                          ? S.of(context).select_start_end_date
+                          : '${S.of(context).start_or_after_date}: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
                     ),
                   ),
                   IconButton(

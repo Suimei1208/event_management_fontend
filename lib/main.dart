@@ -21,8 +21,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  LoggerService.logger
-      .i("Current Platform: ${DefaultFirebaseOptions.currentPlatform}");
+  // LoggerService.logger
+  //     .i("Current Platform: ${DefaultFirebaseOptions.currentPlatform}");
 
   runApp(getApp(settingsController));
 }

@@ -214,7 +214,10 @@ class _UpdateEventState extends State<UpdateEvent> {
       try {
         _isLoading = true;
         String imageUrl = await uploadImageEventToImageKit(
-            _imageFile!, widget.eventId, 'event_${widget.eventId}.jpg', widget.eventId.toString());
+            _imageFile!,
+            widget.eventId,
+            'event_${widget.eventId}.jpg',
+            widget.eventId.toString());
         setState(() {
           _imageUrl = imageUrl;
           _isLoading = false;
@@ -278,7 +281,7 @@ class _UpdateEventState extends State<UpdateEvent> {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        // backgroundColor: Theme.of(context).colorScheme.surface,
         appBar: AppBar(
           title: Text(
             'Update Event',
@@ -287,7 +290,7 @@ class _UpdateEventState extends State<UpdateEvent> {
                   letterSpacing: 0.0,
                 ),
           ),
-          backgroundColor: Theme.of(context).colorScheme.surface,
+          // backgroundColor: Theme.of(context).colorScheme.surface,
           automaticallyImplyLeading: false,
           leading: IconButton(
             icon: Icon(
@@ -1124,8 +1127,13 @@ class _UpdateEventState extends State<UpdateEvent> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.inversePrimary),
                       onPressed: _updateEvent,
-                      child: const Text('Update Event'),
+                      child: const Text(
+                        'Update Event',
+                      ),
                     ),
                   ),
                 ],

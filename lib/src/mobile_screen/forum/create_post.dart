@@ -22,6 +22,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   File? _imageFile;
   bool isLoading = false;
 
+  String? titleError;
+  String? descriptionError;
+  String? categoryError;
+
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? pickedFile =
@@ -34,17 +38,19 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   void _handlePost() {
-    if (selectedCategory == null || selectedCategory!.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return const DialogWidget(
-            message: 'Vui lòng chọn category trước khi đăng bài',
-            title: 'Notification',
-          );
-        },
-      );
-    } else {
+    setState(() {
+      titleError = _titleController.text.isEmpty ? 'Title is required' : null;
+      descriptionError = _descriptionController.text.isEmpty
+          ? 'Description is required'
+          : null;
+      categoryError = selectedCategory == null || selectedCategory!.isEmpty
+          ? 'Please select a category'
+          : null;
+    });
+
+    if (titleError == null &&
+        descriptionError == null &&
+        categoryError == null) {
       setState(() {
         isLoading = true;
       });
@@ -106,18 +112,32 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               decoration: InputDecoration(
                 labelText: S.of(context).post_title,
                 border: const OutlineInputBorder(),
+                errorText: titleError,
               ),
               controller: _titleController,
             ),
+            const SizedBox(height: 8.0),
+            if (titleError != null)
+              Text(
+                titleError!,
+                style: const TextStyle(color: Colors.red),
+              ),
             const SizedBox(height: 16.0),
             TextField(
               maxLines: 5,
               decoration: InputDecoration(
                 labelText: S.of(context).share_thought,
                 border: const OutlineInputBorder(),
+                errorText: descriptionError,
               ),
               controller: _descriptionController,
             ),
+            const SizedBox(height: 8.0),
+            if (descriptionError != null)
+              Text(
+                descriptionError!,
+                style: const TextStyle(color: Colors.red),
+              ),
             const SizedBox(height: 16.0),
             Text(
               S.of(context).category,
@@ -133,6 +153,12 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 _buildCategoryChip(S.of(context).feedback),
               ],
             ),
+            const SizedBox(height: 8.0),
+            if (categoryError != null)
+              Text(
+                categoryError!,
+                style: const TextStyle(color: Colors.red),
+              ),
             const SizedBox(height: 16.0),
             Text(
               S.of(context).attachments,
@@ -176,6 +202,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.inversePrimary,
+                  ),
                   onPressed: isLoading
                       ? null
                       : () {

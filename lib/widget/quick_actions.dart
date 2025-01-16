@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
 
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/participants/add_special_participants.dart';
 import 'package:event_management/src/mobile_screen/document/document_page.dart';
 import 'package:event_management/src/mobile_screen/event/event_analystic.dart';
@@ -74,7 +75,7 @@ class _QuickActionsState extends State<QuickActions> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildActionButton(Icons.edit, "Điều chỉnh khách mời",
+                      _buildActionButton(Icons.edit, S.of(context).edit_guest,
                           () {
                         Navigator.push(
                             context,
@@ -82,8 +83,8 @@ class _QuickActionsState extends State<QuickActions> {
                                 builder: (context) => SpecialParticipantsPage(
                                     eventId: widget.eventId)));
                       }),
-                      _buildActionButton(Icons.person, "Danh sách tham gia",
-                          () {
+                      _buildActionButton(
+                          Icons.person, S.of(context).list_participants, () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -108,8 +109,8 @@ class _QuickActionsState extends State<QuickActions> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildActionButton(Icons.description, "Documents",
-                          () async {
+                      _buildActionButton(
+                          Icons.description, S.of(context).documents, () async {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -119,15 +120,18 @@ class _QuickActionsState extends State<QuickActions> {
                         );
                       }),
                       widget.status != "Cancelled"
-                          ? _buildActionButton(Icons.cancel, "Hủy sự kiện",
+                          ? _buildActionButton(
+                              Icons.cancel, S.of(context).cancel_event,
                               () async {
                               cancelEvent(widget.eventId, context);
                             })
                           : _buildActionButton(
-                              Icons.repeat_outlined, "Mở lại sự kiện", () {
+                              Icons.repeat_outlined, S.of(context).reopen_event,
+                              () {
                               resetEvent(widget.eventId, context);
                             }),
-                      _buildActionButton(Icons.share, "Phân quyền", () {
+                      _buildActionButton(
+                          Icons.share, S.of(context).decentralization, () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -206,7 +210,8 @@ class _QuickActionsState extends State<QuickActions> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildActionButton(Icons.money_outlined, "Chi Tiêu",
+                      _buildActionButton(
+                          Icons.money_outlined, S.of(context).spending,
                           () async {
                         Navigator.push(
                           context,
@@ -217,7 +222,7 @@ class _QuickActionsState extends State<QuickActions> {
                         );
                       }),
                       _buildActionButton(
-                          Icons.cancel_presentation, "Dữ liệu hủy tham gia",
+                          Icons.cancel_presentation, S.of(context).data_cancel,
                           () {
                         Navigator.push(
                           context,
@@ -227,7 +232,8 @@ class _QuickActionsState extends State<QuickActions> {
                                   )),
                         );
                       }),
-                      _buildActionButton(Icons.analytics, "Statistics", () {
+                      _buildActionButton(
+                          Icons.analytics, S.of(context).statistics, () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -250,9 +256,9 @@ class _QuickActionsState extends State<QuickActions> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Accessibility',
-                  style: TextStyle(
+                Text(
+                  S.of(context).accessibility,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -282,9 +288,9 @@ class _QuickActionsState extends State<QuickActions> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Register Schedule',
-                  style: TextStyle(
+                Text(
+                  S.of(context).register_schedule,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
