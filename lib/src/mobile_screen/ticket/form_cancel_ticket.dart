@@ -47,7 +47,7 @@ class _TicketCancellationFormState extends State<TicketCancellationForm> {
           imageUrl = await uploadImageEventToImageKit(
             _selectedImage!,
             widget.eventId,
-            'ticket_cancellation_${user?.uid}_${widget.eventId}',
+            'ticket_cancellation_${user?.uid}_${widget.eventId}',widget.eventId.toString()
           );
         } catch (e) {
           LoggerService.logger.e("Image upload failed: $e");

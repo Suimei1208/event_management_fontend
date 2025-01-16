@@ -80,7 +80,7 @@ class _UserEventsWebState extends State<WebUserEvents> {
                   ElevatedButton.icon(
                     onPressed: _toggleView,
                     icon: const Icon(Icons.tune),
-                    label: const Text("Toggle View"),
+                    label: Text(S.of(context).toggle_view),
                   ),
                   const SizedBox(width: 20),
                   ElevatedButton.icon(
@@ -116,7 +116,7 @@ class _UserEventsWebState extends State<WebUserEvents> {
                 child: _filteredEvents.isEmpty
                     ? Center(
                         child: Text(
-                          'No events found.',
+                          S.of(context).no_events_available,
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       )
@@ -236,24 +236,22 @@ class EventCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Increased font size for event name
                           Text(
                             event.name,
                             style: const TextStyle(
-                              fontSize: 18, // Increased font size
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 12),
-                          // Increased font size for date and time
                           Text(
                             DateFormat('MMMM d, yyyy • h:mm a')
                                 .format(event.startDate),
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
-                                ?.copyWith(fontSize: 16), // Increased font size
+                                ?.copyWith(fontSize: 16),
                           ),
                           const SizedBox(height: 12),
                           Row(
@@ -274,8 +272,7 @@ class EventCard extends StatelessWidget {
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium
-                                      ?.copyWith(
-                                          fontSize: 16), // Increased font size
+                                      ?.copyWith(fontSize: 16),
                                   softWrap: true,
                                 ),
                               ),
@@ -308,7 +305,7 @@ class EventCard extends StatelessWidget {
                                   event.status,
                                   style: TextStyle(
                                     color: statusTextColor,
-                                    fontSize: 18, // Increased font size
+                                    fontSize: 18,
                                   ),
                                 ),
                               ),
@@ -324,6 +321,8 @@ class EventCard extends StatelessWidget {
                                 if (event.status == 'Cancelled') {
                                   deleteEvent(event.id, context)
                                       .then((_) => loadEvents());
+                                  deleteFolderFromImageKit(
+                                      "/${event.id.toString()}");
                                 } else {
                                   showDialog(
                                     context: context,

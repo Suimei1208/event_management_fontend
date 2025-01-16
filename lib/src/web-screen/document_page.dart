@@ -5,8 +5,10 @@ import 'dart:typed_data';
 import 'package:event_management/src/service/document_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/user_service_web.dart';
+import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+// import 'package:googleapis/playcustomapp/v1.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -95,7 +97,7 @@ class _WebEventResourcesPageState extends State<WebEventResourcesPage> {
 
       try {
         String fileUrl = await uploadDocumentsToImageKitWebVersion(
-            base64ImageData, folder, fileName);
+            base64ImageData, "${widget.eventId}/$folder", fileName);
 
         await uploadDocument(
             widget.eventId, fileName, fileUrl, contentType, fileBytes.length);
@@ -221,7 +223,7 @@ class _WebEventResourcesPageState extends State<WebEventResourcesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Event Resources')),
+      appBar: const CustomAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(

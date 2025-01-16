@@ -29,6 +29,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "add_speaker": MessageLookupByLibrary.simpleMessage("Add Speaker"),
         "add_special_guest":
             MessageLookupByLibrary.simpleMessage("Add Special Guest"),
+        "add_via_excel":
+            MessageLookupByLibrary.simpleMessage("Add Participant via Excel"),
         "added_participants":
             MessageLookupByLibrary.simpleMessage("Added Participants"),
         "all": MessageLookupByLibrary.simpleMessage("All"),
@@ -37,13 +39,19 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Approved Participants"),
         "attachments": MessageLookupByLibrary.simpleMessage("Attachments"),
         "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+        "cancel_event": MessageLookupByLibrary.simpleMessage("Cancel Event"),
+        "cancel_list": MessageLookupByLibrary.simpleMessage("Cancel List"),
         "category": MessageLookupByLibrary.simpleMessage("Category"),
         "create_event": MessageLookupByLibrary.simpleMessage("Create Event"),
         "create_post": MessageLookupByLibrary.simpleMessage("Create Post"),
         "desc": MessageLookupByLibrary.simpleMessage("Description"),
         "describe": MessageLookupByLibrary.simpleMessage("Describe"),
         "discussion": MessageLookupByLibrary.simpleMessage("Discussion"),
+        "document": MessageLookupByLibrary.simpleMessage("Document"),
         "editProfile": MessageLookupByLibrary.simpleMessage("Edit Profile"),
+        "edit_event": MessageLookupByLibrary.simpleMessage("Edit Event"),
+        "edit_special_participants":
+            MessageLookupByLibrary.simpleMessage("Edit Special Participants"),
         "end_date": MessageLookupByLibrary.simpleMessage("End Date"),
         "english": MessageLookupByLibrary.simpleMessage("English"),
         "enter": MessageLookupByLibrary.simpleMessage("Enter"),
@@ -77,6 +85,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("No Event Available"),
         "obj": MessageLookupByLibrary.simpleMessage("Event Objectives"),
         "ongoing_event": MessageLookupByLibrary.simpleMessage("On-going Event"),
+        "participant_list":
+            MessageLookupByLibrary.simpleMessage("Participant List"),
         "pending_request":
             MessageLookupByLibrary.simpleMessage("Pending Request"),
         "popular": MessageLookupByLibrary.simpleMessage("Popular"),
@@ -90,10 +100,13 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Register Account"),
         "register_event":
             MessageLookupByLibrary.simpleMessage("Register Event"),
+        "registration_list":
+            MessageLookupByLibrary.simpleMessage("Registration List"),
         "remove_speaker":
             MessageLookupByLibrary.simpleMessage("Remove Speaker"),
         "remove_special_guest":
             MessageLookupByLibrary.simpleMessage("Remove Special Guest"),
+        "reopen": MessageLookupByLibrary.simpleMessage("Re-open Event"),
         "search_event": MessageLookupByLibrary.simpleMessage("Search Event..."),
         "select_date": MessageLookupByLibrary.simpleMessage("Select Date"),
         "select_time": MessageLookupByLibrary.simpleMessage("Selelct Time"),
@@ -103,13 +116,17 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Share Your Thoughts..."),
         "speaker": MessageLookupByLibrary.simpleMessage("Speaker"),
         "special_guest": MessageLookupByLibrary.simpleMessage("Special Guest"),
+        "spending": MessageLookupByLibrary.simpleMessage("Spending"),
         "start_date": MessageLookupByLibrary.simpleMessage("Start Date"),
+        "stat": MessageLookupByLibrary.simpleMessage("Statistics"),
         "tips_tricks": MessageLookupByLibrary.simpleMessage("Tips & Tricks"),
         "title": MessageLookupByLibrary.simpleMessage("Event Management"),
+        "toggle_view": MessageLookupByLibrary.simpleMessage("Toggle View"),
         "unanswered": MessageLookupByLibrary.simpleMessage("Unanswered"),
         "vietnamese": MessageLookupByLibrary.simpleMessage("Vietnamese"),
         "view_detail": MessageLookupByLibrary.simpleMessage("View Detail"),
         "view_schedule": MessageLookupByLibrary.simpleMessage("View Schedule"),
+        "view_ticket": MessageLookupByLibrary.simpleMessage("View Ticket"),
         "welcome": MessageLookupByLibrary.simpleMessage(
             "Welcome to the Event Management app!"),
         "welcome_back": MessageLookupByLibrary.simpleMessage("Welcome Back"),

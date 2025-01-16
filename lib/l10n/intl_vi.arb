@@ -75,5 +75,18 @@
   "feedback": "Phản hồi",
   "attachments": "Tệp đính kèm",
   "add_photo": "Thêm ảnh",
-  "post": "Đăng bài"
+  "post": "Đăng bài",
+  "view_ticket": "Xem vé",
+  "add_via_excel": "Thêm người tham gia qua Excel",
+  "registration_list": "Danh sách đăng ký",
+  "edit_special_participants": "Chỉnh sửa người tham gia đặc biệt",
+  "participant_list": "Danh sách người tham gia",
+  "document": "Tài liệu",
+  "spending": "Chi tiêu",
+  "stat": "Thống kê",
+  "cancel_list": "Danh sách đã hủy",
+  "edit_event": "Chỉnh sửa sự kiện",
+  "reopen": "Mở lại sự kiện",
+  "cancel_event": "Hủy Sự kiện",
+  "toggle_view": "Chế độ xem"
 }

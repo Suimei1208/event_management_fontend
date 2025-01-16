@@ -71,8 +71,8 @@ class _EditProfileScreenState extends State<WebEditProfileScreen> {
       reader.onLoadEnd.listen((e) async {
         final base64ImageData = reader.result as String;
         try {
-          String imageUrl =
-              await uploadImageToImageKitWebVersion(base64ImageData);
+          String imageUrl = await uploadImageToImageKitWebVersion(
+              base64ImageData, "profile_pictures");
           final updatedImageUrl = _appendUpdatedAtQuery(imageUrl);
 
           setState(() {

@@ -29,6 +29,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "add_speaker": MessageLookupByLibrary.simpleMessage("Thêm Diễn Giả"),
         "add_special_guest":
             MessageLookupByLibrary.simpleMessage("Thêm Khách Mời Đặc Biệt"),
+        "add_via_excel": MessageLookupByLibrary.simpleMessage(
+            "Thêm người tham gia qua Excel"),
         "added_participants":
             MessageLookupByLibrary.simpleMessage("Thành Viên Đã Thêm"),
         "all": MessageLookupByLibrary.simpleMessage("Tất cả"),
@@ -37,13 +39,19 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Thành Viên Được Duyệt"),
         "attachments": MessageLookupByLibrary.simpleMessage("Tệp đính kèm"),
         "cancel": MessageLookupByLibrary.simpleMessage("Hủy"),
+        "cancel_event": MessageLookupByLibrary.simpleMessage("Hủy Sự kiện"),
+        "cancel_list": MessageLookupByLibrary.simpleMessage("Danh sách đã hủy"),
         "category": MessageLookupByLibrary.simpleMessage("Danh mục"),
         "create_event": MessageLookupByLibrary.simpleMessage("Tạo Sự Kiện"),
         "create_post": MessageLookupByLibrary.simpleMessage("Tạo bài viết"),
         "desc": MessageLookupByLibrary.simpleMessage("Mô tả"),
         "describe": MessageLookupByLibrary.simpleMessage("Mô Tả"),
         "discussion": MessageLookupByLibrary.simpleMessage("Thảo luận"),
+        "document": MessageLookupByLibrary.simpleMessage("Tài liệu"),
         "editProfile": MessageLookupByLibrary.simpleMessage("Chỉnh sửa hồ sơ"),
+        "edit_event": MessageLookupByLibrary.simpleMessage("Chỉnh sửa sự kiện"),
+        "edit_special_participants": MessageLookupByLibrary.simpleMessage(
+            "Chỉnh sửa người tham gia đặc biệt"),
         "end_date": MessageLookupByLibrary.simpleMessage("Ngày kết thúc"),
         "english": MessageLookupByLibrary.simpleMessage("Tiếng Anh"),
         "enter": MessageLookupByLibrary.simpleMessage("Nhập"),
@@ -78,6 +86,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "obj": MessageLookupByLibrary.simpleMessage("Mục tiêu sự kiện"),
         "ongoing_event":
             MessageLookupByLibrary.simpleMessage("Sự kiện đang diễn ra"),
+        "participant_list":
+            MessageLookupByLibrary.simpleMessage("Danh sách người tham gia"),
         "pending_request":
             MessageLookupByLibrary.simpleMessage("Yêu Cầu Đang Chờ"),
         "popular": MessageLookupByLibrary.simpleMessage("Phổ biến"),
@@ -91,9 +101,12 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Đăng ký tài khoản"),
         "register_event":
             MessageLookupByLibrary.simpleMessage("Đăng ký sự kiện"),
+        "registration_list":
+            MessageLookupByLibrary.simpleMessage("Danh sách đăng ký"),
         "remove_speaker": MessageLookupByLibrary.simpleMessage("Xóa Diễn Giả"),
         "remove_special_guest":
             MessageLookupByLibrary.simpleMessage("Xóa Khách Mời Đặc Biệt"),
+        "reopen": MessageLookupByLibrary.simpleMessage("Mở lại sự kiện"),
         "search_event":
             MessageLookupByLibrary.simpleMessage("Tìm Kiếm Sự Kiện..."),
         "select_date": MessageLookupByLibrary.simpleMessage("Chọn Ngày"),
@@ -105,13 +118,17 @@ class MessageLookup extends MessageLookupByLibrary {
         "speaker": MessageLookupByLibrary.simpleMessage("Diễn giả"),
         "special_guest":
             MessageLookupByLibrary.simpleMessage("Khách mời đặc biệt"),
+        "spending": MessageLookupByLibrary.simpleMessage("Chi tiêu"),
         "start_date": MessageLookupByLibrary.simpleMessage("Ngày bắt đầu"),
+        "stat": MessageLookupByLibrary.simpleMessage("Thống kê"),
         "tips_tricks": MessageLookupByLibrary.simpleMessage("Mẹo & Thủ thuật"),
         "title": MessageLookupByLibrary.simpleMessage("Quản lý sự kiện"),
+        "toggle_view": MessageLookupByLibrary.simpleMessage("Chế độ xem"),
         "unanswered": MessageLookupByLibrary.simpleMessage("Chưa được trả lời"),
         "vietnamese": MessageLookupByLibrary.simpleMessage("Tiếng Việt"),
         "view_detail": MessageLookupByLibrary.simpleMessage("Xem Chi Tiết"),
         "view_schedule": MessageLookupByLibrary.simpleMessage("Xem lịch trình"),
+        "view_ticket": MessageLookupByLibrary.simpleMessage("Xem vé"),
         "welcome": MessageLookupByLibrary.simpleMessage(
             "Chào mừng bạn đến với ứng dụng Quản lý sự kiện!"),
         "welcome_back":

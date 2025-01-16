@@ -75,5 +75,18 @@
   "feedback": "Feedback",
   "attachments": "Attachments",
   "add_photo": "Add Photo",
-  "post": "Post"
+  "post": "Post",
+  "view_ticket": "View Ticket",
+  "add_via_excel": "Add Participant via Excel",
+  "registration_list": "Registration List",
+  "edit_special_participants": "Edit Special Participants",
+  "participant_list": "Participant List",
+  "document": "Document",
+  "spending": "Spending",
+  "stat": "Statistics",
+  "cancel_list": "Cancel List",
+  "edit_event": "Edit Event",
+  "reopen": "Re-open Event",
+  "cancel_event": "Cancel Event",
+  "toggle_view": "Toggle View"
 }

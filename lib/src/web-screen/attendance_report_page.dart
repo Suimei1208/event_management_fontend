@@ -1,24 +1,22 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, deprecated_member_use
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, deprecated_member_use, unused_local_variable, avoid_web_libraries_in_flutter
 
-import 'dart:io';
+import 'dart:html' as html;
 import 'package:event_management/src/service/event_service.dart';
-import 'package:event_management/src/service/logger_service.dart';
-import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
+import 'package:excel/excel.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-class AttendanceReportPage extends StatefulWidget {
+class WebAttendanceReportPage extends StatefulWidget {
   final int eventId;
 
-  const AttendanceReportPage({super.key, required this.eventId});
+  const WebAttendanceReportPage({super.key, required this.eventId});
 
   @override
   _AttendanceReportPageState createState() => _AttendanceReportPageState();
 }
 
-class _AttendanceReportPageState extends State<AttendanceReportPage> {
+class _AttendanceReportPageState extends State<WebAttendanceReportPage> {
   late Future<List<Map<String, dynamic>>> _attendanceData;
 
   @override
@@ -38,15 +36,19 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
 
   Future<void> exportToExcel(List<Map<String, dynamic>> participants) async {
     final excel = Excel.createExcel();
-    final sheet = excel['Attendance'];
+    final defaultSheetName = excel.sheets.keys.first;
+    final sheet = excel[defaultSheetName];
 
-    // Set headers manually
+    sheet.removeRow(0);
+
+    // Set headers
     sheet.cell(CellIndex.indexByString('A1')).value = TextCellValue('Name');
     sheet.cell(CellIndex.indexByString('B1')).value = TextCellValue('Email');
     sheet.cell(CellIndex.indexByString('C1')).value = TextCellValue('Check-In');
     sheet.cell(CellIndex.indexByString('D1')).value =
         TextCellValue('Check-Out');
 
+    // Populate data
     for (int i = 0; i < participants.length; i++) {
       final participant = participants[i];
       sheet.cell(CellIndex.indexByString('A${i + 2}')).value =
@@ -59,23 +61,14 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
           TextCellValue(formatDate(participant['checkOutTime']));
     }
 
-    await _requestPermission(Permission.storage);
-
-    const downloadFolderPath = '/storage/emulated/0/Download/';
-    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    String fileName = "${timestamp}_Attendance_Report.xlsx";
-    String filePath = '$downloadFolderPath/$fileName';
-
-    // Write Excel file
     final fileBytes = excel.save();
-    File(filePath)
-      ..createSync(recursive: true)
-      ..writeAsBytesSync(fileBytes!);
+    if (fileBytes != null) {
+      final blob = html.Blob([fileBytes], 'application/vnd.ms-excel');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      html.Url.revokeObjectUrl(url);
+    }
 
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Xuất báo cáo Excel thành công: $filePath')),
-    );
+    excel.sheets.clear();
   }
 
   Future<void> exportToPDF(List<Map<String, dynamic>> participants) async {
@@ -109,36 +102,20 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
       ),
     );
 
-    await _requestPermission(Permission.storage);
-
-    const downloadFolderPath = '/storage/emulated/0/Download/';
-    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    String fileName = "${timestamp}_Attendance_Report.pdf";
-    String filePath = '$downloadFolderPath/$fileName';
-
-    final file = File(filePath);
-
-    await file.writeAsBytes(await pdf.save());
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Xuất báo cáo PDF thành công: $filePath')),
-    );
-  }
-
-  // Helper method to request permission
-  Future<void> _requestPermission(Permission permission) async {
-    final status = await permission.request();
-    if (status.isGranted) {
-      LoggerService.logger.i('Permission granted');
-    } else {
-      LoggerService.logger.e('Permission denied');
-    }
+    final fileBytes = await pdf.save();
+    final blob = html.Blob([fileBytes], 'application/pdf');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)
+      ..target = 'blank'
+      ..download = 'Attendance_Report.pdf'
+      ..click();
+    html.Url.revokeObjectUrl(url);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Báo Cáo Tham Gia Sự Kiện')),
+      appBar: AppBar(title: const Text('Event Attendance Report')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -146,7 +123,7 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Báo cáo chi tiết',
+                'Attendance Details',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
@@ -167,7 +144,7 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
                       columns: const [
-                        DataColumn(label: Text('Tên')),
+                        DataColumn(label: Text('Name')),
                         DataColumn(label: Text('Email')),
                         DataColumn(label: Text('Check-In')),
                         DataColumn(label: Text('Check-Out')),
@@ -193,7 +170,7 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
                   final participants = await _attendanceData;
                   exportToExcel(participants);
                 },
-                child: const Text('Xuất báo cáo Excel'),
+                child: const Text('Export to Excel'),
               ),
               const SizedBox(height: 10),
               ElevatedButton(
@@ -201,7 +178,7 @@ class _AttendanceReportPageState extends State<AttendanceReportPage> {
                   final participants = await _attendanceData;
                   exportToPDF(participants);
                 },
-                child: const Text('Xuất báo cáo PDF'),
+                child: const Text('Export to PDF'),
               ),
             ],
           ),

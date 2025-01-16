@@ -6,7 +6,8 @@ import 'dart:html' as html;
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-Future<String> uploadImageToImageKitWebVersion(String base64ImageData) async {
+Future<String> uploadImageToImageKitWebVersion(
+    String base64ImageData, String folderName) async {
   const privateKey = 'private_F801T1Ot8g2c8BCrrN+7+y+Kvdc=';
   final base64EncodedKey = base64Encode(utf8.encode('$privateKey:'));
   User? user = FirebaseAuth.instance.currentUser;
@@ -25,7 +26,7 @@ Future<String> uploadImageToImageKitWebVersion(String base64ImageData) async {
   request.appendBlob('file', imageBlob, 'profile_pic_${user!.uid}.jpg');
   request.append('fileName', 'profile_pic_${user.uid}.jpg');
   request.append('useUniqueFileName', 'false');
-  request.append('folder', '/profile_pictures');
+  request.append('folder', "/$folderName");
 
   // Create an XMLHttpRequest to send the form data
   final xhr = html.HttpRequest();
@@ -53,7 +54,8 @@ Future<String> uploadImageToImageKitWebVersion(String base64ImageData) async {
   return completer.future;
 }
 
-Future<String> uploadDocumentsToImageKitWebVersion(String base64ImageData, String folder, String fileName) async {
+Future<String> uploadDocumentsToImageKitWebVersion(
+    String base64ImageData, String folder, String fileName) async {
   const privateKey = 'private_F801T1Ot8g2c8BCrrN+7+y+Kvdc=';
   final base64EncodedKey = base64Encode(utf8.encode('$privateKey:'));
 
