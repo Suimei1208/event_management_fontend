@@ -25,9 +25,11 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
 
   void _fetchData() async {
     final data = await getPosts();
-    setState(() {
-      posts = data;
-    });
+    if (mounted) {
+      setState(() {
+        posts = data;
+      });
+    }
     // LoggerService.logger.i('Posts: $posts');
   }
 
@@ -40,6 +42,7 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           S.of(context).welcome_forum,
           style: const TextStyle(fontSize: 24),

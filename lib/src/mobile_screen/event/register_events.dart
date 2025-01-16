@@ -205,8 +205,8 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
                   Expanded(
                     child: Text(
                       _selectedStartDate == null
-                          ? 'Select Start or After Date'
-                          : 'Start or After Date: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
+                          ? S.of(context).select_start_end_date
+                          : '${S.of(context).start_or_after_date}: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
                     ),
                   ),
                   IconButton(
@@ -336,7 +336,8 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
                   child: Text(S.of(context).view_detail),
                 ),
                 ElevatedButton(
-                  onPressed: isRegistered == "Approved"
+                  onPressed: isRegistered == "Approved" ||
+                          isRegistered == "Added"
                       ? null
                       : () async {
                           if (isRegistered == null) {
@@ -353,8 +354,8 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
                             : Colors.blue),
                   ),
                   child: Text(
-                    isRegistered == "Approved"
-                        ? S.of(context).approved
+                    isRegistered == "Approved" || isRegistered == "Added"
+                        ? isRegistered.toString()
                         : (isRegistered == "Pending"
                             ? S.of(context).cancel
                             : S.of(context).register),

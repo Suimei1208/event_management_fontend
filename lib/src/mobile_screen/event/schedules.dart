@@ -237,7 +237,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         title: const Text("Event Schedule"),
@@ -249,13 +249,17 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
             Container(
               width: MediaQuery.of(context).size.width,
               height: 160,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.purple, Color(0xFF6A1B9A)],
-                  stops: [0, 1],
-                  begin: AlignmentDirectional(0, -1),
-                  end: AlignmentDirectional(0, 1),
-                ),
+              decoration: BoxDecoration(
+                // gradient: LinearGradient(
+                //   colors: [
+                //     Theme.of(context).colorScheme.primary,
+                //     Theme.of(context).colorScheme.secondary
+                //   ],
+                //   stops: const [0, 1],
+                //   begin: const AlignmentDirectional(0, -1),
+                //   end: const AlignmentDirectional(0, 1),
+                // ),
+                color: Theme.of(context).colorScheme.inversePrimary,
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -315,7 +319,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              // color: Colors.black,
                             ),
                           ),
                         ),
@@ -352,7 +356,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                                      // color: Colors.black,
                                     ),
                                   ),
                                   Text(
@@ -360,14 +364,14 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.black,
+                                      // color: Colors.black,
                                     ),
                                   ),
                                   Text(
                                     location,
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: Colors.grey,
+                                      // color: Colors.grey,
                                     ),
                                   ),
                                 ],
@@ -395,15 +399,21 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                                 ),
                               ],
                             ),
-                          TextButton(
-                            onPressed: widget.isRegistered
-                                ? () async {
+                          widget.isRegistered
+                              ? TextButton(
+                                  onPressed: () async {
                                     await addParticipantToSchedule(
                                         widget.event.id, user!.uid);
-                                  }
-                                : null,
-                            child: const Text('Join'),
-                          ),
+                                  },
+                                  child: Text(
+                                    'Join',
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary),
+                                  ),
+                                )
+                              : Container(),
                         ],
                       ),
                     ],

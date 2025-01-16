@@ -929,6 +929,206 @@ class S {
       args: [],
     );
   }
+
+  /// `No upcoming event`
+  String get no_upcoming_event {
+    return Intl.message(
+      'No upcoming event',
+      name: 'no_upcoming_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select Start or After Date`
+  String get select_start_end_date {
+    return Intl.message(
+      'Select Start or After Date',
+      name: 'select_start_end_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Start or After Date`
+  String get start_or_after_date {
+    return Intl.message(
+      'Start or After Date',
+      name: 'start_or_after_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `minutes ago`
+  String get minutes_ago {
+    return Intl.message(
+      'minutes ago',
+      name: 'minutes_ago',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `hours ago`
+  String get hours_ago {
+    return Intl.message(
+      'hours ago',
+      name: 'hours_ago',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Detail post`
+  String get detail_post {
+    return Intl.message(
+      'Detail post',
+      name: 'detail_post',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit Guest`
+  String get edit_guest {
+    return Intl.message(
+      'Edit Guest',
+      name: 'edit_guest',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Participation list`
+  String get list_participants {
+    return Intl.message(
+      'Participation list',
+      name: 'list_participants',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Documents`
+  String get documents {
+    return Intl.message(
+      'Documents',
+      name: 'documents',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reopen the event`
+  String get reopen_event {
+    return Intl.message(
+      'Reopen the event',
+      name: 'reopen_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Decentralization`
+  String get decentralization {
+    return Intl.message(
+      'Decentralization',
+      name: 'decentralization',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Opt-out data`
+  String get data_cancel {
+    return Intl.message(
+      'Opt-out data',
+      name: 'data_cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Statistics`
+  String get statistics {
+    return Intl.message(
+      'Statistics',
+      name: 'statistics',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Accessibility`
+  String get accessibility {
+    return Intl.message(
+      'Accessibility',
+      name: 'accessibility',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Register Schedule`
+  String get register_schedule {
+    return Intl.message(
+      'Register Schedule',
+      name: 'register_schedule',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Review Events`
+  String get review_event {
+    return Intl.message(
+      'Review Events',
+      name: 'review_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rate Your Experience`
+  String get rate {
+    return Intl.message(
+      'Rate Your Experience',
+      name: 'rate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Write Your Review (Optional)`
+  String get content_review {
+    return Intl.message(
+      'Write Your Review (Optional)',
+      name: 'content_review',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Would you recommend this event?`
+  String get like_event_review {
+    return Intl.message(
+      'Would you recommend this event?',
+      name: 'like_event_review',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Submit Review`
+  String get submit_review {
+    return Intl.message(
+      'Submit Review',
+      name: 'submit_review',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

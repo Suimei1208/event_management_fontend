@@ -1,3 +1,4 @@
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +28,7 @@ class _EventReviewPageState extends State<EventReviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Event Review'),
+        title: Text(S.of(context).review_event),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -42,9 +43,9 @@ class _EventReviewPageState extends State<EventReviewPage> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Rate Your Experience',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              S.of(context).rate,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Row(
@@ -65,9 +66,9 @@ class _EventReviewPageState extends State<EventReviewPage> {
               }),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Write Your Review (Optional)',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              S.of(context).content_review,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             TextField(
@@ -82,9 +83,9 @@ class _EventReviewPageState extends State<EventReviewPage> {
               controller: _textController1,
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Would you recommend this event?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              S.of(context).like_event_review,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -113,11 +114,14 @@ class _EventReviewPageState extends State<EventReviewPage> {
             ElevatedButton(
               onPressed: _submitReview,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                 // padding: const EdgeInsets.symmetric(vertical: 15.0),
                 textStyle: const TextStyle(fontSize: 16),
               ),
-              child: const Text('Submit Review'),
+              child: Text(
+                S.of(context).submit_review,
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              ),
             ),
           ],
         ),

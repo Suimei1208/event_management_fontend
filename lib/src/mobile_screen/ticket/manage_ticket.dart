@@ -1,4 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/ticket/form_cancel_ticket.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
@@ -45,7 +46,7 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Tickets'),
+        title: Text(S.of(context).myTicket),
         backgroundColor: Colors.deepPurple,
       ),
       body: FutureBuilder<List<Ticket>>(
@@ -119,6 +120,145 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
     );
   }
 
+  Widget buildTicketCancellationWidget(Ticket ticket, BuildContext context) {
+    final displayStatus =
+        ticket.eventStatus == "Completed" ? "Expired" : ticket.eventStatus;
+    if (displayStatus == "Expired") {
+      return Column(
+        children: [
+          const Text(""),
+          ElevatedButton(
+            onPressed: null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[300],
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: const Text('Expired'),
+          ),
+        ],
+      );
+    } else {
+      if (ticket.cancellationStartDate != null &&
+          ticket.cancellationEndDate != null) {
+        if (DateTime.now().isAfter(ticket.cancellationStartDate!) &&
+            DateTime.now().isBefore(ticket.cancellationEndDate!)) {
+          return Column(
+            children: [
+              Text(text(ticket.cancel_status!)),
+              ElevatedButton(
+                onPressed: ticket.cancel_status == "None"
+                    ? () async {
+                        if (ticket.cancellationLink != null &&
+                            ticket.cancellationLink!.isNotEmpty) {
+                          final Uri url = Uri.parse(ticket.cancellationLink!);
+                          if (url.isAbsolute) {
+                            await launchUrl(url);
+                          } else {
+                            LoggerService.logger.e("Invalid cancellation link");
+                          }
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TicketCancellationForm(
+                                eventId: ticket.eventId,
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red[300],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: const Text('Hủy vé'),
+              ),
+            ],
+          );
+        } else {
+          return Column(
+            children: [
+              Text((ticket.status == "Cancelled" &&
+                      ticket.cancel_status == "Accepted")
+                  ? "Hủy vé thành công"
+                  : "Đã hết hạn hủy vé"),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red[300],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onPressed: null,
+                child: const Text('Hủy vé'),
+              ),
+            ],
+          );
+        }
+      } else if (DateTime.parse(ticket.startDate).isAfter(DateTime.now())) {
+        return Column(
+          children: [
+            Text(ticket.status == "Cancelled" ? "Vé đã bị hủy" : ""),
+            ElevatedButton(
+              onPressed: ticket.status == "Cancelled"
+                  ? null
+                  : () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const DialogWidget(
+                            message:
+                                'Vui lòng liên hệ Admin qua email để hủy vé!',
+                            title: 'Notification',
+                          );
+                        },
+                      );
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[300],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text('Hủy vé'),
+            ),
+          ],
+        );
+      } else {
+        return Column(
+          children: [
+            const Text(""),
+            ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return const DialogWidget(
+                      message: 'Vui lòng liên hệ Admin qua email để hủy vé!',
+                      title: 'Notification',
+                    );
+                  },
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[300],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text('Hủy vé'),
+            ),
+          ],
+        );
+      }
+    }
+  }
+
   Widget _buildEventCard(BuildContext context, Ticket ticket) {
     // Dynamically adjust the event status
     final displayStatus =
@@ -159,134 +299,7 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: [
-                (ticket.cancellationStartDate != null &&
-                        ticket.cancellationEndDate != null)
-                    ? (DateTime.now().isAfter(ticket.cancellationStartDate!) &&
-                            DateTime.now()
-                                .isBefore(ticket.cancellationEndDate!))
-                        ? Column(
-                            children: [
-                              Text(text(ticket.cancel_status!)),
-                              ElevatedButton(
-                                onPressed: ticket.cancel_status == "None"
-                                    ? () async {
-                                        // Nếu thời gian hiện tại nằm trong khoảng thời gian hủy vé
-                                        // thì cho phép hủy vé
-                                        // ignore: deprecated_member_use
-
-                                        if (ticket.cancellationLink != null &&
-                                            ticket
-                                                .cancellationLink!.isNotEmpty) {
-                                          final Uri url = Uri.parse(
-                                              ticket.cancellationLink!);
-                                          // LoggerService.logger.f(url);
-
-                                          if (url.isAbsolute) {
-                                            await launchUrl(url);
-                                          } else {
-                                            LoggerService.logger
-                                                .e("Invalid cancellation link");
-                                          }
-                                        } else {
-                                          // LoggerService.logger
-                                          //     .e("Cancellation link is null");
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  TicketCancellationForm(
-                                                eventId: ticket.eventId,
-                                              ),
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red[300],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                                child: const Text('Hủy vé'),
-                              ),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              Text((ticket.status == "Cancelled" &&
-                                      ticket.cancel_status == "Accepted")
-                                  ? "Hủy vé thành công"
-                                  : "Đã hết hạn hủy vé"),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red[300],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                                onPressed: null,
-                                child: const Text('Hủy vé'),
-                              )
-                            ],
-                          )
-                    : DateTime.parse(ticket.startDate).isAfter(DateTime.now())
-                        ? Column(
-                            children: [
-                              Text(ticket.status == "Cancelled"
-                                  ? "Vé đã bị hủy"
-                                  : ""),
-                              ElevatedButton(
-                                onPressed: ticket.status == "Cancelled"
-                                    ? null
-                                    : () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return const DialogWidget(
-                                              message:
-                                                  'Vui lòng liên hệ Admin qua email để hủy vé!',
-                                              title: 'Notification',
-                                            );
-                                          },
-                                        );
-                                      },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red[300],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                                child: const Text('Hủy vé'),
-                              ),
-                            ],
-                          )
-                        : Column(
-                            children: [
-                              const Text(""),
-                              ElevatedButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return const DialogWidget(
-                                        message:
-                                            'Vui lòng liên hệ Admin qua email để hủy vé!',
-                                        title: 'Notification',
-                                      );
-                                    },
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red[300],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                ),
-                                child: const Text('Hủy vé'),
-                              ),
-                            ],
-                          ),
+                buildTicketCancellationWidget(ticket, context),
                 Column(
                   children: [
                     const Text(""),
@@ -372,6 +385,7 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
     final dynamicQrData = '$qrCode-$trimmedTimestamp';
 
     showModalBottomSheet(
+      backgroundColor: Colors.white,
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -384,7 +398,10 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
             children: [
               const Text(
                 'Your QR Code',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
               ),
               const SizedBox(height: 16),
               Center(
@@ -396,8 +413,17 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),

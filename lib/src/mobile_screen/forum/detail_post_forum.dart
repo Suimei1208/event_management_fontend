@@ -1,3 +1,4 @@
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/models/info_user.dart';
 import 'package:event_management/src/service/forum_service.dart';
 import 'package:flutter/material.dart';
@@ -13,15 +14,15 @@ class ForumPostPage extends StatefulWidget {
   _ForumPostPageState createState() => _ForumPostPageState();
 }
 
-String formatTime(DateTime time) {
+String formatTime(DateTime time, BuildContext context) {
   final now = DateTime.now();
   final difference = now.difference(time);
 
   if (difference.inHours < 24) {
     if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} minutes ago';
+      return '${difference.inMinutes} ${S.of(context).minutes_ago}';
     } else {
-      return '${difference.inHours} hours ago';
+      return '${difference.inHours} ${S.of(context).hours_ago}';
     }
   } else {
     return DateFormat('dd/MM/yyyy hh:mm a').format(time);
@@ -44,12 +45,19 @@ class _ForumPostPageState extends State<ForumPostPage> {
     _fetchData();
   }
 
+  @override
+  void dispose() {
+    _commentController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchData() async {
     // Fetch data from the server
     Map<String, dynamic> data = await getDetailPost(widget.idPost);
     // LoggerService.logger.i('Data: $data');
     if (!mounted) return;
     await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
     setState(() {
       _isLoading = false;
       post = data['post'];
@@ -133,7 +141,7 @@ class _ForumPostPageState extends State<ForumPostPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detail Post'),
+        title: Text(S.of(context).detail_post),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -158,8 +166,8 @@ class _ForumPostPageState extends State<ForumPostPage> {
                                       fontWeight: FontWeight.bold)),
                               if (post['timepost'] != null)
                                 Text(
-                                    formatTime(
-                                        DateTime.parse(post['timepost'])),
+                                    formatTime(DateTime.parse(post['timepost']),
+                                        context),
                                     style: const TextStyle(color: Colors.grey)),
                             ],
                           ),
@@ -239,8 +247,10 @@ class _ForumPostPageState extends State<ForumPostPage> {
                                 return CommentItem(
                                   author: comment['user']['name'],
                                   avtUrl: comment['user']['avtUrl'],
-                                  time: formatTime(DateTime.parse(
-                                      comment['comment']['timepost'])),
+                                  time: formatTime(
+                                      DateTime.parse(
+                                          comment['comment']['timepost']),
+                                      context),
                                   content: comment['comment']['comment'],
                                   likes: comment['comment']['likes'].toString(),
                                   replies: comment['replies'],
@@ -413,7 +423,9 @@ class _CommentItemState extends State<CommentItem> {
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold)),
                               if (replyTime != null)
-                                Text(formatTime(DateTime.parse(replyTime)),
+                                Text(
+                                    formatTime(
+                                        DateTime.parse(replyTime), context),
                                     style: const TextStyle(color: Colors.grey)),
                               Text(replyComment),
                             ],
