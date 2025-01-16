@@ -71,13 +71,15 @@ class _UserEventsState extends State<UserEvents> {
     });
   }
 
+  Future<void> _handleRefresh() async {
+    await _loadEvents();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      // backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        // backgroundColor: Theme.of(context).colorScheme.surface,
         automaticallyImplyLeading: false,
         title: Text(
           S.of(context).manage_event,
@@ -129,43 +131,46 @@ class _UserEventsState extends State<UserEvents> {
                 ),
               ),
               Expanded(
-                child: _filteredEvents.isEmpty
-                    ? Center(
-                        child: Text(
-                          'Không tìm thấy sự kiện nào.',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      )
-                    : (_isGridView
-                        ? GridView.builder(
-                            padding: EdgeInsets.zero,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 16.0,
-                              mainAxisSpacing: 16.0,
-                              childAspectRatio: 0.555,
-                            ),
-                            itemCount: _filteredEvents.length,
-                            itemBuilder: (context, index) {
-                              return EventCard(
-                                event: _filteredEvents[index],
-                                loadEvents: _loadEvents,
-                                isGridView: _isGridView,
-                              );
-                            },
-                          )
-                        : ListView.builder(
-                            padding: EdgeInsets.zero,
-                            itemCount: _filteredEvents.length,
-                            itemBuilder: (context, index) {
-                              return EventCard(
-                                event: _filteredEvents[index],
-                                loadEvents: _loadEvents,
-                                isGridView: _isGridView,
-                              );
-                            },
-                          )),
+                child: RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  child: _filteredEvents.isEmpty
+                      ? Center(
+                          child: Text(
+                            'Không tìm thấy sự kiện nào.',
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                        )
+                      : (_isGridView
+                          ? GridView.builder(
+                              padding: EdgeInsets.zero,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 16.0,
+                                mainAxisSpacing: 16.0,
+                                childAspectRatio: 0.555,
+                              ),
+                              itemCount: _filteredEvents.length,
+                              itemBuilder: (context, index) {
+                                return EventCard(
+                                  event: _filteredEvents[index],
+                                  loadEvents: _loadEvents,
+                                  isGridView: _isGridView,
+                                );
+                              },
+                            )
+                          : ListView.builder(
+                              padding: EdgeInsets.zero,
+                              itemCount: _filteredEvents.length,
+                              itemBuilder: (context, index) {
+                                return EventCard(
+                                  event: _filteredEvents[index],
+                                  loadEvents: _loadEvents,
+                                  isGridView: _isGridView,
+                                );
+                              },
+                            )),
+                ),
               ),
             ],
           ),

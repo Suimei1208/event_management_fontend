@@ -137,6 +137,16 @@ class _ForumPostPageState extends State<ForumPostPage> {
     });
   }
 
+  Future<void> _handleRefresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await _fetchData();
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,141 +155,151 @@ class _ForumPostPageState extends State<ForumPostPage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (_hostPost != null)
+          : RefreshIndicator(
+              onRefresh: _handleRefresh, // Attach the refresh method
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_hostPost != null)
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              foregroundImage: NetworkImage(_hostPost!.avtUrl),
+                            ),
+                            const SizedBox(width: 10),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(_hostPost!.name,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold)),
+                                if (post['timepost'] != null)
+                                  Text(
+                                      formatTime(
+                                          DateTime.parse(post['timepost']),
+                                          context),
+                                      style:
+                                          const TextStyle(color: Colors.grey)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 10),
+                      if (post['title'] != null)
+                        Text(
+                          post['title'],
+                          style: const TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      const SizedBox(height: 10),
+                      Text(
+                        post['description'].toString(),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 10),
+                      if (post['image'] != null && post['image'].isNotEmpty)
+                        Image.network(
+                          post['image'],
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      const SizedBox(height: 20),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            foregroundImage: NetworkImage(_hostPost!.avtUrl),
-                          ),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(_hostPost!.name,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold)),
-                              if (post['timepost'] != null)
-                                Text(
-                                    formatTime(DateTime.parse(post['timepost']),
-                                        context),
-                                    style: const TextStyle(color: Colors.grey)),
-                            ],
-                          ),
+                          if (_isLiked != null)
+                            IconButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _isLiked = !_isLiked!;
+                                  if (_isLiked!) {
+                                    post['likes'] =
+                                        (int.parse(post['likes'].toString()) +
+                                                1)
+                                            .toString();
+                                  } else {
+                                    post['likes'] =
+                                        (int.parse(post['likes'].toString()) -
+                                                1)
+                                            .toString();
+                                  }
+                                });
+                                await updateLike(widget.idPost, _isLiked!);
+                              },
+                              icon: _isLiked!
+                                  ? const Icon(Icons.thumb_up,
+                                      color: Colors.red)
+                                  : const Icon(Icons.thumb_up_alt_rounded),
+                            ),
+                          const SizedBox(width: 5),
+                          Text(post['likes'].toString()),
+                          const SizedBox(width: 20),
+                          const Icon(Icons.comment),
+                          const SizedBox(width: 5),
+                          Text(post['comments_count'].toString()),
                         ],
                       ),
-                    const SizedBox(height: 10),
-                    if (post['title'] != null)
-                      Text(
-                        post['title'],
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Comments',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
-                    const SizedBox(height: 10),
-                    Text(
-                      post['description'].toString(),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 10),
-                    if (post['image'] != null && post['image'].isNotEmpty)
-                      Image.network(
-                        post['image'],
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        if (_isLiked != null)
-                          IconButton(
-                            onPressed: () async {
-                              setState(() {
-                                _isLiked = !_isLiked!;
-                                if (_isLiked!) {
-                                  post['likes'] =
-                                      (int.parse(post['likes'].toString()) + 1)
-                                          .toString();
-                                } else {
-                                  post['likes'] =
-                                      (int.parse(post['likes'].toString()) - 1)
-                                          .toString();
-                                }
-                              });
-                              await updateLike(widget.idPost, _isLiked!);
-                            },
-                            icon: _isLiked!
-                                ? const Icon(Icons.thumb_up, color: Colors.red)
-                                : const Icon(Icons.thumb_up_alt_rounded),
-                          ),
-                        const SizedBox(width: 5),
-                        Text(post['likes'].toString()),
-                        const SizedBox(width: 20),
-                        const Icon(Icons.comment),
-                        const SizedBox(width: 5),
-                        Text(post['comments_count'].toString()),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Comments',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    comments.isEmpty
-                        ? const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: Text('No comments yet'),
+                      comments.isEmpty
+                          ? const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Text('No comments yet'),
+                              ),
+                            )
+                          : SizedBox(
+                              height:
+                                  400, // Set a fixed height for the ListView
+                              child: ListView.builder(
+                                itemCount: comments.length,
+                                itemBuilder: (context, index) {
+                                  final comment = comments[index];
+                                  return CommentItem(
+                                    author: comment['user']['name'],
+                                    avtUrl: comment['user']['avtUrl'],
+                                    time: formatTime(
+                                        DateTime.parse(
+                                            comment['comment']['timepost']),
+                                        context),
+                                    content: comment['comment']['comment'],
+                                    likes:
+                                        comment['comment']['likes'].toString(),
+                                    replies: comment['replies'],
+                                    onReply: (replyContent) => _addReply(index,
+                                        replyContent, comment['comment']['id']),
+                                    onLike: () => _likeComment(index),
+                                  );
+                                },
+                              ),
                             ),
-                          )
-                        : SizedBox(
-                            height: 400, // Set a fixed height for the ListView
-                            child: ListView.builder(
-                              itemCount: comments.length,
-                              itemBuilder: (context, index) {
-                                final comment = comments[index];
-                                return CommentItem(
-                                  author: comment['user']['name'],
-                                  avtUrl: comment['user']['avtUrl'],
-                                  time: formatTime(
-                                      DateTime.parse(
-                                          comment['comment']['timepost']),
-                                      context),
-                                  content: comment['comment']['comment'],
-                                  likes: comment['comment']['likes'].toString(),
-                                  replies: comment['replies'],
-                                  onReply: (replyContent) => _addReply(index,
-                                      replyContent, comment['comment']['id']),
-                                  onLike: () => _likeComment(index),
-                                );
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: TextField(
+                          controller: _commentController,
+                          decoration: InputDecoration(
+                            hintText: 'Write a comment...',
+                            border: const OutlineInputBorder(),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.send),
+                              onPressed: () {
+                                if (_commentController.text.isNotEmpty) {
+                                  _addComment(_commentController.text);
+                                }
                               },
                             ),
                           ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: TextField(
-                        controller: _commentController,
-                        decoration: InputDecoration(
-                          hintText: 'Write a comment...',
-                          border: const OutlineInputBorder(),
-                          suffixIcon: IconButton(
-                            icon: const Icon(Icons.send),
-                            onPressed: () {
-                              if (_commentController.text.isNotEmpty) {
-                                _addComment(_commentController.text);
-                              }
-                            },
-                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

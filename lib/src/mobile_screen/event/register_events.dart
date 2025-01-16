@@ -229,20 +229,47 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
                         child: Text(S.of(context).no_events_available));
                   }
 
-                  return ListView.builder(
-                    itemCount: _filteredEvents.length,
-                    itemBuilder: (context, index) {
-                      final event = _filteredEvents[index];
-                      return _buildEventCard(event);
-                    },
+                  return RefreshIndicator(
+                    onRefresh: _handleRefresh,
+                    child: _filteredEvents.isEmpty
+                        ? SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height,
+                              child: Center(
+                                  child:
+                                      Text(S.of(context).no_events_available)),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemCount: _filteredEvents.length,
+                            itemBuilder: (context, index) {
+                              final event = _filteredEvents[index];
+                              return _buildEventCard(event);
+                            },
+                          ),
                   );
                 },
               ),
-            ),
+            )
           ],
         ),
       ),
     );
+  }
+
+  Future<void> _handleRefresh() async {
+    try {
+      await _loadEvents();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Events refreshed successfully")),
+      );
+    } catch (e) {
+      LoggerService.logger.e("Error refreshing events: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to refresh events: $e")),
+      );
+    }
   }
 
   Widget _buildEventCard(Map<String, dynamic> event) {
