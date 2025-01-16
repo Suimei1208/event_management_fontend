@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_null_comparison
+// ignore_for_file: unnecessary_null_comparison, use_build_context_synchronously
 
 import 'package:event_management/src/mobile_screen/event/detail_event.dart';
 import 'package:event_management/src/mobile_screen/forum/forum_screen.dart';
@@ -31,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late List<Event> events = [];
   int _currentIndex = 0;
   String userName = "";
-  // List<String> notifications = [];
 
   @override
   void initState() {
@@ -94,142 +93,160 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
+    Future<void> handleRefresh() async {
+      try {
+        await fetchEvents();
+        await _fetchUserName(context);
+        setState(() {});
+      } catch (e) {
+        LoggerService.logger.e("Failed to refresh events: $e");
+      }
+    }
+
     final List<Widget> screens = [
-      SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ongoingEvents != null
-                  ? Card(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(S.of(context).ongoing_event,
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    ongoingEvents.name,
-                                    style: const TextStyle(fontSize: 16),
-                                    softWrap: true,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
+      RefreshIndicator(
+        onRefresh: handleRefresh,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ongoingEvents != null
+                    ? Card(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(S.of(context).ongoing_event,
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      ongoingEvents.name,
+                                      style: const TextStyle(fontSize: 16),
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 8,
-                                ),
-                                Chip(
-                                  label: Text(S.of(context).Ongoing,
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
+                                  Chip(
+                                    label: Text(S.of(context).Ongoing,
+                                        style: const TextStyle(
+                                            color: Colors.white)),
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 245, 203, 18),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 5),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      "${DateFormat.jm().format(ongoingEvents.startDate)} - ${ongoingEvents.location}",
                                       style:
-                                          const TextStyle(color: Colors.white)),
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 245, 203, 18),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "${DateFormat.jm().format(ongoingEvents.startDate)} - ${ongoingEvents.location}",
-                                    style: const TextStyle(color: Colors.grey),
-                                    softWrap: true,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
+                                          const TextStyle(color: Colors.grey),
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                                user?.uid == ongoingEvents.idCreate
-                                    ? const Text("")
-                                    : ElevatedButton(
-                                        style: Theme.of(context).brightness ==
-                                                Brightness.dark
-                                            ? ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.purple)
-                                            : null,
-                                        onPressed: () {
-                                          setState(() {
-                                            LoggerService.logger.i(
-                                                "Event clicked ticket ${ongoingEvents?.id}");
-                                          });
-                                        },
-                                        child: const Text('View your ticket'))
-                              ],
+                                  user?.uid == ongoingEvents.idCreate
+                                      ? const Text("")
+                                      : ElevatedButton(
+                                          style: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.purple)
+                                              : null,
+                                          onPressed: () {
+                                            setState(() {
+                                              LoggerService.logger.i(
+                                                  "Event clicked ticket ${ongoingEvents?.id}");
+                                            });
+                                          },
+                                          child: const Text('View your ticket'))
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+                Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(S.of(context).next_event,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                nextEvent?.name ??
+                                    S.of(context).no_upcoming_event,
+                                style: const TextStyle(fontSize: 16),
+                                softWrap: true,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Chip(
+                              label: Text(
+                                  "In ${timeUntilNextEvent.inHours} hours",
+                                  style: const TextStyle(color: Colors.white)),
+                              backgroundColor: Colors.green,
                             ),
                           ],
                         ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-              Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(S.of(context).next_event,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              nextEvent?.name ??
-                                  S.of(context).no_upcoming_event,
-                              style: const TextStyle(fontSize: 16),
-                              softWrap: true,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 8,
-                          ),
-                          Chip(
-                            label: Text(
-                                "In ${timeUntilNextEvent.inHours} hours",
-                                style: const TextStyle(color: Colors.white)),
-                            backgroundColor: Colors.green,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      Text(
-                        "${DateFormat.jm().format(nextEvent?.startDate ?? now)} - ${nextEvent?.location ?? "N/A"}",
-                        style: const TextStyle(color: Colors.grey),
-                      ),
-                    ],
+                        const SizedBox(height: 5),
+                        Text(
+                          "${DateFormat.jm().format(nextEvent?.startDate ?? now)} - ${nextEvent?.location ?? "N/A"}",
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Text(S.of(context).next_events,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              Column(
-                children: events
-                    .where((event) => event != ongoingEvents)
-                    .map((event) => buildEventCard(event))
-                    .toList(),
-              )
-            ],
+                const SizedBox(height: 20),
+                Text(S.of(context).next_events,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                Column(
+                  children: events
+                      .where((event) => event != ongoingEvents)
+                      .map((event) => buildEventCard(event))
+                      .toList(),
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -251,12 +268,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.only(right: 16.0),
                   child: Row(
                     children: [
-                      // IconButton(
-                      //   icon: const Icon(Icons.notifications),
-                      //   onPressed: () {
-                      //     _showNotificationsDialog(context);
-                      //   },
-                      // ),
                       Text(
                         userName,
                         style: const TextStyle(
@@ -327,44 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // void _showNotificationsDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: const Text("Notifications"),
-  //         content: SizedBox(
-  //           width: double.maxFinite,
-  //           child: ListView.builder(
-  //             shrinkWrap: true,
-  //             itemCount: notifications.length,
-  //             itemBuilder: (BuildContext context, int index) {
-  //               return ListTile(
-  //                 title: Text(notifications[index]),
-  //               );
-  //             },
-  //           ),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             child: const Text("Close"),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   Widget buildEventCard(Event event) {
-    // String? qr;
-    // getQrTicket(event.id).then((value) {
-    //   setState(() {
-    //     qr = value;
-    //   });
-    // });
     return Column(
       children: [
         InkWell(
@@ -440,7 +414,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () async {
                             Map<String, dynamic> qrCode =
                                 await getQrTicket(event.id);
-                            // ignore: use_build_context_synchronously
                             _viewQRCode(context, qrCode['qr']);
                           },
                           child: const Text('View your ticket'),

@@ -33,6 +33,10 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
     // LoggerService.logger.i('Posts: $posts');
   }
 
+  Future<void> _handleRefresh() async {
+    _fetchData();
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -88,15 +92,13 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
                     label: Text(S.of(context).latest),
                     selected: false,
                     onSelected: (selected) {}),
-                // FilterChip(
-                //     label: Text(S.of(context).unanswered),
-                //     selected: false,
-                //     onSelected: (selected) {}),
               ],
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: ListView.builder(
+              child: RefreshIndicator(
+                onRefresh: _handleRefresh,
+                child: ListView.builder(
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
                     final post = posts[index];
@@ -116,7 +118,9 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
                       image: post['image'].toString(),
                       isLike: post['isLike'],
                     );
-                  }),
+                  },
+                ),
+              ),
             ),
           ],
         ),
