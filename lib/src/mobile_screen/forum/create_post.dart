@@ -164,10 +164,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               S.of(context).attachments,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(),
-                borderRadius: BorderRadius.circular(5.0),
+            InputDecorator(
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.all(8.0),
               ),
               child: Column(
                 children: [

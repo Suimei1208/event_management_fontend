@@ -224,6 +224,7 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
                         controller: _tabController,
                         children: [
                           SpendingPieChart(
+                            
                             title: "Chi tiêu",
                             dataMap: _expenseData,
                             isExpense: true,

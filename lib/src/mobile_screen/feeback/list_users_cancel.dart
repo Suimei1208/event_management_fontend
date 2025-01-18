@@ -14,28 +14,18 @@ class CancelledUsersScreen extends StatefulWidget {
   State<CancelledUsersScreen> createState() => _CancelledUsersScreenState();
 }
 
-class _CancelledUsersScreenState extends State<CancelledUsersScreen> {
-  int _selectedIndex = 0;
+class _CancelledUsersScreenState extends State<CancelledUsersScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   final List<Map<String, dynamic>> cancelledUsers = [];
   final List<Map<String, dynamic>> alreadyCancelledUsers = [];
-  late List<Widget> _pages;
-  bool isLoading = true; // Track if data is loading
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     _fetchCancelledUsers();
-    _pages = [
-      CancelledUsersPage(
-          cancelledUsers: cancelledUsers, refreshData: _fetchCancelledUsers),
-      AlreadyCancelledUsersPage(cancelledUsers: alreadyCancelledUsers),
-    ];
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   Future<void> _fetchCancelledUsers() async {
@@ -76,10 +66,6 @@ class _CancelledUsersScreenState extends State<CancelledUsersScreen> {
         centerTitle: true,
         elevation: 0,
         actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.file_open),
-          //   onPressed: () {},
-          // ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -94,47 +80,34 @@ class _CancelledUsersScreenState extends State<CancelledUsersScreen> {
             },
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Danh sách chờ duyệt'),
+            Tab(text: 'Danh sách đã hủy'),
+          ],
+        ),
       ),
-      body: Column(
-        children: [
-          Card(
-            // color: Theme.of(context).colorScheme.primary,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : TabBarView(
+              controller: _tabController,
               children: [
-                TextButton(
-                  onPressed: () => _onItemTapped(0),
-                  child: Text(
-                    'Danh sách chờ duyệt',
-                    style: TextStyle(
-                        color:
-                            _selectedIndex == 0 ? Colors.orange : Colors.white),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => _onItemTapped(1),
-                  child: Text(
-                    'Danh sách đã hủy',
-                    style: TextStyle(
-                        color:
-                            _selectedIndex == 1 ? Colors.orange : Colors.white),
-                  ),
-                ),
+                CancelledUsersPage(
+                    cancelledUsers: cancelledUsers,
+                    refreshData: _fetchCancelledUsers),
+                AlreadyCancelledUsersPage(
+                    cancelledUsers: alreadyCancelledUsers),
               ],
             ),
-          ),
-          Expanded(
-            child: isLoading
-                ? const Center(
-                    child:
-                        CircularProgressIndicator()) // Show loading indicator
-                : IndexedStack(
-                    index: _selectedIndex,
-                    children: _pages,
-                  ),
-          ),
-        ],
-      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 }

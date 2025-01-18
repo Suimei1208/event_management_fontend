@@ -34,10 +34,12 @@ class _UserEventsState extends State<UserEvents> {
   Future<void> _loadEvents() async {
     try {
       final events = await fetchEvents();
-      setState(() {
-        _allEvents = events;
-        _filteredEvents = events;
-      });
+      if (mounted) {
+        setState(() {
+          _allEvents = events;
+          _filteredEvents = events;
+        });
+      }
     } catch (error) {
       LoggerService.logger.e('Error loading events: $error');
     }
