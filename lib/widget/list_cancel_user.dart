@@ -63,75 +63,85 @@ class _CancelledUsersPageState extends State<CancelledUsersPage> {
                 final user = widget.cancelledUsers[index];
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 25,
-                      backgroundImage: user["avtUrl"] != null
-                          ? NetworkImage(user["avtUrl"]!)
-                          : const AssetImage("assets/default_avatar.png")
-                              as ImageProvider,
-                    ),
-                    title: Text(
-                      user["name"] ?? "Unknown",
-                      style: const TextStyle(
-                          fontSize: 16.0, fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
                       children: [
-                        Text(
-                          user["nameFromEmail"] ?? "???",
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Text(
-                              "Reason: ",
-                              style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Expanded(
-                              child: Text(
-                                "${user["reason"] ?? "No reason provided"}",
-                                style: TextStyle(color: Colors.grey[600]),
-                                softWrap: true,
-                                maxLines: 2,
+                        ListTile(
+                          leading: CircleAvatar(
+                            radius: 25,
+                            backgroundImage: user["avtUrl"] != null
+                                ? NetworkImage(user["avtUrl"]!)
+                                : const AssetImage("assets/default_avatar.png")
+                                    as ImageProvider,
+                          ),
+                          title: Text(
+                            user["name"] ?? "Unknown",
+                            style: const TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user["nameFromEmail"] ?? "???",
                                 overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Text(
+                                    "Reason: ",
+                                    style: TextStyle(
+                                        // color: Colors.grey[600],
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      "${user["reason"] ?? "No reason provided"}",
+                                      // style: TextStyle(color: Colors.grey[600]),
+                                      softWrap: true,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.check),
+                                onPressed: () async {
+                                  await updateCancelTicketStatus(
+                                      [user["uid"] as String], "Accepted");
+                                  widget
+                                      .refreshData(); // Làm mới dữ liệu sau khi cập nhật
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () async {
+                                  await updateCancelTicketStatus(
+                                      [user["uid"] as String], "Rejected");
+                                  widget
+                                      .refreshData(); // Làm mới dữ liệu sau khi cập nhật
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                         TextButton(
+                          style: TextButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.inversePrimary),
                           onPressed: () {
                             _showImageDialog(context, user["link_image"]);
                           },
                           child: const Text('Xem ảnh'),
                         )
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.check),
-                          onPressed: () async {
-                            await updateCancelTicketStatus(
-                                [user["uid"] as String], "Accepted");
-                            widget
-                                .refreshData(); // Làm mới dữ liệu sau khi cập nhật
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () async {
-                            await updateCancelTicketStatus(
-                                [user["uid"] as String], "Rejected");
-                            widget
-                                .refreshData(); // Làm mới dữ liệu sau khi cập nhật
-                          },
-                        ),
                       ],
                     ),
                   ),

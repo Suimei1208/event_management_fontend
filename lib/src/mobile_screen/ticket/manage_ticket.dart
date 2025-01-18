@@ -47,7 +47,7 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).myTicket),
-        backgroundColor: Colors.deepPurple,
+        // backgroundColor: Colors.deepPurple,
       ),
       body: FutureBuilder<List<Ticket>>(
         future: _ticketsFuture,

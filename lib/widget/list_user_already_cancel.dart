@@ -55,6 +55,9 @@ class _AlreadyCancelledUsersPageState extends State<AlreadyCancelledUsersPage> {
                 ],
               ),
               trailing: TextButton(
+                style: TextButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.inversePrimary),
                 onPressed: () {
                   // Hiển thị ảnh khi bấm nút
                   _showImageDialog(context, user["link_image"]);

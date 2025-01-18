@@ -175,11 +175,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   backgroundColor:
                                                       Colors.purple)
                                               : null,
-                                          onPressed: () {
-                                            setState(() {
-                                              LoggerService.logger.i(
-                                                  "Event clicked ticket ${ongoingEvents?.id}");
-                                            });
+                                          onPressed: () async {
+                                            Map<String, dynamic> qrCode =
+                                                await getQrTicket(
+                                                    ongoingEvents!.id);
+                                            _viewQRCode(context, qrCode['qr']);
                                           },
                                           child: const Text('View your ticket'))
                                 ],
