@@ -4,7 +4,6 @@ import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:event_management/src/web-screen/edit_profile.dart';
 import 'package:event_management/src/web-screen/list_event_finished.dart';
 import 'package:event_management/src/web-screen/manager_ticket.dart';
-import 'package:event_management/widget/options_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/generated/l10n.dart';
@@ -22,231 +21,214 @@ class _ProfileWebScreenState extends State<ProfileWebScreen> {
   User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
-  void initState() {
-    super.initState();
-  }
+  Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final isDark = brightness == Brightness.dark;
 
-  @override
-  void dispose() {
-    super.dispose();
+    return Scaffold(
+      key: scaffoldKey,
+      appBar: const CustomAppBar(),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: getUserDetails(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (snapshot.hasData) {
+            final userData = snapshot.data!;
+
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  // Hero Section
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isDark
+                            ? [Colors.blueGrey[800]!, Colors.blueGrey[600]!]
+                            : [Colors.blue[300]!, Colors.blue[700]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundImage: currentUser?.photoURL != null
+                              ? NetworkImage(currentUser!.photoURL!)
+                              : null,
+                          child: currentUser?.photoURL == null
+                              ? const Icon(Icons.person,
+                                  size: 60, color: Colors.grey)
+                              : null,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          userData['name'] ?? 'User Name',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          userData['email'] ?? 'Email not available',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Profile Options
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SectionTitle(text: S.of(context).account),
+                        const SizedBox(height: 10),
+                        OptionsCard(
+                          icon: Icons.account_circle_outlined,
+                          text: S.of(context).editProfile,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              WebEditProfileScreen.routeName,
+                            );
+                          },
+                        ),
+                        OptionsCard(
+                          icon: Icons.confirmation_num,
+                          text: S.of(context).myTicket,
+                          onTap: () {
+                            Navigator.pushNamed(
+                              context,
+                              MyTicketsPageWeb.routeName,
+                            );
+                          },
+                        ),
+                        OptionsCard(
+                          icon: Icons.thumb_up,
+                          text: S.of(context).rate_event,
+                          onTap: () {
+                            Navigator.pushNamed(
+                                context, EventFinishedScreenWeb.routeName);
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        SectionTitle(text: S.of(context).general),
+                        const SizedBox(height: 10),
+                        OptionsCard(
+                          icon: Icons.settings,
+                          text: S.of(context).setting,
+                          onTap: () {
+                            Navigator.pushNamed(context, '/settings');
+                          },
+                        ),
+                        OptionsCard(
+                          icon: Icons.language,
+                          text: S.of(context).language,
+                          onTap: () {
+                            Navigator.pushNamed(context, '/language');
+                          },
+                        ),
+                        OptionsCard(
+                          icon: Icons.logout,
+                          text: S.of(context).logout,
+                          onTap: () {
+                            logoutWeb(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return const Center(child: Text('No user data available'));
+        },
+      ),
+    );
   }
+}
+
+// Helper Widgets
+class SectionTitle extends StatelessWidget {
+  final String text;
+  const SectionTitle({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: isDark ? Colors.white : Colors.black,
+      ),
+    );
+  }
+}
+
+class OptionsCard extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final VoidCallback onTap;
+
+  const OptionsCard({
+    super.key,
+    required this.icon,
+    required this.text,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        key: scaffoldKey,
-        appBar: const CustomAppBar(),
-        body: FutureBuilder<Map<String, dynamic>>(
-          future: getUserDetails(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-
-            if (snapshot.hasData) {
-              final userData = snapshot.data!;
-
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsetsDirectional.fromSTEB(0, 1, 0, 0),
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: brightness == Brightness.dark
-                              ? Colors.grey[850]
-                              : Colors.white,
-                          boxShadow: const [
-                            BoxShadow(
-                              blurRadius: 50,
-                              color: Color(0x33000000),
-                              offset: Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 90,
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  color: brightness == Brightness.dark
-                                      ? Colors.grey[600]
-                                      : Colors.white,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.grey,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: StreamBuilder<User?>(
-                                  stream: FirebaseAuth.instance.userChanges(),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.active) {
-                                      final user = snapshot.data;
-                                      final photoURL = user?.photoURL;
-                                      return CircleAvatar(
-                                        radius: 60,
-                                        backgroundImage: (photoURL != null)
-                                            ? NetworkImage(photoURL)
-                                            : null,
-                                        child: (photoURL == null)
-                                            ? const Icon(Icons.person, size: 60)
-                                            : null,
-                                      );
-                                    }
-                                    return const Center(
-                                        child: CircularProgressIndicator());
-                                  },
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsetsDirectional.fromSTEB(
-                                    16, 0, 0, 0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      userData['name'] ?? 'Default',
-                                      style: TextStyle(
-                                        fontFamily: 'Inter Tight',
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 0.0,
-                                        color: brightness == Brightness.dark
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                    Text(userData['nameFromEmail'] ?? '',
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontSize: 14,
-                                          color: brightness == Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black,
-                                        )),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              0, 4, 0, 0),
-                                      child: Text(
-                                        userData['email'] ??
-                                            'default@gmail.com',
-                                        style: TextStyle(
-                                          fontFamily: 'Inter',
-                                          fontSize: 14,
-                                          color: brightness == Brightness.dark
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
-                      child: Text(
-                        S.of(context).account,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 16,
-                          color: brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                      ),
-                    ),
-                    OptionsWidget(
-                      icon: Icons.account_circle_outlined,
-                      text: S.of(context).editProfile,
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          WebEditProfileScreen.routeName,
-                        );
-                      },
-                    ),
-                    OptionsWidget(
-                      icon: Icons.confirmation_num,
-                      text: S.of(context).myTicket,
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          MyTicketsPageWeb.routeName,
-                        );
-                      },
-                    ),
-                    OptionsWidget(
-                      icon: Icons.thumb_up,
-                      text: S.of(context).rate_event,
-                      onTap: () {
-                        Navigator.pushNamed(
-                            context, EventFinishedScreenWeb.routeName);
-                      },
-                    ),
-                    Padding(
-                      padding:
-                          const EdgeInsetsDirectional.fromSTEB(16, 16, 0, 0),
-                      child: Text(
-                        S.of(context).general,
-                        style: TextStyle(
-                          fontFamily: 'Inter',
-                          fontSize: 16,
-                          color: brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black,
-                        ),
-                      ),
-                    ),
-                    OptionsWidget(
-                      icon: Icons.settings,
-                      text: S.of(context).setting,
-                      onTap: () {
-                        Navigator.pushNamed(context, '/settings');
-                      },
-                    ),
-                    OptionsWidget(
-                      icon: Icons.language,
-                      text: S.of(context).language,
-                      onTap: () {
-                        Navigator.pushNamed(context, '/language');
-                      },
-                    ),
-                    OptionsWidget(
-                      icon: Icons.logout,
-                      text: S.of(context).logout,
-                      onTap: () {
-                        logoutWeb(context);
-                      },
-                    ),
-                  ],
+      onTap: onTap,
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              Icon(icon, size: 30, color: isDark ? Colors.white : Colors.blue),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black,
+                  ),
                 ),
-              );
-            }
-
-            return const Center(child: Text('No user data available'));
-          },
+              ),
+              const Icon(Icons.chevron_right, color: Colors.grey),
+            ],
+          ),
         ),
       ),
     );

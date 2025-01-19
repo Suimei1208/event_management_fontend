@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:event_management/src/service/ticket_service.dart';
+import 'package:event_management/src/web-screen/banner.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -66,28 +67,42 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                S.of(context).next_events,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Stack(
+              children: [
+                HeroSection(),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Upcoming Events',
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  events.isEmpty
+                      ? Center(
+                          child: Text(S.of(context).no_events_available),
+                        )
+                      : Column(
+                          children: events
+                              .map((event) => buildEventCard(event))
+                              .toList(),
+                        ),
+                ],
               ),
-              const SizedBox(height: 16),
-              events.isEmpty
-                  ? Center(
-                      child: Text(S.of(context).no_events_available),
-                    )
-                  : Column(
-                      children:
-                          events.map((event) => buildEventCard(event)).toList(),
-                    ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

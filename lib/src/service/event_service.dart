@@ -474,6 +474,7 @@ Future<List<Map<String, dynamic>>> fetchEventCanRegister() async {
   }
 
   String? idToken = await user.getIdToken();
+  LoggerService.logger.i(idToken);
   try {
     final response = await http.get(
         Uri.parse('${Config.baseUrl}/event-service/event/can-register'),

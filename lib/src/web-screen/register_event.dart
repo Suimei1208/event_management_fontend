@@ -31,6 +31,9 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
     "Competition"
   ];
 
+  int _currentPage = 0;
+  int _itemsPerPage = 6;
+
   @override
   void initState() {
     super.initState();
@@ -44,22 +47,8 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
       setState(() {
         _allEvents = events;
         _filteredEvents = events;
+        _currentPage = 0;
       });
-    }
-  }
-
-  Color _getStatusColorType(String type) {
-    switch (type) {
-      case 'Seminar':
-        return Colors.green.shade600;
-      case 'Workshop':
-        return Colors.blue.shade600;
-      case 'Conference':
-        return Colors.red.shade600;
-      case 'Competitions':
-        return Colors.purple.shade600;
-      default:
-        return Colors.grey;
     }
   }
 
@@ -80,6 +69,7 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
 
     setState(() {
       _filteredEvents = filtered;
+      _currentPage = 0;
     });
   }
 
@@ -96,6 +86,58 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
         _selectedStartDate = picked;
       });
       _filterEvents('');
+    }
+  }
+
+  int _getItemsPerPage(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+
+    if (width >= 1200) {
+      return 6;
+    } else if (width >= 800) {
+      return 4;
+    } else {
+      return 2;
+    }
+  }
+
+  void _nextPage() {
+    setState(() {
+      if ((_currentPage + 1) * _itemsPerPage < _filteredEvents.length) {
+        _currentPage++;
+      }
+    });
+  }
+
+  void _previousPage() {
+    setState(() {
+      if (_currentPage > 0) {
+        _currentPage--;
+      }
+    });
+  }
+
+  String _formatDate(String date) {
+    try {
+      final DateTime parsedDate = DateTime.parse(date);
+      return DateFormat.yMMMd().format(parsedDate);
+    } catch (e) {
+      return "Invalid date";
+    }
+  }
+
+  Color _getStatusColorType(String type) {
+    switch (type) {
+      case 'Seminar':
+        return Colors.green.shade600;
+      case 'Workshop':
+        return Colors.blue.shade600;
+      case 'Conference':
+        return Colors.red.shade600;
+      case 'Competitions':
+        return Colors.purple.shade600;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -132,21 +174,11 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
     }
   }
 
-  String _formatDate(String date) {
-    try {
-      final DateTime parsedDate = DateTime.parse(date);
-      return DateFormat.yMMMd().format(parsedDate);
-    } catch (e) {
-      return "Invalid date";
-    }
-  }
-
   Widget _buildEventCard(Map<String, dynamic> event) {
     final user = event["user"];
     final String? isRegistered = event["isRegistered"];
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -178,7 +210,6 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
                     child: Text(
                       event["type"],
                       style: const TextStyle(
-                        // color: statusTextColor,
                         fontSize: 15,
                       ),
                     ),
@@ -198,6 +229,17 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
               ],
             ),
             const SizedBox(height: 8),
+            if (event['banner'] != null && event['banner'].isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  event['banner'],
+                  width: double.infinity,
+                  height: 150, // Adjust the height to avoid overflow
+                  fit: BoxFit.cover, // Adjust image aspect ratio
+                ),
+              ),
+            const SizedBox(height: 8),
             Row(
               children: [
                 CircleAvatar(
@@ -205,10 +247,14 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
                   radius: 16.0,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  user["name"],
-                  style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
+                Flexible(
+                  // Wrap text in Flexible to prevent overflow
+                  child: Text(
+                    user["name"],
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis, // Prevent text overflow
+                  ),
                 ),
               ],
             ),
@@ -261,6 +307,9 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Update itemsPerPage based on screen width
+    _itemsPerPage = _getItemsPerPage(context);
+
     return Scaffold(
       appBar: const CustomAppBar(),
       body: Padding(
@@ -272,7 +321,6 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
               child: Container(
                 width: 300,
                 padding: const EdgeInsets.all(16),
-                // color: Colors.grey.shade200,
                 child: Column(
                   children: [
                     TextField(
@@ -354,19 +402,52 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
                         child: Text(S.of(context).no_events_available));
                   }
 
-                  return GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 3 / 2,
-                    ),
-                    itemCount: _filteredEvents.length,
-                    itemBuilder: (context, index) {
-                      final event = _filteredEvents[index];
-                      return _buildEventCard(event);
-                    },
+                  // Calculate the current page slice
+                  int startIndex = _currentPage * _itemsPerPage;
+                  int endIndex = (_currentPage + 1) * _itemsPerPage;
+                  List<Map<String, dynamic>> eventsToDisplay =
+                      _filteredEvents.sublist(
+                          startIndex,
+                          endIndex < _filteredEvents.length
+                              ? endIndex
+                              : _filteredEvents.length);
+
+                  return Column(
+                    children: [
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: 3 / 2,
+                        ),
+                        itemCount: eventsToDisplay.length,
+                        itemBuilder: (context, index) {
+                          final event = eventsToDisplay[index];
+                          return _buildEventCard(event);
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _currentPage > 0 ? _previousPage : null,
+                            child: const Text('Previous'),
+                          ),
+                          ElevatedButton(
+                            onPressed: (_currentPage + 1) * _itemsPerPage <
+                                    _filteredEvents.length
+                                ? _nextPage
+                                : null,
+                            child: const Text('Next'),
+                          ),
+                        ],
+                      ),
+                    ],
                   );
                 },
               ),

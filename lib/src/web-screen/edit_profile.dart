@@ -63,7 +63,13 @@ class _EditProfileScreenState extends State<WebEditProfileScreen> {
     // Listen for the file selection and upload the image
     uploadInput.onChange.listen((e) async {
       final files = uploadInput.files;
-      if (files?.isEmpty ?? true) return;
+      if (files?.isEmpty ?? true) {
+        setState(() {
+          _isUploading = false;
+          _isLoading = false;
+        });
+        return;
+      }
 
       final reader = html.FileReader();
       reader.readAsDataUrl(files![0]);
