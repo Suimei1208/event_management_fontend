@@ -57,10 +57,10 @@ class _HeroSectionState extends State<HeroSection> {
           // Gradient overlay
           Container(
             height: 300,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.black.withOpacity(0.8),
+                  Color.fromRGBO(0, 0, 0, 0.8),
                   Colors.transparent,
                 ],
                 begin: Alignment.bottomCenter,
@@ -130,11 +130,10 @@ class _HeroSectionState extends State<HeroSection> {
                     width: _currentPage == index ? 18 : 14,
                     height: _currentPage == index ? 18 : 14,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _currentPage == index
-                          ? Colors.white
-                          : Colors.white.withOpacity(0.5),
-                    ),
+                        shape: BoxShape.circle,
+                        color: _currentPage == index
+                            ? Colors.white
+                            : const Color.fromRGBO(255, 255, 255, 0.5)),
                   ),
                 ),
               ),
