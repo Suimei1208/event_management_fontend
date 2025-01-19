@@ -8,6 +8,7 @@ import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/settings/settings_view.dart';
 import 'package:event_management/src/web-screen/add_special_participants.dart';
 import 'package:event_management/src/web-screen/attendance_report_page.dart';
+import 'package:event_management/src/web-screen/auth/register_account.dart';
 import 'package:event_management/src/web-screen/checkin.dart';
 import 'package:event_management/src/web-screen/checkout.dart';
 import 'package:event_management/src/web-screen/document_page.dart';
@@ -29,7 +30,7 @@ import 'package:flutter/material.dart';
 import 'package:event_management/src/web-screen/create_event.dart';
 import 'package:event_management/src/web-screen/edit_profile.dart';
 import 'package:event_management/src/web-screen/home.dart';
-import 'package:event_management/src/web-screen/login.dart';
+import 'package:event_management/src/web-screen/auth/login.dart';
 import 'package:event_management/src/models/checkedInData.dart'; // Adjust the import path as needed
 import 'package:provider/provider.dart';
 
@@ -154,6 +155,7 @@ class _MyWebAppState extends State<MyWebApp> {
                           uri.pathSegments.first == 'my-tickets' ||
                           uri.pathSegments.first == 'finished-events' ||
                           uri.pathSegments.first == 'settings' ||
+                          uri.pathSegments.first == 'register' ||
                           uri.pathSegments.first == 'language') {
                       } else {
                         return const PageNotFoundPage();
@@ -182,8 +184,8 @@ class _MyWebAppState extends State<MyWebApp> {
                           return const EventFinishedScreenWeb();
                         case MyTicketsPageWeb.routeName:
                           return const MyTicketsPageWeb();
-                        // case CreatePostScreenWeb.routeName:
-                        //   return const CreatePostScreenWeb();
+                        case RegisterScreenWeb.routeName:
+                          return const RegisterScreenWeb();
                         case SettingsView.routeName:
                           return SettingsView(
                               controller: widget.settingsController);
@@ -260,7 +262,6 @@ Future<String?> fetchUserRole(int eventId) {
 }
 
 class NoTransitionBuilder extends PageTransitionsBuilder {
-  @override
   @override
   Widget buildTransitions<T>(
       PageRoute<T> route,

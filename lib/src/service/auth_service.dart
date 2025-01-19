@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:event_management/config.dart';
 import 'package:event_management/src/mobile_screen/auth/login.dart';
 import 'package:event_management/src/service/logger_service.dart';
-import 'package:event_management/src/web-screen/login.dart';
+import 'package:event_management/src/web-screen/auth/login.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

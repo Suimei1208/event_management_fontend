@@ -174,13 +174,28 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
-              ElevatedButton(
-                onPressed: () async {
-                  Map<String, dynamic> qrCode = await getQrTicket(event.id);
-                  _viewQRCode(context, qrCode['qr']);
-                },
-                child: const Text('View Ticket'),
+              // const SizedBox(width: 16),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text(
+                                'Đang định test, nào rảnh thì làm, chill thôi')),
+                      );
+                    },
+                    child: const Text('Thêm vào google calendar'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      Map<String, dynamic> qrCode = await getQrTicket(event.id);
+                      _viewQRCode(context, qrCode['qr']);
+                    },
+                    child: const Text('View Ticket'),
+                  ),
+                ],
               ),
             ],
           ),
