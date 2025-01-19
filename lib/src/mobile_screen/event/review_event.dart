@@ -30,100 +30,106 @@ class _EventReviewPageState extends State<EventReviewPage> {
       appBar: AppBar(
         title: Text(S.of(context).review_event),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: Text(
-                widget.eventName,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(
+                child: Text(
+                  widget.eventName,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 30),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                S.of(context).rate,
                 style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              S.of(context).rate,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(5, (index) {
-                return IconButton(
-                  icon: Icon(
-                    size: 50,
-                    index < _rating ? Icons.star : Icons.star_border,
-                    color: Colors.yellow,
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  return IconButton(
+                    icon: Icon(
+                      size: 50,
+                      index < _rating ? Icons.star : Icons.star_border,
+                      color: Colors.yellow,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _rating = index + 1;
+                      });
+                    },
+                  );
+                }),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                S.of(context).content_review,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  hintText: 'Share your thoughts about the event...',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) {
+                  setState(() {});
+                },
+                controller: _textController1,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                S.of(context).like_event_review,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.thumb_up,
+                        color: _recommend ? Colors.blue : Colors.grey),
+                    onPressed: () {
+                      setState(() {
+                        _recommend = true;
+                      });
+                    },
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _rating = index + 1;
-                    });
-                  },
-                );
-              }),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              S.of(context).content_review,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              maxLines: 4,
-              decoration: const InputDecoration(
-                hintText: 'Share your thoughts about the event...',
-                border: OutlineInputBorder(),
+                  IconButton(
+                    icon: Icon(Icons.thumb_down,
+                        color: !_recommend ? Colors.red : Colors.grey),
+                    onPressed: () {
+                      setState(() {
+                        _recommend = false;
+                      });
+                    },
+                  ),
+                ],
               ),
-              onChanged: (value) {
-                setState(() {});
-              },
-              controller: _textController1,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              S.of(context).like_event_review,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.thumb_up,
-                      color: _recommend ? Colors.blue : Colors.grey),
-                  onPressed: () {
-                    setState(() {
-                      _recommend = true;
-                    });
-                  },
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _submitReview,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  // padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  textStyle: const TextStyle(fontSize: 16),
                 ),
-                IconButton(
-                  icon: Icon(Icons.thumb_down,
-                      color: !_recommend ? Colors.red : Colors.grey),
-                  onPressed: () {
-                    setState(() {
-                      _recommend = false;
-                    });
-                  },
+                child: Text(
+                  S.of(context).submit_review,
+                  style:
+                      TextStyle(color: Theme.of(context).colorScheme.primary),
                 ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _submitReview,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                // padding: const EdgeInsets.symmetric(vertical: 15.0),
-                textStyle: const TextStyle(fontSize: 16),
               ),
-              child: Text(
-                S.of(context).submit_review,
-                style: TextStyle(color: Theme.of(context).colorScheme.primary),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

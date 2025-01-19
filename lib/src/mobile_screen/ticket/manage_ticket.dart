@@ -1,4 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
+
+
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/ticket/form_cancel_ticket.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -33,7 +35,7 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
   String text(String status) {
     if (status == "Pending") {
       return "Đang chờ xử lý";
-    } else if (status == "Approved") {
+    } else if (status == "Accepted") {
       return "Đã được chấp nhận";
     } else if (status == "Rejected") {
       return "Đã bị từ chối";
@@ -65,10 +67,10 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
           }
 
           final tickets = snapshot.data!;
-          for (var ticket in tickets) {
-            LoggerService.logger.i(ticket.cancel_status);
-            LoggerService.logger.i(ticket.status);
-          }
+          // for (var ticket in tickets) {
+          //   LoggerService.logger.i(ticket.cancel_status);
+          //   LoggerService.logger.i(ticket.status);
+          // }
           final upcomingTickets = tickets
               .where((ticket) =>
                   ticket.eventStatus == 'Upcoming' ||
@@ -144,32 +146,94 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
           ticket.cancellationEndDate != null) {
         if (DateTime.now().isAfter(ticket.cancellationStartDate!) &&
             DateTime.now().isBefore(ticket.cancellationEndDate!)) {
+          if (ticket.cancel_status == "None") {
+            return Column(
+              children: [
+                Text(text(ticket.cancel_status!)),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (ticket.cancellationLink != null &&
+                        ticket.cancellationLink!.isNotEmpty) {
+                      final Uri url = Uri.parse(ticket.cancellationLink!);
+                      if (url.isAbsolute) {
+                        await launchUrl(url);
+                      } else {
+                        LoggerService.logger.e("Invalid cancellation link");
+                      }
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TicketCancellationForm(
+                            eventId: ticket.eventId,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[300],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  child: const Text('Hủy vé'),
+                ),
+              ],
+            );
+          } else if (ticket.status == "Cancelled" &&
+              ticket.cancel_status == "Accepted") {
+            return Column(
+              children: [
+                Text(text(ticket.cancel_status!)),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[300],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  onPressed: null,
+                  child: const Text('Hủy vé'),
+                ),
+              ],
+            );
+          } else {
+            return Column(
+              children: [
+                Text(text(ticket.cancel_status!)),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[300],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  onPressed: null,
+                  child: const Text('Hủy vé'),
+                ),
+              ],
+            );
+          }
+        } else if (DateTime.parse(ticket.startDate).isAfter(DateTime.now())) {
           return Column(
             children: [
-              Text(text(ticket.cancel_status!)),
+              Text(ticket.status == "Cancelled" ? "Vé đã bị hủy" : ""),
               ElevatedButton(
-                onPressed: ticket.cancel_status == "None"
-                    ? () async {
-                        if (ticket.cancellationLink != null &&
-                            ticket.cancellationLink!.isNotEmpty) {
-                          final Uri url = Uri.parse(ticket.cancellationLink!);
-                          if (url.isAbsolute) {
-                            await launchUrl(url);
-                          } else {
-                            LoggerService.logger.e("Invalid cancellation link");
-                          }
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TicketCancellationForm(
-                                eventId: ticket.eventId,
-                              ),
-                            ),
-                          );
-                        }
-                      }
-                    : null,
+                onPressed: ticket.status == "Cancelled"
+                    ? null
+                    : () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return const DialogWidget(
+                              message:
+                                  'Vui lòng liên hệ Admin qua email để hủy vé!',
+                              title: 'Notification',
+                            );
+                          },
+                        );
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red[300],
                   shape: RoundedRectangleBorder(
@@ -183,52 +247,30 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
         } else {
           return Column(
             children: [
-              Text((ticket.status == "Cancelled" &&
-                      ticket.cancel_status == "Accepted")
-                  ? "Hủy vé thành công"
-                  : "Đã hết hạn hủy vé"),
+              const Text(""),
               ElevatedButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return const DialogWidget(
+                        message: 'Vui lòng liên hệ Admin qua email để hủy vé!',
+                        title: 'Notification',
+                      );
+                    },
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red[300],
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                onPressed: null,
                 child: const Text('Hủy vé'),
               ),
             ],
           );
         }
-      } else if (DateTime.parse(ticket.startDate).isAfter(DateTime.now())) {
-        return Column(
-          children: [
-            Text(ticket.status == "Cancelled" ? "Vé đã bị hủy" : ""),
-            ElevatedButton(
-              onPressed: ticket.status == "Cancelled"
-                  ? null
-                  : () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return const DialogWidget(
-                            message:
-                                'Vui lòng liên hệ Admin qua email để hủy vé!',
-                            title: 'Notification',
-                          );
-                        },
-                      );
-                    },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[300],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: const Text('Hủy vé'),
-            ),
-          ],
-        );
       } else {
         return Column(
           children: [
