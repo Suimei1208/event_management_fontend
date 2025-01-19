@@ -70,68 +70,74 @@ class _UserEventsWebState extends State<WebUserEvents> {
       appBar: const CustomAppBar(),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
-              const SizedBox(height: 20),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton.icon(
-                    onPressed: _toggleView,
-                    icon: const Icon(Icons.tune),
-                    label: Text(S.of(context).toggle_view),
-                  ),
-                  const SizedBox(width: 20),
-                  ElevatedButton.icon(
-                    onPressed: () => Navigator.pushNamed(
-                      context,
-                      WebCreateEvent.routeName,
+                  Expanded(
+                    child: TextField(
+                      onChanged: _filterEvents,
+                      decoration: InputDecoration(
+                        hintText: S.of(context).search_event,
+                        prefixIcon: Icon(Icons.search,
+                            color: Theme.of(context).primaryColor),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                      ),
                     ),
-                    icon: const Icon(Icons.add),
-                    label: Text(S.of(context).create_event),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24)),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
+                    ),
+                    onPressed: () =>
+                        Navigator.pushNamed(context, WebCreateEvent.routeName),
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    label: Text(S.of(context).create_event,
+                        style: const TextStyle(color: Colors.white)),
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: Icon(
+                      _isGridView ? Icons.grid_view : Icons.view_list,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    onPressed: _toggleView,
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              // Search bar
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: TextField(
-                  onChanged: _filterEvents,
-                  decoration: InputDecoration(
-                    hintText: S.of(context).search_event,
-                    prefixIcon: Icon(Icons.search,
-                        color: Theme.of(context).primaryColor),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                  ),
-                ),
-              ),
               Expanded(
-                child: _filteredEvents.isEmpty
-                    ? Center(
-                        child: Text(
-                          S.of(context).no_events_available,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      )
-                    : LayoutBuilder(
-                        builder: (context, constraints) {
-                          return _isGridView
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      _filteredEvents.isEmpty
+                          ? Center(
+                              child: Text(S.of(context).no_events_available))
+                          : _isGridView
                               ? GridView.builder(
+                                  shrinkWrap: true,
                                   padding: EdgeInsets.zero,
                                   gridDelegate:
                                       SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount:
-                                        constraints.maxWidth > 800 ? 3 : 2,
+                                        MediaQuery.of(context).size.width > 800
+                                            ? 3
+                                            : 2,
                                     crossAxisSpacing: 16.0,
                                     mainAxisSpacing: 16.0,
-                                    childAspectRatio: 0.555,
+                                    childAspectRatio: 1.5,
                                   ),
                                   itemCount: _filteredEvents.length,
                                   itemBuilder: (context, index) {
@@ -143,6 +149,8 @@ class _UserEventsWebState extends State<WebUserEvents> {
                                   },
                                 )
                               : ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
                                   padding: EdgeInsets.zero,
                                   itemCount: _filteredEvents.length,
                                   itemBuilder: (context, index) {
@@ -152,9 +160,10 @@ class _UserEventsWebState extends State<WebUserEvents> {
                                       isGridView: _isGridView,
                                     );
                                   },
-                                );
-                        },
-                      ),
+                                ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -288,6 +297,7 @@ class EventCard extends StatelessWidget {
                           event.banner,
                           width: 200,
                           height: 200,
+                          fit: BoxFit.cover,
                         ),
                         const SizedBox(width: 50),
                         Column(

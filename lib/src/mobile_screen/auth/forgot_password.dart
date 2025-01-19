@@ -11,7 +11,8 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final TextEditingController emailAddressTextController = TextEditingController();
+  final TextEditingController emailAddressTextController =
+      TextEditingController();
   final FocusNode emailAddressFocusNode = FocusNode();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -26,10 +27,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      appBar: AppBar(
-        // title: const Text('Forgot Password'),
-        // backgroundColor: Theme.of(context).primaryColor,
-      ),
+      appBar: AppBar(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -58,7 +56,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => resetPassword(emailAddressTextController.text, context),
+                  onPressed: () =>
+                      resetPassword(emailAddressTextController.text, context),
                   child: const Text('Send Link'),
                 ),
               ),

@@ -39,6 +39,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
   bool allowSelectSchedule = false;
   String userRole = "";
   String status = "";
+  List<Map<String, dynamic>> specialParticipants = [];
 
   @override
   void initState() {
@@ -58,14 +59,29 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
       status = '';
       access = false;
       allowSelectSchedule = false;
+      specialParticipants = [];
     });
     await _loadUserRole();
     await _loadEventData();
+    await _loadSpecialParticipants();
 
     if (!mounted) return;
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> _loadSpecialParticipants() async {
+    try {
+      final participants = await fetchSpecialParticipants(widget.eventId);
+      if (!mounted) return;
+
+      setState(() {
+        specialParticipants = participants;
+      });
+    } catch (e) {
+      LoggerService.logger.e("Error fetching special participants: $e");
+    }
   }
 
   Future<void> _loadEventData() async {
@@ -223,90 +239,103 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
           if (isHostOrStaff)
             Card(
               child: Container(
-                width: 350,
-                // color: Colors.deepPurple.shade50,
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSidebarButton(
-                        Icons.file_copy, S.of(context).add_via_excel, () {
-                      handleExcelUpload(widget.eventId, eventName);
-                    }),
-                    _buildSidebarButton(Icons.insert_invitation,
-                        S.of(context).registration_list, () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/pending-requests");
-                    }),
-                    _buildSidebarButton(
-                        Icons.edit, S.of(context).edit_special_participants,
-                        () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/special-participants");
-                    }),
-                    _buildSidebarButton(
-                        Icons.person, S.of(context).participant_list, () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/existed-participants");
-                    }),
-                    _buildSidebarButton(
-                        Icons.description, S.of(context).document, () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/documents");
-                    }),
-                    _buildSidebarButton(Icons.share, S.of(context).share_role,
-                        () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/share-roles");
-                    }),
-                    _buildSidebarButton(
-                        Icons.money_outlined, S.of(context).spending, () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/spending");
-                    }),
-                    _buildSidebarButton(Icons.analytics, S.of(context).stat,
-                        () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/event-analystics");
-                    }),
-                    _buildSidebarButton(
-                        Icons.cancel_presentation, S.of(context).cancel_list,
-                        () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/list-cancelled-users");
-                    }),
-                    _buildSidebarButton(Icons.login, "CheckIn", () async {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/check-in");
-                    }),
-                    _buildSidebarButton(Icons.logout, "CheckOut", () async {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/check-out");
-                    }),
-                    _buildSidebarButton(Icons.edit, S.of(context).edit_event,
-                        () {
-                      Navigator.pushNamed(context,
-                          "/home/detail-event/${widget.eventId}/edit-event");
-                    }),
-                    status != "Cancelled"
-                        ? _buildSidebarButton(
-                            Icons.cancel, S.of(context).cancel_event, () async {
-                            cancelEvent(widget.eventId, context);
-                          })
-                        : _buildSidebarButton(
-                            Icons.repeat_outlined, S.of(context).reopen, () {
-                            resetEvent(widget.eventId, context);
-                          }),
-                  ],
-                ),
-              ),
+                  width: 350,
+                  height: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSidebarButton(
+                            Icons.file_copy, S.of(context).add_via_excel, () {
+                          handleExcelUpload(widget.eventId, eventName);
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(Icons.insert_invitation,
+                            S.of(context).registration_list, () {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/pending-requests");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(
+                            Icons.edit, S.of(context).edit_special_participants,
+                            () {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/special-participants");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(
+                            Icons.person, S.of(context).participant_list, () {
+                          Navigator.pushNamed(context,
+                              "/hoconst SizedBox(height: 16),me/detail-event/${widget.eventId}/existed-participants");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(
+                            Icons.description, S.of(context).document, () {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/documents");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(
+                            Icons.share, S.of(context).share_role, () {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/share-roles");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(
+                            Icons.money_outlined, S.of(context).spending, () {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/spending");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(Icons.analytics, S.of(context).stat,
+                            () {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/event-analystics");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(Icons.cancel_presentation,
+                            S.of(context).cancel_list, () {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/list-cancelled-users");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(Icons.login, "CheckIn", () async {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/check-in");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(Icons.logout, "CheckOut", () async {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/check-out");
+                        }),
+                        const SizedBox(height: 16),
+                        _buildSidebarButton(
+                            Icons.edit, S.of(context).edit_event, () {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/edit-event");
+                        }),
+                        const SizedBox(height: 16),
+                        status != "Cancelled"
+                            ? _buildSidebarButton(
+                                Icons.cancel, S.of(context).cancel_event,
+                                () async {
+                                cancelEvent(widget.eventId, context);
+                              })
+                            : _buildSidebarButton(
+                                Icons.repeat_outlined, S.of(context).reopen,
+                                () {
+                                resetEvent(widget.eventId, context);
+                              }),
+                      ],
+                    ),
+                  )),
             ),
 
           // Main Content
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 20), // Adjusted padding
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
@@ -316,14 +345,12 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                     if (photoUrl.isNotEmpty)
                       Center(
                         child: ClipRRect(
-                          borderRadius:
-                              BorderRadius.circular(16), // Rounded corners
+                          borderRadius: BorderRadius.circular(16),
                           child: Image.network(
                             photoUrl,
-                            width: double.infinity, // Make it responsive
-                            height: 250, // Adjusted height
-                            fit: BoxFit
-                                .contain, // Make the image fill its container
+                            width: double.infinity,
+                            height: 250,
+                            fit: BoxFit.contain,
                           ),
                         ),
                       ),
@@ -335,7 +362,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                       style: const TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple, // Enhanced color
+                        color: Colors.deepPurple,
                       ),
                     ),
                     const SizedBox(height: 15),
@@ -377,7 +404,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                     const SizedBox(height: 30),
 
                     // Special Participants Section
-                    _buildSpecialParticipantsSection(widget.eventId),
+                    _buildSpecialParticipantsSection(),
                     const SizedBox(height: 30),
 
                     // View Schedule Button
@@ -418,71 +445,55 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
     );
   }
 
-  // Helper method for creating sidebar buttons
-  Widget _buildSidebarButton(IconData icon, String label, VoidCallback onTap) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: GestureDetector(
-        onTap: onTap,
+  Widget _buildSidebarButton(
+      IconData icon, String label, VoidCallback onPressed) {
+    return MouseRegion(
+      onEnter: (_) => setState(() {}),
+      onExit: (_) => setState(() {}),
+      child: MaterialButton(
+        onPressed: onPressed,
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+        hoverColor: Theme.of(context).colorScheme.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Row(
           children: [
-            Icon(icon, size: 28, color: Colors.deepPurple),
+            Icon(icon, size: 24),
             const SizedBox(width: 16),
-            Text(label, style: const TextStyle(fontSize: 16)),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 20),
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSpecialParticipantsSection(int eventId) {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: fetchSpecialParticipants(eventId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(
-              child: Text('This event has no special participants',
-                  style: TextStyle(fontSize: 22)));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(S.of(context).special_guest,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              const Text('No special participants available for this event.',
-                  style: TextStyle(fontSize: 20)),
-            ],
-          );
-        } else {
-          final participants = snapshot.data!;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text("Special Participants",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: participants.length,
-                itemBuilder: (context, index) {
-                  final participant = participants[index];
-                  return _buildParticipantTile(
-                    name: participant['name'] ?? 'Unknown',
-                    role: participant['role'] ?? 'Unknown',
-                    description: participant['description'] ?? "Unknown",
-                    photoUrl: participant['photoUrl'],
-                  );
-                },
-              ),
-            ],
-          );
-        }
-      },
+  Widget _buildSpecialParticipantsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          S.of(context).special_guest,
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: 8),
+        if (specialParticipants.isEmpty)
+          const Text("No Special participants")
+        else
+          ...specialParticipants.map((participant) {
+            return _buildParticipantTile(
+              name: participant['name'],
+              role: participant['role'],
+              photoUrl: participant['photoUrl'],
+              description: participant['description'],
+            );
+          }),
+      ],
     );
   }
 

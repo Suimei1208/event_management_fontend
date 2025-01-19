@@ -3,7 +3,6 @@
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/models/info_user.dart';
 import 'package:event_management/src/service/forum_service.dart';
-import 'package:event_management/src/web-screen/create_post_forum.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -11,13 +10,14 @@ import 'package:intl/intl.dart';
 class WebCommunityForumScreen extends StatefulWidget {
   const WebCommunityForumScreen({super.key});
   static const routeName = "/forum";
+
   @override
-  State<WebCommunityForumScreen> createState() =>
-      _WebCommunityForumScreenState();
+  State<WebCommunityForumScreen> createState() => _CommunityForumScreenState();
 }
 
-class _WebCommunityForumScreenState extends State<WebCommunityForumScreen> {
-  final List<Map<String, dynamic>> posts = [];
+class _CommunityForumScreenState extends State<WebCommunityForumScreen> {
+  List<Map<String, dynamic>> posts = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -25,114 +25,100 @@ class _WebCommunityForumScreenState extends State<WebCommunityForumScreen> {
     _fetchData();
   }
 
-  void _fetchData() async {
-    final data = await getPosts();
-    setState(() {
-      posts.addAll(data);
-    });
+  Future<void> _fetchData() async {
+    try {
+      final data = await getPosts(); // Fetch posts using API
+      if (mounted) {
+        setState(() {
+          posts = data;
+          isLoading = false;
+        });
+      }
+    } catch (error) {
+      // Handle API errors (e.g., network issues)
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+      debugPrint('Error fetching posts: $error');
+    }
+  }
+
+  Future<void> _handleRefresh() async {
+    setState(() => isLoading = true);
+    await _fetchData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(),
-      body: Row(
-        children: [
-          // Sidebar for navigation
-          SizedBox(
-            width: 250,
-            // color: Colors.grey[200],
-            child: Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.home),
-                    title: Text(S.of(context).home),
-                    onTap: () {},
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.trending_up),
-                    title: Text(S.of(context).popular),
-                    onTap: () {},
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.new_releases),
-                    title: Text(S.of(context).latest),
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Main content area
-          Expanded(
-            child: Padding(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const CreatePostScreenWeb()),
-                        );
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text('Create Post'),
-                    ),
+                  Text(
+                    S.of(context).guide_forum,
+                    style: const TextStyle(color: Colors.grey),
                   ),
-                  const SizedBox(height: 16),
-                  // Search bar
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Search posts...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 20),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 4.0,
+                    children: [
+                      FilterChip(
+                          label: Text(S.of(context).all),
+                          selected: true,
+                          onSelected: (selected) {
+                            // Filter logic here
+                          }),
+                      FilterChip(
+                          label: Text(S.of(context).popular),
+                          selected: false,
+                          onSelected: (selected) {
+                            // Filter logic here
+                          }),
+                      FilterChip(
+                          label: Text(S.of(context).latest),
+                          selected: false,
+                          onSelected: (selected) {
+                            // Filter logic here
+                          }),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: _handleRefresh,
+                      child: ListView.builder(
+                        itemCount: posts.length,
+                        itemBuilder: (context, index) {
+                          final post = posts[index];
+                          return WebPostItem(
+                            id: int.parse(post['id'].toString()),
+                            author: InfoUser.fromJson(post['user']),
+                            time: DateTime.parse(post['timepost']),
+                            title: post['title'].toString(),
+                            content: post['description'].toString(),
+                            comments: int.tryParse(
+                                    post['comments_count'].toString()) ??
+                                0,
+                            likes: int.tryParse(post['likes'].toString()) ?? 0,
+                            type: post['category'].toString(),
+                            image: post['image'].toString(),
+                            isLike: post['isLike'],
+                          );
+                        },
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  // Posts feed
-                  Expanded(
-                    child: posts.isEmpty
-                        ? const Center(child: CircularProgressIndicator())
-                        : ListView.builder(
-                            itemCount: posts.length,
-                            itemBuilder: (context, index) {
-                              final post = posts[index];
-                              final comments = int.tryParse(
-                                      post['comments_count'].toString()) ??
-                                  0;
-                              final likes =
-                                  int.tryParse(post['likes'].toString()) ?? 0;
-                              final DateTime time =
-                                  DateTime.parse(post['timepost']);
-                              return WebPostItem(
-                                id: int.parse(post['id'].toString()),
-                                author: InfoUser.fromJson(post['user']),
-                                time: time,
-                                title: post['title'].toString(),
-                                content: post['description'].toString(),
-                                comments: comments,
-                                likes: likes,
-                                type: post['category'].toString(),
-                                image: post['image'].toString(),
-                                isLike: post['isLike'],
-                              );
-                            },
-                          ),
-                  ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
     );
   }
 }
