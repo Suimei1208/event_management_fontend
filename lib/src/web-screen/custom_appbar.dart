@@ -44,16 +44,17 @@ class _CustomAppBarState extends State<CustomAppBar> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     double titleFontSize =
-        screenWidth > 860 ? 28 : (screenWidth > 740 ? 24 : 20);
-    double buttonFontSize =
-        screenWidth > 860 ? 20 : (screenWidth > 740 ? 18 : 14);
+        screenWidth > 940 ? 28 : (screenWidth > 860 ? 24 : 20);
+    double buttonFontSize = screenWidth > 940
+        ? 18
+        : (screenWidth > 860 ? 16 : (screenWidth > 420 ? 14 : 10));
 
     return AppBar(
       automaticallyImplyLeading: false,
       title: Row(
         children: [
           Offstage(
-            offstage: screenWidth < 635,
+            offstage: screenWidth < 725,
             child: _buildResponsiveButton(
                 context, '/home', 'Welcome Back', titleFontSize),
           ),
@@ -70,7 +71,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
       ),
       actions: [
         Offstage(
-          offstage: MediaQuery.of(context).size.width < 510,
+          offstage: MediaQuery.of(context).size.width < 567,
           child: InkWell(
             onTap: () => Navigator.pushNamed(context, '/profile'),
             child: Row(

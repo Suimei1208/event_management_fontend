@@ -1,5 +1,5 @@
-import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service.dart';
+import 'package:event_management/src/service/user_service_web.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:event_management/src/web-screen/edit_profile.dart';
 import 'package:event_management/src/web-screen/list_event_finished.dart';

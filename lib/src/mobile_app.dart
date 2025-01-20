@@ -13,8 +13,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MyMobileApp extends StatefulWidget {
-  const MyMobileApp({ super.key,
-    required this.settingsController,});
+  const MyMobileApp({
+    super.key,
+    required this.settingsController,
+  });
   final SettingsController settingsController;
 
   @override
@@ -22,7 +24,6 @@ class MyMobileApp extends StatefulWidget {
 }
 
 class _MyMobileAppState extends State<MyMobileApp> {
-
   @override
   void initState() {
     super.initState();
@@ -59,7 +60,7 @@ class _MyMobileAppState extends State<MyMobileApp> {
                 return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) {
-                return const HomeScreen();
+                return const LoginScreen();
               } else {
                 return const LoginScreen();
               }
@@ -71,7 +72,8 @@ class _MyMobileAppState extends State<MyMobileApp> {
               builder: (BuildContext context) {
                 switch (routeSettings.name) {
                   case '/language':
-                    return LanguageSelectionPage(settingsController: widget.settingsController);
+                    return LanguageSelectionPage(
+                        settingsController: widget.settingsController);
                   case SettingsView.routeName:
                     return SettingsView(controller: widget.settingsController);
                   case HomeScreen.routeName:

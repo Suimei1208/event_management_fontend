@@ -17,7 +17,7 @@ import 'package:event_management/generated/l10n.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const routeName = '/home';
+  static const routeName = '/home-mobile';
 
   const HomeScreen({super.key});
 
