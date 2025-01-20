@@ -21,9 +21,10 @@
   <meta name="description" content="A new Flutter project.">
 
   <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="event_management">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <meta name="mobile-web-app-status-bar-style" content="black">
+  <meta name="mobile-web-app-title" content="event_management">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
@@ -31,6 +32,29 @@
 
   <title>event_management</title>
   <link rel="manifest" href="manifest.json">
+  <script>
+    window.fbAsyncInit = function () {
+      FB.init({
+        appId: '1507667579935506', // Replace with your Facebook App ID
+        cookie: true,
+        xfbml: true,
+        version: 'v16.0',
+      });
+      console.log('Facebook SDK initialized successfully');
+      // Notify Flutter that FB is ready
+      window.FBLoaded = true;
+    };
+  
+    (function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s);
+      js.id = id;
+      js.src = 'https://connect.facebook.net/en_US/sdk.js';
+      fjs.parentNode.insertBefore(js, fjs);
+    })(document, 'script', 'facebook-jssdk');
+  </script>
+  
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

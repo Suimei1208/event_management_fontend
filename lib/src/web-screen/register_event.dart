@@ -93,11 +93,11 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
     double width = MediaQuery.of(context).size.width;
 
     if (width >= 1200) {
-      return 6;
+      return 9;
     } else if (width >= 800) {
-      return 4;
+      return 6;
     } else {
-      return 2;
+      return 3;
     }
   }
 
@@ -181,7 +181,7 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -191,8 +191,10 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
                 Expanded(
                   child: Text(
                     event["name"],
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width < 600
+                          ? 14
+                          : 18, // Adjust font size based on screen width
                       fontWeight: FontWeight.bold,
                     ),
                     softWrap: true,
@@ -206,11 +208,13 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width < 600 ? 6.0 : 8.0),
                     child: Text(
                       event["type"],
-                      style: const TextStyle(
-                        fontSize: 15,
+                      style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width < 600 ? 12 : 15,
                       ),
                     ),
                   ),
@@ -230,33 +234,58 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
             ),
             const SizedBox(height: 8),
             if (event['banner'] != null && event['banner'].isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  event['banner'],
-                  width: double.infinity,
-                  height: 150, // Adjust the height to avoid overflow
-                  fit: BoxFit.cover, // Adjust image aspect ratio
+              AspectRatio(
+                aspectRatio:
+                    MediaQuery.of(context).size.width < 600 ? 4 / 3 : 16 / 9,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(
+                    event['banner'],
+                    width: double.infinity,
+                    height: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                CircleAvatar(
-                  backgroundImage: NetworkImage(user["photoUrl"]),
-                  radius: 16.0,
-                ),
-                const SizedBox(width: 8),
-                Flexible(
-                  // Wrap text in Flexible to prevent overflow
-                  child: Text(
-                    user["name"],
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.bold),
-                    overflow: TextOverflow.ellipsis, // Prevent text overflow
+            Offstage(
+                offstage: MediaQuery.of(context).size.width < 600,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minHeight: 40,
+                    ),
+                    child: Text(
+                      event["description"],
+                      style: const TextStyle(
+                        fontSize: 12,
+                      ),
+                      softWrap: true,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-              ],
+                )),
+            Offstage(
+              offstage: MediaQuery.of(context).size.width < 530,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundImage: NetworkImage(user["photoUrl"]),
+                    radius: 16.0,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      user["name"],
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             Row(
@@ -317,76 +346,78 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
         child: Row(
           children: [
             // Sidebar for Filters
-            Card(
-              child: Container(
-                width: 300,
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    TextField(
-                      onChanged: _filterEvents,
-                      decoration: InputDecoration(
-                        hintText: S.of(context).search_event,
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    DropdownButtonFormField<String>(
-                      value: _selectedType,
-                      items: [
-                        const DropdownMenuItem(
-                            value: '', child: Text('All Types')),
-                        ..._eventTypes.map((type) {
-                          return DropdownMenuItem(
-                            value: type,
-                            child: Text(type),
-                          );
-                        }),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedType = value;
-                        });
-                        _filterEvents('');
-                      },
-                      decoration: InputDecoration(
-                        labelText: S.of(context).event_type,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context)
-                            .colorScheme
-                            .surfaceContainerHighest,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
+            Offstage(
+                offstage: MediaQuery.of(context).size.width < 800,
+                child: Card(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.15,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: Text(
-                            _selectedStartDate == null
-                                ? 'Select Start or After Date'
-                                : 'Start or After Date: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
+                        TextField(
+                          onChanged: _filterEvents,
+                          decoration: InputDecoration(
+                            hintText: S.of(context).search_event,
+                            prefixIcon: const Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.calendar_today),
-                          onPressed: () => _selectStartDate(context),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          value: _selectedType,
+                          items: [
+                            const DropdownMenuItem(
+                                value: '', child: Text('All Types')),
+                            ..._eventTypes.map((type) {
+                              return DropdownMenuItem(
+                                value: type,
+                                child: Text(type),
+                              );
+                            }),
+                          ],
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedType = value;
+                            });
+                            _filterEvents('');
+                          },
+                          decoration: InputDecoration(
+                            labelText: S.of(context).event_type,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            filled: true,
+                            fillColor: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _selectedStartDate == null
+                                    ? 'Select Start or After Date'
+                                    : 'Start or After Date: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.calendar_today),
+                              onPressed: () => _selectStartDate(context),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
+                )),
             const SizedBox(width: 16),
             // Main Content for Events
             Expanded(
@@ -412,42 +443,51 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
                               ? endIndex
                               : _filteredEvents.length);
 
-                  return Column(
-                    children: [
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 16,
-                          mainAxisSpacing: 16,
-                          childAspectRatio: 3 / 2,
+                  int crossAxisCount = 3;
+                  if (MediaQuery.of(context).size.width < 1075) {
+                    crossAxisCount = 1;
+                  } else if (MediaQuery.of(context).size.width < 1590) {
+                    crossAxisCount = 2;
+                  }
+
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        GridView.builder(
+                          shrinkWrap: true,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 1 / 1.1,
+                          ),
+                          itemCount: eventsToDisplay.length,
+                          itemBuilder: (context, index) {
+                            final event = eventsToDisplay[index];
+                            return _buildEventCard(event);
+                          },
                         ),
-                        itemCount: eventsToDisplay.length,
-                        itemBuilder: (context, index) {
-                          final event = eventsToDisplay[index];
-                          return _buildEventCard(event);
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton(
-                            onPressed: _currentPage > 0 ? _previousPage : null,
-                            child: const Text('Previous'),
-                          ),
-                          ElevatedButton(
-                            onPressed: (_currentPage + 1) * _itemsPerPage <
-                                    _filteredEvents.length
-                                ? _nextPage
-                                : null,
-                            child: const Text('Next'),
-                          ),
-                        ],
-                      ),
-                    ],
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ElevatedButton(
+                              onPressed:
+                                  _currentPage > 0 ? _previousPage : null,
+                              child: const Text('Previous'),
+                            ),
+                            ElevatedButton(
+                              onPressed: (_currentPage + 1) * _itemsPerPage <
+                                      _filteredEvents.length
+                                  ? _nextPage
+                                  : null,
+                              child: const Text('Next'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),

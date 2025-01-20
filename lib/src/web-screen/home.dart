@@ -26,6 +26,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   late String userProfileUrl;
   late List<Event> events = [];
   String userName = "";
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -44,6 +45,10 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   }
 
   Future<void> fetchEvents() async {
+    setState(() {
+      isLoading = true;
+    });
+
     List<Event> listEvents = await fetchEventById(user!.uid);
     List<Event> toRemove = [];
 
@@ -57,6 +62,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     if (mounted) {
       setState(() {
         events = listEvents..removeWhere((event) => toRemove.contains(event));
+        isLoading = false;
       });
     }
 
@@ -90,15 +96,19 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  events.isEmpty
-                      ? Center(
-                          child: Text(S.of(context).no_events_available),
+                  isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(),
                         )
-                      : Column(
-                          children: events
-                              .map((event) => buildEventCard(event))
-                              .toList(),
-                        ),
+                      : events.isEmpty
+                          ? Center(
+                              child: Text(S.of(context).no_events_available),
+                            )
+                          : Column(
+                              children: events
+                                  .map((event) => buildEventCard(event))
+                                  .toList(),
+                            ),
                 ],
               ),
             ),

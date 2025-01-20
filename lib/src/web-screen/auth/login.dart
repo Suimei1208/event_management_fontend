@@ -1,5 +1,6 @@
 import 'package:event_management/src/mobile_screen/auth/forgot_password.dart';
 import 'package:event_management/src/service/auth_service.dart';
+import 'package:event_management/src/service/user_service_web.dart';
 import 'package:flutter/material.dart';
 
 class WebLoginScreen extends StatefulWidget {
@@ -136,7 +137,7 @@ class _WebLoginScreenState extends State<WebLoginScreen> {
                       children: [
                         ElevatedButton.icon(
                           onPressed: () async {
-                            await loginWithGoogle(context);
+                            await loginWithGoogleWeb(context);
                           },
                           icon: const Icon(Icons.g_mobiledata,
                               color: Colors.white),
@@ -155,7 +156,7 @@ class _WebLoginScreenState extends State<WebLoginScreen> {
                         const SizedBox(height: 20),
                         ElevatedButton.icon(
                           onPressed: () async {
-                            await loginWithFacebook(context);
+                            await signInWithFacebookWeb(context);
                           },
                           icon: const Icon(Icons.facebook),
                           label: const Text('Continue with Facebook',

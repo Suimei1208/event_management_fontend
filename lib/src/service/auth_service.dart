@@ -4,8 +4,9 @@ import 'dart:convert';
 
 import 'package:event_management/config.dart';
 import 'package:event_management/src/mobile_screen/auth/login.dart';
+import 'package:event_management/src/mobile_screen/event/home_screen.dart';
 import 'package:event_management/src/service/logger_service.dart';
-import 'package:event_management/src/web-screen/auth/login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ String uri = '${Config.baseUrl}/user-services';
 
 Future<void> loginWithFacebook(BuildContext context) async {
   try {
+    await FacebookAuth.instance.logOut();
+    await FirebaseAuth.instance.signOut();
     final LoginResult result = await FacebookAuth.instance.login();
 
     if (result.status == LoginStatus.success) {
@@ -43,48 +46,73 @@ Future<void> loginWithFacebook(BuildContext context) async {
       );
 
       if (response.statusCode == 200) {
-        final response = await http.get(
+        final backendResponse = await http.get(
           Uri.parse(
               '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
         );
 
-        if (response.statusCode == 200) {
-          final responseData = json.decode(response.body);
+        if (backendResponse.statusCode == 200) {
+          final responseData = json.decode(backendResponse.body);
           if (responseData['success'] == true && responseData['data'] != null) {
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text('Failed to login: ${responseData['message']}')));
+              content: Text('Failed to login: ${responseData['message']}'),
+            ));
           }
         }
       } else {
-        LoggerService.logger.e("Error: ${response.body}");
+        LoggerService.logger
+            .e("Error: ${response.body}, status: ${response.statusCode}");
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Registration failed: ${response.body}"),
+        ));
       }
     } else {
-      LoggerService.logger.e("Facebook Login failed: ${result.status}");
+      LoggerService.logger.e("Facebook Login failed: ${result.message}");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content:
+            Text("Facebook login failed: ${result.message ?? 'Unknown error'}"),
+      ));
     }
   } catch (e) {
     LoggerService.logger.e("Facebook Login Error: $e");
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("An error occurred during Facebook login: $e"),
+    ));
   }
 }
 
 Future<void> loginWithGoogle(BuildContext context) async {
   try {
-    // Trigger the Google Sign-In flow
-    final GoogleAuthProvider googleProvider = GoogleAuthProvider();
+    await GoogleSignIn().signOut();
+    final GoogleSignIn googleSignIn = GoogleSignIn();
 
-    // Use Firebase's sign-in method
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    if (googleUser == null) {
+      return;
+    }
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    final OAuthCredential googleCredential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
     final UserCredential userCredential =
-        await FirebaseAuth.instance.signInWithPopup(googleProvider);
+        await FirebaseAuth.instance.signInWithCredential(googleCredential);
 
-    // Get ID token to send to your backend
     String? idToken = await userCredential.user?.getIdToken();
 
     if (idToken == null) {
       throw Exception("Failed to get ID token.");
     }
 
-    // Send the ID token to your backend
     final response = await http.post(
       Uri.parse(
           '${Config.baseUrl}/user-services/api/Users/register-via-social'),
@@ -99,7 +127,6 @@ Future<void> loginWithGoogle(BuildContext context) async {
     );
 
     if (response.statusCode == 200) {
-      // After registering, login via backend
       final response = await http.get(
         Uri.parse(
             '${Config.baseUrl}/user-services/api/Users/login?firebaseIdToken=$idToken'),
@@ -108,7 +135,10 @@ Future<void> loginWithGoogle(BuildContext context) async {
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         if (responseData['success'] == true && responseData['data'] != null) {
-          Navigator.pushReplacementNamed(context, '/home');
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('Failed to login: ${responseData['message']}'),
@@ -271,20 +301,6 @@ Future<void> logout(BuildContext context) async {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
-    );
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error during logout: $e')),
-    );
-  }
-}
-
-Future<void> logoutWeb(BuildContext context) async {
-  try {
-    await FirebaseAuth.instance.signOut();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const WebLoginScreen()),
     );
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
