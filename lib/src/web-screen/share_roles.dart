@@ -195,117 +195,125 @@ class _ShareRolePageState extends State<WebShareRolePage> {
       appBar: const CustomAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Search Bar Section
-            TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Search users...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Search Bar Section
+                TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    labelText: 'Search users...',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onChanged: _searchUsers,
                 ),
-              ),
-              onChanged: _searchUsers,
+                const SizedBox(height: 20),
+
+                // Hosts Section
+                if (_isLoadingParticipants)
+                  const Center(child: CircularProgressIndicator())
+                else
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        const Text(
+                          'Hosts',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ...hosts.map((host) {
+                          return ListTile(
+                            leading: host.photoUrl.isNotEmpty
+                                ? CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(host.photoUrl),
+                                  )
+                                : const CircleAvatar(child: Icon(Icons.person)),
+                            title: Text(host.name),
+                            subtitle: const Text('Host'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                _modifyParticipantRole(host);
+                              },
+                            ),
+                          );
+                        }),
+                        const SizedBox(height: 20),
+
+                        // Staff Section
+                        const Text(
+                          'Staff',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ...staff.map((staffMember) {
+                          return ListTile(
+                            leading: staffMember.photoUrl.isNotEmpty
+                                ? CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(staffMember.photoUrl),
+                                  )
+                                : const CircleAvatar(child: Icon(Icons.person)),
+                            title: Text(staffMember.name),
+                            subtitle: const Text('Staff'),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () {
+                                _modifyParticipantRole(staffMember);
+                              },
+                            ),
+                          );
+                        }),
+                        const Divider(),
+
+                        // Search Results Section
+                        const Text(
+                          'Search Results',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        if (_isSearching)
+                          const Center(child: CircularProgressIndicator())
+                        else if (searchResults.isNotEmpty)
+                          ...searchResults.map((user) {
+                            return ListTile(
+                              leading: user['avtUrl'].isNotEmpty
+                                  ? CircleAvatar(
+                                      backgroundImage:
+                                          NetworkImage(user['avtUrl']),
+                                    )
+                                  : const CircleAvatar(
+                                      child: Icon(Icons.person)),
+                              title: Text(user['name']),
+                              onTap: () {
+                                _selectUser(user);
+                              },
+                            );
+                          })
+                        else
+                          const Center(child: Text('No results found')),
+                      ],
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(height: 20),
-
-            // Hosts Section
-            if (_isLoadingParticipants)
-              const Center(child: CircularProgressIndicator())
-            else
-              Expanded(
-                child: ListView(
-                  children: [
-                    const Text(
-                      'Hosts',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...hosts.map((host) {
-                      return ListTile(
-                        leading: host.photoUrl.isNotEmpty
-                            ? CircleAvatar(
-                                backgroundImage: NetworkImage(host.photoUrl),
-                              )
-                            : const CircleAvatar(child: Icon(Icons.person)),
-                        title: Text(host.name),
-                        subtitle: const Text('Host'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            _modifyParticipantRole(host);
-                          },
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 20),
-
-                    // Staff Section
-                    const Text(
-                      'Staff',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...staff.map((staffMember) {
-                      return ListTile(
-                        leading: staffMember.photoUrl.isNotEmpty
-                            ? CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(staffMember.photoUrl),
-                              )
-                            : const CircleAvatar(child: Icon(Icons.person)),
-                        title: Text(staffMember.name),
-                        subtitle: const Text('Staff'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            _modifyParticipantRole(staffMember);
-                          },
-                        ),
-                      );
-                    }),
-                    const Divider(),
-
-                    // Search Results Section
-                    const Text(
-                      'Search Results',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    if (_isSearching)
-                      const Center(child: CircularProgressIndicator())
-                    else if (searchResults.isNotEmpty)
-                      ...searchResults.map((user) {
-                        return ListTile(
-                          leading: user['avtUrl'].isNotEmpty
-                              ? CircleAvatar(
-                                  backgroundImage: NetworkImage(user['avtUrl']),
-                                )
-                              : const CircleAvatar(child: Icon(Icons.person)),
-                          title: Text(user['name']),
-                          onTap: () {
-                            _selectUser(user);
-                          },
-                        );
-                      })
-                    else
-                      const Center(child: Text('No results found')),
-                  ],
-                ),
-              ),
-          ],
+          ),
         ),
       ),
     );

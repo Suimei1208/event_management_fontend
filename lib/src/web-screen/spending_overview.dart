@@ -200,6 +200,8 @@ class _SpendingOverviewPageState extends State<WebSpendingOverviewPage>
 
   @override
   Widget build(BuildContext context) {
+    Brightness brightness = Theme.of(context).brightness;
+
     return Scaffold(
       appBar: const CustomAppBar(),
       body: Row(
@@ -214,7 +216,9 @@ class _SpendingOverviewPageState extends State<WebSpendingOverviewPage>
               });
             },
             labelType: NavigationRailLabelType.all,
-            backgroundColor: Colors.white, // Set background color for rail
+            backgroundColor: brightness == Brightness.light
+                ? Colors.white
+                : Colors.grey[900],
             selectedLabelTextStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.blue, // Set color for selected label
@@ -254,60 +258,71 @@ class _SpendingOverviewPageState extends State<WebSpendingOverviewPage>
                 padding: const EdgeInsets.all(16.0),
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                    : Row(
                         children: [
-                          Text(
-                            "Tổng quan sự kiện",
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 16),
-                          Expanded(
-                            child: TabBarView(
-                              controller: _tabController,
+                          // Wrap the Column inside a Flexible to prevent layout issues
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                SpendingPieChart(
-                                  title: "Chi tiêu",
-                                  dataMap: _expenseData,
-                                  isExpense: true,
+                                Text(
+                                  "Tổng quan sự kiện",
+                                  style: Theme.of(context).textTheme.titleLarge,
                                 ),
-                                SpendingPieChart(
-                                  title: "Thu nhập",
-                                  dataMap: _incomeData,
-                                  isExpense: false,
+                                const SizedBox(height: 16),
+                                Flexible(
+                                  child: TabBarView(
+                                    controller: _tabController,
+                                    children: [
+                                      SpendingPieChart(
+                                        title: "Chi tiêu",
+                                        dataMap: _expenseData,
+                                        isExpense: true,
+                                      ),
+                                      SpendingPieChart(
+                                        title: "Thu nhập",
+                                        dataMap: _incomeData,
+                                        isExpense: false,
+                                      ),
+                                      HistoryOverviewTab(
+                                        history: _history,
+                                        onDelete: _deleteSpending,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                HistoryOverviewTab(
-                                  history: _history,
-                                  onDelete: _deleteSpending,
+                                const SizedBox(height: 16),
+                                Text(
+                                  "Tổng thu nhập: ${formatCurrency(_totalIncome)}",
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Tổng chi tiêu: ${formatCurrency(_totalExpense)}",
+                                  style: const TextStyle(fontSize: 18),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Số dư còn lại: ${formatCurrency(_remainingBalance)}",
+                                  style: const TextStyle(fontSize: 18),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Tổng thu nhập: ${formatCurrency(_totalIncome)}",
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Tổng chi tiêu: ${formatCurrency(_totalExpense)}",
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Số dư còn lại: ${formatCurrency(_remainingBalance)}",
-                            style: const TextStyle(fontSize: 18),
-                          ),
-                          const SizedBox(height: 16),
-                          // Add Button
-                          ElevatedButton.icon(
-                            onPressed: _showAddSpendingDialog,
-                            icon: const Icon(Icons.add),
-                            label: const Text("Thêm thu/chi"),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 24,
+                          Padding(
+                            padding: const EdgeInsets.only(right: 200),
+                            child: ElevatedButton.icon(
+                              onPressed: _showAddSpendingDialog,
+                              icon: const Icon(Icons.add),
+                              label: const Text(
+                                "Thêm thu/chi",
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 20,
+                                  horizontal: 20,
+                                ),
                               ),
                             ),
                           ),

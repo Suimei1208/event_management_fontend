@@ -86,74 +86,80 @@ class _SpecialParticipantsPageState extends State<WebSpecialParticipantsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Search users...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    labelText: 'Search users...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    prefixIcon: const Icon(Icons.search),
+                  ),
+                  onChanged: _searchUsers,
                 ),
-                prefixIcon: const Icon(Icons.search),
               ),
-              onChanged: _searchUsers,
-            ),
+              if (_isSearching)
+                const Center(child: CircularProgressIndicator())
+              else if (searchResults.isNotEmpty)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: searchResults.length,
+                    itemBuilder: (context, index) {
+                      final result = searchResults[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: result['avtUrl'] != null
+                              ? NetworkImage(result['avtUrl'])
+                              : const AssetImage('assets/default_avatar.png')
+                                  as ImageProvider,
+                        ),
+                        title: Text(result['name'] ?? 'Unknown'),
+                        subtitle: Text(
+                            result['nameFromEmail'] ?? 'No role available'),
+                        trailing: ElevatedButton(
+                          onPressed: () {
+                            _addUserToParticipants(result);
+                          },
+                          child: const Text('Add'),
+                        ),
+                      );
+                    },
+                  ),
+                )
+              else
+                Expanded(
+                  child: _participants.isEmpty
+                      ? const Center(
+                          child: Text('No participants added yet.'),
+                        )
+                      : ListView.builder(
+                          itemCount: _participants.length,
+                          itemBuilder: (context, index) {
+                            final participant = _participants[index];
+                            return ListTile(
+                              leading: CircleAvatar(
+                                backgroundImage: participant['photoUrl'] != null
+                                    ? NetworkImage(participant['photoUrl'])
+                                    : const AssetImage(
+                                            'assets/default_avatar.png')
+                                        as ImageProvider,
+                              ),
+                              title: Text(participant['name']),
+                              subtitle: Text(participant['role'] ?? 'No role'),
+                            );
+                          },
+                        ),
+                ),
+            ],
           ),
-          if (_isSearching)
-            const Center(child: CircularProgressIndicator())
-          else if (searchResults.isNotEmpty)
-            Expanded(
-              child: ListView.builder(
-                itemCount: searchResults.length,
-                itemBuilder: (context, index) {
-                  final result = searchResults[index];
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: result['avtUrl'] != null
-                          ? NetworkImage(result['avtUrl'])
-                          : const AssetImage('assets/default_avatar.png')
-                              as ImageProvider,
-                    ),
-                    title: Text(result['name'] ?? 'Unknown'),
-                    subtitle:
-                        Text(result['nameFromEmail'] ?? 'No role available'),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        _addUserToParticipants(result);
-                      },
-                      child: const Text('Add'),
-                    ),
-                  );
-                },
-              ),
-            )
-          else
-            Expanded(
-              child: _participants.isEmpty
-                  ? const Center(
-                      child: Text('No participants added yet.'),
-                    )
-                  : ListView.builder(
-                      itemCount: _participants.length,
-                      itemBuilder: (context, index) {
-                        final participant = _participants[index];
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundImage: participant['photoUrl'] != null
-                                ? NetworkImage(participant['photoUrl'])
-                                : const AssetImage('assets/default_avatar.png')
-                                    as ImageProvider,
-                          ),
-                          title: Text(participant['name']),
-                          subtitle: Text(participant['role'] ?? 'No role'),
-                        );
-                      },
-                    ),
-            ),
-        ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

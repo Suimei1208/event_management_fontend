@@ -188,16 +188,16 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Đang định test, nào rảnh thì làm, chill thôi')),
-                      );
-                    },
-                    child: const Text('Thêm vào google calendar'),
-                  ),
+                  // ElevatedButton(
+                  //   onPressed: () {
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       const SnackBar(
+                  //           content: Text(
+                  //               'Đang định test, nào rảnh thì làm, chill thôi')),
+                  //     );
+                  //   },
+                  //   child: const Text('Thêm vào google calendar'),
+                  // ),
                   ElevatedButton(
                     onPressed: () async {
                       Map<String, dynamic> qrCode = await getQrTicket(event.id);
