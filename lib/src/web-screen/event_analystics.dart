@@ -163,8 +163,13 @@ class _EventAnalyticsWebPageState extends State<EventAnalyticsWebPage> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   textStyle: const TextStyle(fontSize: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20,
+                    horizontal: 20,
+                  ),
                 ),
-                child: const Text('Detail'),
+                child: const Text('Detail',
+                    style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
             ),
           ],

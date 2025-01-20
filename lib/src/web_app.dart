@@ -15,11 +15,13 @@ import 'package:event_management/src/web-screen/document_page.dart';
 import 'package:event_management/src/web-screen/error.dart';
 import 'package:event_management/src/web-screen/event_analystics.dart';
 import 'package:event_management/src/web-screen/existed_participants.dart';
-import 'package:event_management/src/web-screen/forum_screen.dart';
+import 'package:event_management/src/web-screen/forum/create_post_forum.dart';
+import 'package:event_management/src/web-screen/forum/detail_post_web.dart';
+import 'package:event_management/src/web-screen/forum/forum_screen.dart';
 import 'package:event_management/src/web-screen/list_event_finished.dart';
 import 'package:event_management/src/web-screen/list_user_cancel.dart';
 import 'package:event_management/src/web-screen/manager_ticket.dart';
-import 'package:event_management/src/web-screen/profile.dart';
+import 'package:event_management/src/web-screen/profile/profile.dart';
 import 'package:event_management/src/web-screen/register_event.dart';
 import 'package:event_management/src/web-screen/request.dart';
 import 'package:event_management/src/web-screen/share_roles.dart';
@@ -28,7 +30,7 @@ import 'package:event_management/src/web-screen/update_event.dart';
 import 'package:event_management/src/web-screen/user_events.dart';
 import 'package:flutter/material.dart';
 import 'package:event_management/src/web-screen/create_event.dart';
-import 'package:event_management/src/web-screen/edit_profile.dart';
+import 'package:event_management/src/web-screen/profile/edit_profile.dart';
 import 'package:event_management/src/web-screen/home.dart';
 import 'package:event_management/src/web-screen/auth/login.dart';
 import 'package:event_management/src/models/checkedInData.dart'; // Adjust the import path as needed
@@ -138,6 +140,13 @@ class _MyWebAppState extends State<MyWebApp> {
                         if (id != null) {
                           return buildDetailEventRoute(uri, id);
                         }
+                      } else if (uri.pathSegments.length == 3 &&
+                          uri.pathSegments.first == 'forum' &&
+                          uri.pathSegments[1] == 'detail-post') {
+                        final id = int.tryParse(uri.pathSegments[2]);
+                        if (id != null) {
+                          return ForumPostPageWeb(idPost: id);
+                        }
                       } else if (uri.pathSegments.length == 5 &&
                           uri.pathSegments.first == 'home' &&
                           uri.pathSegments[1] == 'detail-event' &&
@@ -156,6 +165,7 @@ class _MyWebAppState extends State<MyWebApp> {
                           uri.pathSegments.first == 'finished-events' ||
                           uri.pathSegments.first == 'settings' ||
                           uri.pathSegments.first == 'register' ||
+                          uri.pathSegments.first == 'create-post' ||
                           uri.pathSegments.first == 'language') {
                       } else {
                         return const PageNotFoundPage();
@@ -186,6 +196,9 @@ class _MyWebAppState extends State<MyWebApp> {
                           return const MyTicketsPageWeb();
                         case RegisterScreenWeb.routeName:
                           return const RegisterScreenWeb();
+                        case CreatePostScreenWeb.routeName:
+                          return const CreatePostScreenWeb();
+
                         case SettingsView.routeName:
                           return SettingsView(
                               controller: widget.settingsController);
@@ -269,7 +282,7 @@ class NoTransitionBuilder extends PageTransitionsBuilder {
       Animation<double> animation,
       Animation<double> secondaryAnimation,
       Widget child) {
-    return child; // Không có hiệu ứng chuyển cảnh
+    return child;
   }
 }
 

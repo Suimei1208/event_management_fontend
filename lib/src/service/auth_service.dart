@@ -209,7 +209,8 @@ Future<void> signInWithEmailPassword(
       //     if (role == "None") {
       //       Navigator.pushNamed(context, '/role');
       //     } else {
-      Navigator.pushNamed(context, '/home');
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const HomeScreen()));
     }
     //     } else {
     //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

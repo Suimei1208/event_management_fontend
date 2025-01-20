@@ -224,34 +224,39 @@ class _WebEventResourcesPageState extends State<WebEventResourcesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Manage your event resources',
-                  style: TextStyle(fontSize: 16)),
-              const SizedBox(height: 20),
-              buildSection(
-                title: 'Documents',
-                resources: documents,
-                uploadFolder: '/event_documents',
-                resourceType: 'document',
+      body: Center(
+        heightFactor: 1.0,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Manage your event resources',
+                      style: TextStyle(fontSize: 16)),
+                  const SizedBox(height: 20),
+                  buildSection(
+                    title: 'Documents',
+                    resources: documents,
+                    uploadFolder: '/event_documents',
+                    resourceType: 'document',
+                  ),
+                  buildSection(
+                    title: 'Images',
+                    resources: images,
+                    uploadFolder: '/event_images',
+                    resourceType: 'image',
+                  ),
+                  buildSection(
+                    title: 'Videos',
+                    resources: videos,
+                    uploadFolder: '/event_videos',
+                    resourceType: 'video',
+                  ),
+                ],
               ),
-              buildSection(
-                title: 'Images',
-                resources: images,
-                uploadFolder: '/event_images',
-                resourceType: 'image',
-              ),
-              buildSection(
-                title: 'Videos',
-                resources: videos,
-                uploadFolder: '/event_videos',
-                resourceType: 'video',
-              ),
-            ],
+            ),
           ),
         ),
       ),
