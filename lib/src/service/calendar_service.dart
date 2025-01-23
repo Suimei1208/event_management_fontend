@@ -1,41 +1,82 @@
-// import 'package:device_calendar/device_calendar.dart' as device_calendar;
-// import 'package:device_calendar/device_calendar.dart';
-// import 'package:event_management/src/models/events.dart';
+// ignore_for_file: use_build_context_synchronously
 
-// class CalendarService {
-//   final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
+import 'package:flutter/material.dart';
+import 'package:device_calendar/device_calendar.dart';
+import 'package:event_management/src/service/logger_service.dart';
 
-//   Future<bool> requestPermissions() async {
-//     var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
-//     if (!permissionsGranted.isSuccess || !permissionsGranted.data) {
-//       permissionsGranted = await _deviceCalendarPlugin.requestPermissions();
-//       return permissionsGranted.isSuccess && permissionsGranted.data;
-//     }
-//     return true;
-//   }
+final DeviceCalendarPlugin _calendarPlugin = DeviceCalendarPlugin();
 
-//   Future<List<Calendar>> retrieveCalendars() async {
-//     var permissionsGranted = await requestPermissions();
-//     if (!permissionsGranted) {
-//       return [];
-//     }
-//     final calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
-//     return calendarsResult?.data ?? [];
-//   }
+Future<bool> requestPermissionsCalendar() async {
+  final permissions = await _calendarPlugin.requestPermissions();
+  return permissions.data ?? false;
+}
 
-//   Future<void> addEventToCalendar(Event event) async {
-//     final calendars = await retrieveCalendars();
-//     if (calendars.isNotEmpty) {
-//       final calendar = calendars.firstWhere((c) => c.isDefault);
-//       final newEvent = device_calendar.Event(
-//         calendar.id,
-//         title: event.name,
-//         description: event.description,
-//         start: event.startDate,
-//         end: event.endDate,
-//         location: event.location,
-//       );
-//       await _deviceCalendarPlugin.createOrUpdateEvent(newEvent);
-//     }
-//   }
-// }
+Future<List<Calendar>> getCalendars() async {
+  final result = await _calendarPlugin.retrieveCalendars();
+  if (result.isSuccess && result.data != null) {
+    return result.data!;
+  }
+  return [];
+}
+
+Future<List<Event>> getEvents(
+    String calendarId, DateTime startDate, DateTime endDate) async {
+  final result = await _calendarPlugin.retrieveEvents(
+    calendarId,
+    RetrieveEventsParams(startDate: startDate, endDate: endDate),
+  );
+  if (result.isSuccess && result.data != null) {
+    return result.data!;
+  }
+  return [];
+}
+
+Future<void> addEventWithCheck(
+    BuildContext context,
+    String calendarId,
+    String name,
+    String? description,
+    DateTime startDate,
+    DateTime endDate) async {
+  if (!context.mounted) return;
+
+  final existingEvents = await getEvents(calendarId, startDate, endDate);
+
+  final isDuplicate = existingEvents.any((event) =>
+      event.title == name &&
+      event.description == description &&
+      event.start!.isAtSameMomentAs(startDate) &&
+      event.end!.isAtSameMomentAs(endDate));
+
+  if (isDuplicate) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Sự kiện đã được thêm trước đó!")),
+      );
+    }
+    LoggerService.logger.i("Sự kiện đã tồn tại, không thêm.");
+  } else {
+    final event = Event(calendarId,
+        title: name,
+        description: description!.isNotEmpty ? description : null,
+        start: TZDateTime.from(startDate, local),
+        end: TZDateTime.from(endDate, local));
+
+    final result = await _calendarPlugin.createOrUpdateEvent(event);
+    if (result!.isSuccess) {
+      LoggerService.logger.i("Thêm sự kiện thành công.");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Thêm sự kiện thành công!")),
+        );
+      }
+    } else {
+      LoggerService.logger.i("Không thể thêm sự kiện.");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Thêm sự kiện thất bại!")),
+        );
+      }
+    }
+  }
+}

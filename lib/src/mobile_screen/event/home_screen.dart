@@ -5,6 +5,7 @@ import 'package:event_management/src/mobile_screen/forum/forum_screen.dart';
 import 'package:event_management/src/mobile_screen/event/register_events.dart';
 import 'package:event_management/src/mobile_screen/event/user_event.dart';
 import 'package:event_management/src/models/events.dart';
+import 'package:event_management/src/service/calendar_service.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
@@ -45,6 +46,33 @@ class _HomeScreenState extends State<HomeScreen> {
       userName = await GetNameUser(context);
     } catch (e) {
       LoggerService.logger.e("Failed to fetch user name: $e");
+    }
+  }
+
+  Future<void> _addEventToCalendarInMobile(
+      BuildContext context, Event event) async {
+    final hasPermission = await requestPermissionsCalendar();
+    if (!hasPermission) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Không có quyền truy cập lịch")),
+      );
+      return;
+    }
+
+    final calendars = await getCalendars();
+    if (calendars.isNotEmpty) {
+      await addEventWithCheck(
+        context,
+        calendars.first.id!,
+        event.name,
+        event.description,
+        event.startDate,
+        event.endDate,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Không tìm thấy lịch nào!")),
+      );
     }
   }
 
@@ -404,20 +432,76 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  event.idCreate == user?.uid
-                      ? const Text("Event của bạn")
-                      : ElevatedButton(
-                          style: Theme.of(context).brightness == Brightness.dark
-                              ? ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.purple)
-                              : null,
-                          onPressed: () async {
-                            Map<String, dynamic> qrCode =
-                                await getQrTicket(event.id);
-                            _viewQRCode(context, qrCode['qr']);
-                          },
-                          child: const Text('View your ticket'),
-                        )
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        style: Theme.of(context).brightness == Brightness.dark
+                            ? ElevatedButton.styleFrom(
+                                backgroundColor: Colors.purple)
+                            : null,
+                        onPressed: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return SizedBox(
+                                height: 100,
+                                child: Wrap(
+                                  children: [
+                                    ListTile(
+                                      leading: const Icon(Icons.phone_android),
+                                      title:
+                                          const Text('Add to phone calendar'),
+                                      onTap: () async {
+                                        Navigator.pop(context);
+                                        await _addEventToCalendarInMobile(
+                                            context, event);
+                                      },
+                                    ),
+                                    ListTile(
+                                      leading: const Icon(Icons.calendar_today),
+                                      title:
+                                          const Text('Add to Google Calendar'),
+                                      onTap: () async {
+                                        Navigator.pop(context);
+                                        // await addGoogleCalendarEvent(
+                                        //     event.name,
+                                        //     event.description,
+                                        //     event.startDate,
+                                        //     event.endDate,
+                                        //     context);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: const Row(
+                          children: [
+                            Icon(Icons.add_card_outlined),
+                            Text('Add to calendar'),
+                          ],
+                        ),
+                      ),
+                      event.idCreate == user?.uid
+                          ? const Text("Event của bạn")
+                          : ElevatedButton(
+                              style: Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.purple)
+                                  : null,
+                              onPressed: () async {
+                                Map<String, dynamic> qrCode =
+                                    await getQrTicket(event.id);
+                                _viewQRCode(context, qrCode['qr']);
+                              },
+                              child: const Text('View your ticket'),
+                            )
+                    ],
+                  )
                 ],
               ),
             ),
