@@ -35,13 +35,12 @@
   <script>
     window.fbAsyncInit = function () {
       FB.init({
-        appId: '1507667579935506', // Replace with your Facebook App ID
+        appId: '1507667579935506',
         cookie: true,
         xfbml: true,
         version: 'v16.0',
       });
       console.log('Facebook SDK initialized successfully');
-      // Notify Flutter that FB is ready
       window.FBLoaded = true;
     };
   
