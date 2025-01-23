@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:event_management/src/service/google_calendar.dart';
 import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/src/web-screen/banner.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
@@ -27,6 +28,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
   late List<Event> events = [];
   String userName = "";
   bool isLoading = true;
+  List<Event> googleCalendarEvents = [];
 
   @override
   void initState() {
@@ -34,6 +36,24 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     userProfileUrl = user?.photoURL ?? "";
     fetchEvents();
     _fetchUserName(context);
+    fetchGoogleCalendarEvent(context);
+  }
+
+  Future<void> fetchGoogleCalendarEvent(BuildContext context) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      googleCalendarEvents = await fetchGoogleCalendarEvents(context, user!.email);
+      LoggerService.logger.i("Fetched: $googleCalendarEvents");
+    } catch (e) {
+      LoggerService.logger.e("Failed to fetch Google Calendar events: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<void> _fetchUserName(BuildContext context) async {
@@ -184,20 +204,22 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   ],
                 ),
               ),
-              // const SizedBox(width: 16),
+              const SizedBox(width: 16),
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     ScaffoldMessenger.of(context).showSnackBar(
-                  //       const SnackBar(
-                  //           content: Text(
-                  //               'Đang định test, nào rảnh thì làm, chill thôi')),
-                  //     );
-                  //   },
-                  //   child: const Text('Thêm vào google calendar'),
-                  // ),
+                  ElevatedButton(
+                    onPressed: () {
+                      addGoogleCalendarEvent(
+                          email: user!.email,
+                          name: event.name,
+                          description: event.description,
+                          startDate: event.startDate,
+                          endDate: event.endDate,
+                          context: context);
+                    },
+                    child: const Text('Thêm vào google calendar'),
+                  ),
                   ElevatedButton(
                     onPressed: () async {
                       Map<String, dynamic> qrCode = await getQrTicket(event.id);
