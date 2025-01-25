@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 import 'package:event_management/src/mobile_screen/user/profile.dart';
 import 'package:event_management/generated/l10n.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   static const routeName = '/home-mobile';
@@ -336,32 +337,27 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _currentIndex,
         children: screens,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.home), label: S.of(context).home),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.event),
-              label: S.of(context).register_event),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.forum), label: S.of(context).forum),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.edit_calendar),
-              label: S.of(context).manage_event),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.person), label: S.of(context).profile),
-        ],
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
+      bottomNavigationBar: ConvexAppBar(
+        style: TabStyle.react,
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? Colors.grey[900]
             : Colors.white,
-        selectedItemColor: Theme.of(context).brightness == Brightness.dark
+        activeColor: Theme.of(context).brightness == Brightness.dark
             ? Colors.tealAccent
             : Colors.blue,
-        unselectedItemColor: Theme.of(context).brightness == Brightness.dark
+        color: Theme.of(context).brightness == Brightness.dark
             ? Colors.grey
             : Colors.black54,
+        items: [
+          TabItem(icon: Icons.home, title: S.of(context).home),
+          TabItem(icon: Icons.event, title: S.of(context).register_event),
+          TabItem(icon: Icons.forum, title: S.of(context).forum),
+          TabItem(icon: Icons.edit_calendar, title: S.of(context).manage_event),
+          TabItem(icon: Icons.person, title: S.of(context).profile),
+        ],
+        initialActiveIndex: _currentIndex,
+        onTap: _onItemTapped,
+        // height: 0,
       ),
     );
   }

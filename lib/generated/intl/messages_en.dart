@@ -90,8 +90,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "location": MessageLookupByLibrary.simpleMessage("Location"),
         "login": MessageLookupByLibrary.simpleMessage("Login"),
         "logout": MessageLookupByLibrary.simpleMessage("Logout"),
-        "manage_event":
-            MessageLookupByLibrary.simpleMessage("Management Event"),
+        "manage_event": MessageLookupByLibrary.simpleMessage("Manage"),
+        "management": MessageLookupByLibrary.simpleMessage("Event Management"),
         "minutes_ago": MessageLookupByLibrary.simpleMessage("minutes ago"),
         "myTicket": MessageLookupByLibrary.simpleMessage("My Ticket"),
         "next_event": MessageLookupByLibrary.simpleMessage("Next Event"),
@@ -116,8 +116,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "register": MessageLookupByLibrary.simpleMessage("Register"),
         "register_account":
             MessageLookupByLibrary.simpleMessage("Register Account"),
-        "register_event":
-            MessageLookupByLibrary.simpleMessage("Register Event"),
+        "register_event": MessageLookupByLibrary.simpleMessage("Register"),
         "register_schedule":
             MessageLookupByLibrary.simpleMessage("Register Schedule"),
         "registration_list":

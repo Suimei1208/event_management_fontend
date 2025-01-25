@@ -143,7 +143,7 @@ class _EventRegisterScreenState extends State<EventRegisterScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text(S.of(context).register_event),
+        title: Text(S.of(context).management),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
