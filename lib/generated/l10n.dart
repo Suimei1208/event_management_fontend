@@ -250,20 +250,30 @@ class S {
     );
   }
 
-  /// `Management Event`
+  /// `Event Management`
+  String get management {
+    return Intl.message(
+      'Event Management',
+      name: 'management',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Manage`
   String get manage_event {
     return Intl.message(
-      'Management Event',
+      'Manage',
       name: 'manage_event',
       desc: '',
       args: [],
     );
   }
 
-  /// `Register Event`
+  /// `Register`
   String get register_event {
     return Intl.message(
-      'Register Event',
+      'Register',
       name: 'register_event',
       desc: '',
       args: [],

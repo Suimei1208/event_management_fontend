@@ -93,7 +93,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "location": MessageLookupByLibrary.simpleMessage("Địa điểm"),
         "login": MessageLookupByLibrary.simpleMessage("Đăng nhập"),
         "logout": MessageLookupByLibrary.simpleMessage("Đăng xuất"),
-        "manage_event": MessageLookupByLibrary.simpleMessage("Quản lý sự kiện"),
+        "manage_event": MessageLookupByLibrary.simpleMessage("Quản lý"),
+        "management": MessageLookupByLibrary.simpleMessage("Quản lý sự kiện"),
         "minutes_ago": MessageLookupByLibrary.simpleMessage("phút trước"),
         "myTicket": MessageLookupByLibrary.simpleMessage("Vé của tôi"),
         "next_event": MessageLookupByLibrary.simpleMessage("Sự kiện tiếp theo"),
@@ -121,8 +122,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "register": MessageLookupByLibrary.simpleMessage("Đăng Ký"),
         "register_account":
             MessageLookupByLibrary.simpleMessage("Đăng ký tài khoản"),
-        "register_event":
-            MessageLookupByLibrary.simpleMessage("Đăng ký sự kiện"),
+        "register_event": MessageLookupByLibrary.simpleMessage("Đăng ký"),
         "register_schedule":
             MessageLookupByLibrary.simpleMessage("Đăng ký tham gia lịch trình"),
         "registration_list":
