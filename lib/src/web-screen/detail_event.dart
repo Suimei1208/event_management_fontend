@@ -239,7 +239,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
           if (isHostOrStaff)
             Card(
               child: Container(
-                  width: 350,
+                  width: MediaQuery.of(context).size.width * 0.2,
                   height: double.infinity,
                   padding: const EdgeInsets.all(16),
                   child: SingleChildScrollView(
@@ -267,7 +267,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                         _buildSidebarButton(
                             Icons.person, S.of(context).participant_list, () {
                           Navigator.pushNamed(context,
-                              "/hoconst SizedBox(height: 16),me/detail-event/${widget.eventId}/existed-participants");
+                              "/home/detail-event/${widget.eventId}/existed-participants");
                         }),
                         const SizedBox(height: 16),
                         _buildSidebarButton(
@@ -327,6 +327,55 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                                 () {
                                 resetEvent(widget.eventId, context);
                               }),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildSidebarButton(Icons.accessibility_new,
+                                S.of(context).accessibility, () {}),
+                            Transform.scale(
+                              scale: MediaQuery.of(context).size.width * 0.0006,
+                              child: Switch(
+                                value: access,
+                                onChanged: (bool value) async {
+                                  setState(() {
+                                    access = value;
+                                  });
+
+                                  await updateEventAccess(
+                                      widget.eventId, value);
+                                },
+                                activeColor: Colors.green,
+                                inactiveThumbColor: Colors.grey,
+                                inactiveTrackColor: Colors.grey[300],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildSidebarButton(Icons.schedule,
+                                S.of(context).register_schedule, () {}),
+                            Transform.scale(
+                              scale: MediaQuery.of(context).size.width * 0.0006,
+                              child: Switch(
+                                value: allowSelectSchedule,
+                                onChanged: (bool value) async {
+                                  setState(() {
+                                    allowSelectSchedule = value;
+                                  });
+
+                                  await updateEventAllow(widget.eventId, value);
+                                },
+                                activeColor: Colors.green,
+                                inactiveThumbColor: Colors.grey,
+                                inactiveTrackColor: Colors.grey[300],
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   )),
@@ -422,15 +471,14 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            elevation: 5, // Add shadow for depth
+                            elevation: 5,
                             backgroundColor: Colors.purple),
                         child: Text(
                           S.of(context).view_schedule,
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color:
-                                Colors.white, // Ensuring text color is legible
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -447,6 +495,11 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
 
   Widget _buildSidebarButton(
       IconData icon, String label, VoidCallback onPressed) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    double iconSize = screenWidth * 0.015;
+    double fontSize = screenWidth * 0.01;
+
     return MouseRegion(
       onEnter: (_) => setState(() {}),
       onExit: (_) => setState(() {}),
@@ -459,11 +512,11 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 24),
+            Icon(icon, size: iconSize),
             const SizedBox(width: 16),
             Text(
               label,
-              style: const TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: fontSize),
               overflow: TextOverflow.ellipsis,
             ),
           ],

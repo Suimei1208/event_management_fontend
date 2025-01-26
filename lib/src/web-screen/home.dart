@@ -36,7 +36,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     userProfileUrl = user?.photoURL ?? "";
     fetchEvents();
     _fetchUserName(context);
-    fetchGoogleCalendarEvent(context);
+    // fetchGoogleCalendarEvent(context);
   }
 
   Future<void> fetchGoogleCalendarEvent(BuildContext context) async {
@@ -45,7 +45,8 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
     });
 
     try {
-      googleCalendarEvents = await fetchGoogleCalendarEvents(context, user!.email);
+      googleCalendarEvents =
+          await fetchGoogleCalendarEvents(context, user!.email);
       LoggerService.logger.i("Fetched: $googleCalendarEvents");
     } catch (e) {
       LoggerService.logger.e("Failed to fetch Google Calendar events: $e");
@@ -140,100 +141,114 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
 
   Widget buildEventCard(Event event) {
     return GestureDetector(
-      onTap: () {
-        Navigator.pushNamed(
-          context,
-          "/home/detail-event/${event.id}",
-        );
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  event.banner,
-                  height: 192,
-                  width: 168,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const SizedBox(
-                      height: 80,
-                      width: 80,
-                      child: Center(
-                        child: Icon(Icons.image, size: 40, color: Colors.grey),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
+        onTap: () {
+          Navigator.pushNamed(
+            context,
+            "/home/detail-event/${event.id}",
+          );
+        },
+        child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Stack(
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      event.name,
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        event.banner,
+                        height: 192,
+                        width: 168,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const SizedBox(
+                            height: 80,
+                            width: 80,
+                            child: Center(
+                              child: Icon(Icons.image,
+                                  size: 40, color: Colors.grey),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "${DateFormat.yMMMd().format(event.startDate)} - ${DateFormat.jm().format(event.startDate)}",
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      event.description,
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      event.location,
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            event.name,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "${DateFormat.yMMMd().format(event.startDate)} - ${DateFormat.jm().format(event.startDate)}",
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            event.description,
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            event.location,
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(width: 16),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      addGoogleCalendarEvent(
-                          email: user!.email,
-                          name: event.name,
-                          description: event.description,
-                          startDate: event.startDate,
-                          endDate: event.endDate,
-                          context: context);
-                    },
-                    child: const Text('Thêm vào google calendar'),
+                const SizedBox(height: 16),
+                Positioned(
+                  bottom: 16,
+                  right: 16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          Map<String, dynamic> qrCode =
+                              await getQrTicket(event.id);
+                          _viewQRCode(context, qrCode['qr']);
+                        },
+                        child: const Text('View Ticket'),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          addGoogleCalendarEvent(
+                              email: user!.email,
+                              name: event.name,
+                              description: event.description,
+                              startDate: event.startDate,
+                              endDate: event.endDate,
+                              context: context);
+                        },
+                        child: const Text('Add Google Calendar'),
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      Map<String, dynamic> qrCode = await getQrTicket(event.id);
-                      _viewQRCode(context, qrCode['qr']);
-                    },
-                    child: const Text('View Ticket'),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   void _viewQRCode(BuildContext context, String qrCode) {

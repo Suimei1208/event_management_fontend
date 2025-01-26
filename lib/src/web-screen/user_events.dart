@@ -295,8 +295,8 @@ class EventCard extends StatelessWidget {
                       children: [
                         Image.network(
                           event.banner,
-                          width: 200,
-                          height: 200,
+                          width: 250,
+                          height: 250 / 16 * 9,
                           fit: BoxFit.cover,
                         ),
                         const SizedBox(width: 50),
