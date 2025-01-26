@@ -141,7 +141,7 @@ class _CreateEventState extends State<WebCreateEvent> {
           startDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS').parse(startDateTime),
           endDate: DateFormat('yyyy-MM-dd HH:mm:ss.SSS').parse(endDateTime),
           banner:
-              "https://ik.imagekit.io/9nhhlzjgp/event_images/placeholder.webp?updatedAt=1736652778905",
+              "https://ik.imagekit.io/9nhhlzjgp/placeholder-1920x1080.png?updatedAt=1737867365664",
           status: "Upcoming",
           idCreate: "",
           access: false,
@@ -230,8 +230,7 @@ class _CreateEventState extends State<WebCreateEvent> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildSectionTitle('Event Details'),
-              _buildTextField(
-                  label: 'Event Name', controller: _nameController),
+              _buildTextField(label: 'Event Name', controller: _nameController),
               _buildTextField(
                 label: 'Description',
                 controller: _descriptionController,
