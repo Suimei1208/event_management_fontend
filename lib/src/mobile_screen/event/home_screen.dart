@@ -7,6 +7,7 @@ import 'package:event_management/src/mobile_screen/event/user_event.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/calendar_service.dart';
 import 'package:event_management/src/service/event_service.dart';
+import 'package:event_management/src/service/google_calendar.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/src/service/user_service.dart';
@@ -33,13 +34,28 @@ class _HomeScreenState extends State<HomeScreen> {
   late List<Event> events = [];
   int _currentIndex = 0;
   String userName = "";
+  late BuildContext _context;
 
   @override
   void initState() {
     super.initState();
     userProfileUrl = user?.photoURL ?? "";
     fetchEvents();
-    _fetchUserName(context);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _context = context;
+    if (mounted) {
+      _fetchUserName(_context);
+    }
+  }
+
+  @override
+  void dispose() {
+    // No need to use context here
+    super.dispose();
   }
 
   Future<void> _fetchUserName(BuildContext context) async {
@@ -446,8 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     ListTile(
                                       leading: const Icon(Icons.phone_android),
-                                      title:
-                                          const Text('Add to phone calendar'),
+                                      title: Text(S.of(context).add_phone),
                                       onTap: () async {
                                         Navigator.pop(context);
                                         await _addEventToCalendarInMobile(
@@ -456,16 +471,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     ListTile(
                                       leading: const Icon(Icons.calendar_today),
-                                      title:
-                                          const Text('Add to Google Calendar'),
+                                      title: Text(S.of(context).add_gg_cal),
                                       onTap: () async {
                                         Navigator.pop(context);
-                                        // await addGoogleCalendarEvent(
-                                        //     event.name,
-                                        //     event.description,
-                                        //     event.startDate,
-                                        //     event.endDate,
-                                        //     context);
+                                        await addGoogleCalendarEvent(
+                                            email: user!.email,
+                                            name: event.name,
+                                            description: event.description,
+                                            startDate: event.startDate,
+                                            endDate: event.endDate,
+                                            context: context);
                                       },
                                     ),
                                   ],

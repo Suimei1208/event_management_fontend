@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'dart:async';
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/service/spending_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -95,7 +96,7 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text("Thêm thu/chi"),
+          title: Text(S.of(context).add_income_spending),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -104,7 +105,7 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ChoiceChip(
-                    label: const Text("Chi tiêu"),
+                    label: Text(S.of(context).spending),
                     selected: selectedType == "Expense",
                     onSelected: (selected) {
                       if (selected) {
@@ -114,7 +115,7 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
                   ),
                   const SizedBox(width: 10),
                   ChoiceChip(
-                    label: const Text("Thu nhập"),
+                    label: Text(S.of(context).income),
                     selected: selectedType == "Income",
                     onSelected: (selected) {
                       if (selected) {
@@ -130,22 +131,24 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
                 controller: categoryController,
                 decoration: InputDecoration(
                   labelText: selectedType == "Expense"
-                      ? "Danh mục chi tiêu"
-                      : "Nguồn tiền",
+                      ? S.of(context).spe_cate
+                      : S.of(context).source,
                 ),
               ),
               TextField(
                 controller: amountController,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: "Số tiền"),
+                decoration: InputDecoration(
+                  labelText: S.of(context).amount,
+                ),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Hủy"),
+              child: Text(S.of(context).cancel),
             ),
             TextButton(
               onPressed: () {
@@ -158,14 +161,13 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
                   Navigator.pop(context);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content:
-                          Text("Danh mục không được để trống và số tiền > 0"),
+                    SnackBar(
+                      content: Text(S.of(context).spending_warning),
                     ),
                   );
                 }
               },
-              child: const Text("Thêm"),
+              child: const Text("OK"),
             ),
           ],
         ),
@@ -201,13 +203,13 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Quản lý chi tiêu"),
+        title: Text(S.of(context).spending_mana),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: "Chi tiêu"),
-            Tab(text: "Thu nhập"),
-            Tab(text: "Tổng quan"),
+          tabs: [
+            Tab(text: S.of(context).spending),
+            Tab(text: S.of(context).income),
+            Tab(text: S.of(context).overview),
           ],
         ),
       ),
@@ -224,13 +226,12 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
                         controller: _tabController,
                         children: [
                           SpendingPieChart(
-                            
-                            title: "Chi tiêu",
+                            title: S.of(context).spending,
                             dataMap: _expenseData,
                             isExpense: true,
                           ),
                           SpendingPieChart(
-                            title: "Thu nhập",
+                            title: S.of(context).income,
                             dataMap: _incomeData,
                             isExpense: false,
                           ),
@@ -243,11 +244,14 @@ class _SpendingOverviewPageState extends State<SpendingOverviewPage>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text("Tổng thu nhập: ${formatCurrency(_totalIncome)}"),
+                    Text(
+                        "${S.of(context).total_income}: ${formatCurrency(_totalIncome)}"),
                     const SizedBox(height: 8),
-                    Text("Tổng chi tiêu: ${formatCurrency(_totalExpense)}"),
+                    Text(
+                        "${S.of(context).total_spending}: ${formatCurrency(_totalExpense)}"),
                     const SizedBox(height: 8),
-                    Text("Số dư còn lại: ${formatCurrency(_remainingBalance)}"),
+                    Text(
+                        "${S.of(context).remain}: ${formatCurrency(_remainingBalance)}"),
                     const SizedBox(height: 16),
                   ],
                 ),
@@ -301,7 +305,7 @@ class HistoryOverviewTab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Thu nhập",
+                    S.of(context).income,
                     style: Theme.of(context)
                         .textTheme
                         .titleLarge
@@ -314,7 +318,7 @@ class HistoryOverviewTab extends StatelessWidget {
                     itemCount: incomeItems.length,
                     itemBuilder: (context, index) {
                       final item = incomeItems[index];
-                      return _buildTransactionCard(item);
+                      return _buildTransactionCard(context, item);
                     },
                   ),
                 ],
@@ -328,7 +332,7 @@ class HistoryOverviewTab extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Chi tiêu",
+                    S.of(context).spending,
                     style: Theme.of(context)
                         .textTheme
                         .titleLarge
@@ -341,7 +345,8 @@ class HistoryOverviewTab extends StatelessWidget {
                     itemCount: expenseItems.length,
                     itemBuilder: (context, index) {
                       final item = expenseItems[index];
-                      return _buildTransactionCard(item);
+                      return _buildTransactionCard(
+                          context, item); // Add context parameter
                     },
                   ),
                 ],
@@ -350,10 +355,10 @@ class HistoryOverviewTab extends StatelessWidget {
 
           // If no transactions, show message
           if (incomeItems.isEmpty && expenseItems.isEmpty)
-            const Center(
+            Center(
               child: Text(
-                "Không có giao dịch nào",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                S.of(context).no_transactions,
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ),
         ],
@@ -362,7 +367,8 @@ class HistoryOverviewTab extends StatelessWidget {
   }
 
   // Helper method to build a transaction card
-  Widget _buildTransactionCard(Map<String, dynamic> item) {
+  Widget _buildTransactionCard(
+      BuildContext context, Map<String, dynamic> item) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       shape: RoundedRectangleBorder(
@@ -386,7 +392,8 @@ class HistoryOverviewTab extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: "Số tiền: ${formatCurrency(item['amount'])} | ",
+                text:
+                    "${S.of(context).amount}: ${formatCurrency(item['amount'])} | ",
                 style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               TextSpan(
