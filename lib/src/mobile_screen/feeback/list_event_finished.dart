@@ -109,7 +109,7 @@ class _EventFinishedScreenState extends State<EventFinishedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Text(S.of(context).review_event),
+        title: Text(S.of(context).review_event),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -303,8 +303,8 @@ class _EventFinishedScreenState extends State<EventFinishedScreen> {
                     ],
                   ),
                   event['isReview']
-                      ? const Text("Đã đánh giá")
-                      : const Text("Chưa đánh giá"),
+                      ? Text(S.of(context).reviewed)
+                      : Text(S.of(context).not_yet_review),
                 ],
               ),
               // const SizedBox(height: 16),

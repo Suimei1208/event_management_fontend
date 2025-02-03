@@ -1139,6 +1139,266 @@ class S {
       args: [],
     );
   }
+
+  /// `Pending review`
+  String get not_yet_review {
+    return Intl.message(
+      'Pending review',
+      name: 'not_yet_review',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reviewed`
+  String get reviewed {
+    return Intl.message(
+      'Reviewed',
+      name: 'reviewed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add event to phone calendar`
+  String get add_phone {
+    return Intl.message(
+      'Add event to phone calendar',
+      name: 'add_phone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add event to Google Calendar`
+  String get add_gg_cal {
+    return Intl.message(
+      'Add event to Google Calendar',
+      name: 'add_gg_cal',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Awaiting approval`
+  String get await_appro {
+    return Intl.message(
+      'Awaiting approval',
+      name: 'await_appro',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Accepted`
+  String get accepted {
+    return Intl.message(
+      'Accepted',
+      name: 'accepted',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Spending management`
+  String get spending_mana {
+    return Intl.message(
+      'Spending management',
+      name: 'spending_mana',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Income`
+  String get income {
+    return Intl.message(
+      'Income',
+      name: 'income',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `General overview`
+  String get overview {
+    return Intl.message(
+      'General overview',
+      name: 'overview',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total income`
+  String get total_income {
+    return Intl.message(
+      'Total income',
+      name: 'total_income',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Total spending`
+  String get total_spending {
+    return Intl.message(
+      'Total spending',
+      name: 'total_spending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Balance remaining`
+  String get remain {
+    return Intl.message(
+      'Balance remaining',
+      name: 'remain',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No transactions available`
+  String get no_transactions {
+    return Intl.message(
+      'No transactions available',
+      name: 'no_transactions',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add income/spending`
+  String get add_income_spending {
+    return Intl.message(
+      'Add income/spending',
+      name: 'add_income_spending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Spending categories`
+  String get spe_cate {
+    return Intl.message(
+      'Spending categories',
+      name: 'spe_cate',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Source of money`
+  String get source {
+    return Intl.message(
+      'Source of money',
+      name: 'source',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Amount of money (VND)`
+  String get amount {
+    return Intl.message(
+      'Amount of money (VND)',
+      name: 'amount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Category must not be empty and amount must be greater than 0.`
+  String get spending_warning {
+    return Intl.message(
+      'Category must not be empty and amount must be greater than 0.',
+      name: 'spending_warning',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancelled Users`
+  String get cancel_user {
+    return Intl.message(
+      'Cancelled Users',
+      name: 'cancel_user',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Setting cancel`
+  String get setting_cancel {
+    return Intl.message(
+      'Setting cancel',
+      name: 'setting_cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select Reason`
+  String get reason {
+    return Intl.message(
+      'Select Reason',
+      name: 'reason',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add Image Evidence`
+  String get add_image_cancel {
+    return Intl.message(
+      'Add Image Evidence',
+      name: 'add_image_cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select start date`
+  String get select_start_date {
+    return Intl.message(
+      'Select start date',
+      name: 'select_start_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Select end date`
+  String get select_end_date {
+    return Intl.message(
+      'Select end date',
+      name: 'select_end_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add External Link`
+  String get add_link_cancel {
+    return Intl.message(
+      'Add External Link',
+      name: 'add_link_cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter External Link`
+  String get enter_link {
+    return Intl.message(
+      'Enter External Link',
+      name: 'enter_link',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

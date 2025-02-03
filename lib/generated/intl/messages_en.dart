@@ -23,9 +23,20 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "Ongoing": MessageLookupByLibrary.simpleMessage("Ongoing"),
+        "accepted": MessageLookupByLibrary.simpleMessage("Accepted"),
         "accessibility": MessageLookupByLibrary.simpleMessage("Accessibility"),
         "account": MessageLookupByLibrary.simpleMessage("Account"),
+        "add_gg_cal": MessageLookupByLibrary.simpleMessage(
+            "Add event to Google Calendar"),
+        "add_image_cancel":
+            MessageLookupByLibrary.simpleMessage("Add Image Evidence"),
+        "add_income_spending":
+            MessageLookupByLibrary.simpleMessage("Add income/spending"),
+        "add_link_cancel":
+            MessageLookupByLibrary.simpleMessage("Add External Link"),
         "add_member": MessageLookupByLibrary.simpleMessage("Add member"),
+        "add_phone":
+            MessageLookupByLibrary.simpleMessage("Add event to phone calendar"),
         "add_photo": MessageLookupByLibrary.simpleMessage("Add Photo"),
         "add_speaker": MessageLookupByLibrary.simpleMessage("Add Speaker"),
         "add_special_guest":
@@ -35,13 +46,17 @@ class MessageLookup extends MessageLookupByLibrary {
         "added_participants":
             MessageLookupByLibrary.simpleMessage("Added Participants"),
         "all": MessageLookupByLibrary.simpleMessage("All"),
+        "amount": MessageLookupByLibrary.simpleMessage("Amount of money (VND)"),
         "approved": MessageLookupByLibrary.simpleMessage("Approved"),
         "approved_participants":
             MessageLookupByLibrary.simpleMessage("Approved Participants"),
         "attachments": MessageLookupByLibrary.simpleMessage("Attachments"),
+        "await_appro":
+            MessageLookupByLibrary.simpleMessage("Awaiting approval"),
         "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
         "cancel_event": MessageLookupByLibrary.simpleMessage("Cancel Event"),
         "cancel_list": MessageLookupByLibrary.simpleMessage("Cancel List"),
+        "cancel_user": MessageLookupByLibrary.simpleMessage("Cancelled Users"),
         "category": MessageLookupByLibrary.simpleMessage("Category"),
         "content_review": MessageLookupByLibrary.simpleMessage(
             "Write Your Review (Optional)"),
@@ -64,6 +79,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "end_date": MessageLookupByLibrary.simpleMessage("End Date"),
         "english": MessageLookupByLibrary.simpleMessage("English"),
         "enter": MessageLookupByLibrary.simpleMessage("Enter"),
+        "enter_link":
+            MessageLookupByLibrary.simpleMessage("Enter External Link"),
         "event_name": MessageLookupByLibrary.simpleMessage("Event Name"),
         "event_type": MessageLookupByLibrary.simpleMessage("Event Type"),
         "existed_participant":
@@ -81,6 +98,7 @@ class MessageLookup extends MessageLookupByLibrary {
             "Join discussions, share informations, and connect with others"),
         "home": MessageLookupByLibrary.simpleMessage("Home"),
         "hours_ago": MessageLookupByLibrary.simpleMessage("hours ago"),
+        "income": MessageLookupByLibrary.simpleMessage("Income"),
         "language": MessageLookupByLibrary.simpleMessage("Language"),
         "latest": MessageLookupByLibrary.simpleMessage("latest"),
         "like_event_review": MessageLookupByLibrary.simpleMessage(
@@ -98,10 +116,15 @@ class MessageLookup extends MessageLookupByLibrary {
         "next_events": MessageLookupByLibrary.simpleMessage("Next Events"),
         "no_events_available":
             MessageLookupByLibrary.simpleMessage("No Event Available"),
+        "no_transactions":
+            MessageLookupByLibrary.simpleMessage("No transactions available"),
         "no_upcoming_event":
             MessageLookupByLibrary.simpleMessage("No upcoming event"),
+        "not_yet_review":
+            MessageLookupByLibrary.simpleMessage("Pending review"),
         "obj": MessageLookupByLibrary.simpleMessage("Event Objectives"),
         "ongoing_event": MessageLookupByLibrary.simpleMessage("On-going Event"),
+        "overview": MessageLookupByLibrary.simpleMessage("General overview"),
         "participant_list":
             MessageLookupByLibrary.simpleMessage("Participant List"),
         "pending_request":
@@ -113,6 +136,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "questions": MessageLookupByLibrary.simpleMessage("Questions"),
         "rate": MessageLookupByLibrary.simpleMessage("Rate Your Experience"),
         "rate_event": MessageLookupByLibrary.simpleMessage("Rate Event"),
+        "reason": MessageLookupByLibrary.simpleMessage("Select Reason"),
         "register": MessageLookupByLibrary.simpleMessage("Register"),
         "register_account":
             MessageLookupByLibrary.simpleMessage("Register Account"),
@@ -121,6 +145,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Register Schedule"),
         "registration_list":
             MessageLookupByLibrary.simpleMessage("Registration List"),
+        "remain": MessageLookupByLibrary.simpleMessage("Balance remaining"),
         "remove_speaker":
             MessageLookupByLibrary.simpleMessage("Remove Speaker"),
         "remove_special_guest":
@@ -129,18 +154,31 @@ class MessageLookup extends MessageLookupByLibrary {
         "reopen_event":
             MessageLookupByLibrary.simpleMessage("Reopen the event"),
         "review_event": MessageLookupByLibrary.simpleMessage("Review Events"),
+        "reviewed": MessageLookupByLibrary.simpleMessage("Reviewed"),
         "search_event": MessageLookupByLibrary.simpleMessage("Search Event..."),
         "select_date": MessageLookupByLibrary.simpleMessage("Select Date"),
+        "select_end_date":
+            MessageLookupByLibrary.simpleMessage("Select end date"),
+        "select_start_date":
+            MessageLookupByLibrary.simpleMessage("Select start date"),
         "select_start_end_date":
             MessageLookupByLibrary.simpleMessage("Select Start or After Date"),
         "select_time": MessageLookupByLibrary.simpleMessage("Selelct Time"),
         "setting": MessageLookupByLibrary.simpleMessage("Setting"),
+        "setting_cancel":
+            MessageLookupByLibrary.simpleMessage("Setting cancel"),
         "share_role": MessageLookupByLibrary.simpleMessage("Share Role"),
         "share_thought":
             MessageLookupByLibrary.simpleMessage("Share Your Thoughts..."),
+        "source": MessageLookupByLibrary.simpleMessage("Source of money"),
+        "spe_cate": MessageLookupByLibrary.simpleMessage("Spending categories"),
         "speaker": MessageLookupByLibrary.simpleMessage("Speaker"),
         "special_guest": MessageLookupByLibrary.simpleMessage("Special Guest"),
         "spending": MessageLookupByLibrary.simpleMessage("Spending"),
+        "spending_mana":
+            MessageLookupByLibrary.simpleMessage("Spending management"),
+        "spending_warning": MessageLookupByLibrary.simpleMessage(
+            "Category must not be empty and amount must be greater than 0."),
         "start_date": MessageLookupByLibrary.simpleMessage("Start Date"),
         "start_or_after_date":
             MessageLookupByLibrary.simpleMessage("Start or After Date"),
@@ -150,6 +188,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "tips_tricks": MessageLookupByLibrary.simpleMessage("Tips & Tricks"),
         "title": MessageLookupByLibrary.simpleMessage("Event Management"),
         "toggle_view": MessageLookupByLibrary.simpleMessage("Toggle View"),
+        "total_income": MessageLookupByLibrary.simpleMessage("Total income"),
+        "total_spending":
+            MessageLookupByLibrary.simpleMessage("Total spending"),
         "unanswered": MessageLookupByLibrary.simpleMessage("Unanswered"),
         "vietnamese": MessageLookupByLibrary.simpleMessage("Vietnamese"),
         "view_detail": MessageLookupByLibrary.simpleMessage("View Detail"),

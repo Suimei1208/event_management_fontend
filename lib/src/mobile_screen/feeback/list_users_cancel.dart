@@ -1,3 +1,4 @@
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/feeback/setting_feed_back_cancel_event.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/ticket_service.dart';
@@ -62,7 +63,7 @@ class _CancelledUsersScreenState extends State<CancelledUsersScreen>
             Navigator.pop(context);
           },
         ),
-        title: const Text('Cancelled Users'),
+        title: Text(S.of(context).cancel_user),
         centerTitle: true,
         elevation: 0,
         actions: [
@@ -82,9 +83,9 @@ class _CancelledUsersScreenState extends State<CancelledUsersScreen>
         ],
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Danh sách chờ duyệt'),
-            Tab(text: 'Danh sách đã hủy'),
+          tabs: [
+            Tab(text: S.of(context).await_appro),
+            Tab(text: S.of(context).accepted),
           ],
         ),
       ),

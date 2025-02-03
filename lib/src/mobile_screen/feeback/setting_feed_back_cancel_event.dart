@@ -1,3 +1,4 @@
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/service/cancellationperiods_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:flutter/material.dart';
@@ -77,7 +78,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
             Navigator.pop(context);
           },
         ),
-        title: const Text('Setting Feedback'),
+        title: Text(S.of(context).setting_cancel),
         centerTitle: true,
         elevation: 0,
       ),
@@ -87,7 +88,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
           children: [
             // Select Reason
             SwitchListTile(
-              title: const Text('Select Reason'),
+              title: Text(S.of(context).reason),
               value: selectReason,
               onChanged: (value) {
                 setState(() {
@@ -100,7 +101,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
 
             // Add Image Evidence
             SwitchListTile(
-              title: const Text('Add Image Evidence'),
+              title: Text(S.of(context).add_image_cancel),
               value: selectReason,
               onChanged: (value) {
                 setState(() {
@@ -114,7 +115,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Select start date'),
+                Text(S.of(context).select_start_date),
                 TextButton(
                   onPressed: () => _selectDate(context, true),
                   child: Text(
@@ -129,7 +130,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Select end date'),
+                Text(S.of(context).select_end_date),
                 TextButton(
                   onPressed: () => _selectDate(context, false),
                   child: Text(
@@ -148,7 +149,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
               children: [
                 // Thêm SwitchListTile
                 SwitchListTile(
-                  title: const Text('Add External Link'),
+                  title: Text(S.of(context).add_link_cancel),
                   value: addExternalLink,
                   onChanged: (value) {
                     setState(() {
@@ -161,9 +162,9 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
                 if (addExternalLink)
                   TextField(
                     controller: externalLinkController,
-                    decoration: const InputDecoration(
-                      labelText: 'Enter External Link',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: S.of(context).enter_link,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
               ],
@@ -239,7 +240,7 @@ class _SettingCancelEventState extends State<SettingCancelEvent> {
                   ),
                 ),
                 child: const Text(
-                  'Save',
+                  'OK',
                   style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),

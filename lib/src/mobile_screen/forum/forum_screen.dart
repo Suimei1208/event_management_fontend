@@ -10,13 +10,16 @@ class CommunityForumScreen extends StatefulWidget {
   const CommunityForumScreen({super.key});
 
   @override
-  State<CommunityForumScreen> createState() => _CommunityForumScreenState();
+  // ignore: library_private_types_in_public_api
+  _CommunityForumScreenState createState() => _CommunityForumScreenState();
 }
 
 class _CommunityForumScreenState extends State<CommunityForumScreen> {
   final router = "/forums";
 
   List<Map<String, dynamic>> posts = [];
+  String selectedFilter = "all";
+
   @override
   void initState() {
     super.initState();
@@ -27,19 +30,23 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
     final data = await getPosts();
     if (mounted) {
       setState(() {
-        posts = data;
+        posts = _applyFilter(data);
       });
     }
-    // LoggerService.logger.i('Posts: $posts');
+  }
+
+  List<Map<String, dynamic>> _applyFilter(List<Map<String, dynamic>> data) {
+    if (selectedFilter == "popular") {
+      data.sort((a, b) => (b['likes'] as int).compareTo(a['likes'] as int));
+    } else if (selectedFilter == "latest") {
+      data.sort((a, b) => DateTime.parse(b['timepost'])
+          .compareTo(DateTime.parse(a['timepost'])));
+    }
+    return data;
   }
 
   Future<void> _handleRefresh() async {
     _fetchData();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -81,17 +88,35 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
               runSpacing: 4.0,
               children: [
                 FilterChip(
-                    label: Text(S.of(context).all),
-                    selected: true,
-                    onSelected: (selected) {}),
+                  label: Text(S.of(context).all),
+                  selected: selectedFilter == "all",
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedFilter = "all";
+                      _fetchData();
+                    });
+                  },
+                ),
                 FilterChip(
-                    label: Text(S.of(context).popular),
-                    selected: false,
-                    onSelected: (selected) {}),
+                  label: Text(S.of(context).popular),
+                  selected: selectedFilter == "popular",
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedFilter = "popular";
+                      posts = _applyFilter(posts);
+                    });
+                  },
+                ),
                 FilterChip(
-                    label: Text(S.of(context).latest),
-                    selected: false,
-                    onSelected: (selected) {}),
+                  label: Text(S.of(context).latest),
+                  selected: selectedFilter == "latest",
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedFilter = "latest";
+                      posts = _applyFilter(posts);
+                    });
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -102,18 +127,15 @@ class _CommunityForumScreenState extends State<CommunityForumScreen> {
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
                     final post = posts[index];
-                    final comments =
-                        int.tryParse(post['comments_count'].toString()) ?? 0;
-                    final likes = int.tryParse(post['likes'].toString()) ?? 0;
-                    final DateTime time = DateTime.parse(post['timepost']);
                     return PostItem(
                       id: int.parse(post['id'].toString()),
                       author: InfoUser.fromJson(post['user']),
-                      time: time,
+                      time: DateTime.parse(post['timepost']),
                       title: post['title'].toString(),
                       content: post['description'].toString(),
-                      comments: comments,
-                      likes: likes,
+                      comments:
+                          int.tryParse(post['comments_count'].toString()) ?? 0,
+                      likes: int.tryParse(post['likes'].toString()) ?? 0,
                       type: post['category'].toString(),
                       image: post['image'].toString(),
                       isLike: post['isLike'],

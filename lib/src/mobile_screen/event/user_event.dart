@@ -138,7 +138,7 @@ class _UserEventsState extends State<UserEvents> {
                   child: _filteredEvents.isEmpty
                       ? Center(
                           child: Text(
-                            'Không tìm thấy sự kiện nào.',
+                            S.of(context).no_events_available,
                             style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         )
