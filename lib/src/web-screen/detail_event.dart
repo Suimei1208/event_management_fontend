@@ -239,7 +239,7 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
           if (isHostOrStaff)
             Card(
               child: Container(
-                  width: MediaQuery.of(context).size.width * 0.2,
+                  width: MediaQuery.of(context).size.width * 0.21,
                   height: double.infinity,
                   padding: const EdgeInsets.all(16),
                   child: SingleChildScrollView(

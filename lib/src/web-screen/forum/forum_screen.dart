@@ -85,8 +85,8 @@ class _CommunityForumScreenState extends State<WebCommunityForumScreen> {
                                 onPressed: () {
                                   Navigator.pushNamed(context, "/create-post");
                                 },
-                                label: const Text("Tạo bài viết",
-                                    style: TextStyle(fontSize: 16)),
+                                label: Text(S.of(context).create_post,
+                                    style: const TextStyle(fontSize: 16)),
                                 icon: const Icon(Icons.add)),
                           ),
                           const SizedBox(height: 20),
@@ -261,7 +261,7 @@ class _WebPostItemState extends State<WebPostItem> {
                     children: [
                       const Icon(Icons.comment, size: 16),
                       const SizedBox(width: 5),
-                      Text('${widget.comments} Comments'),
+                      Text('${widget.comments} ${S.of(context).comments}'),
                     ],
                   ),
                   InkWell(
@@ -281,7 +281,7 @@ class _WebPostItemState extends State<WebPostItem> {
                           size: 16,
                         ),
                         const SizedBox(width: 5),
-                        Text('${widget.likes} Likes'),
+                        Text('${widget.likes} ${S.of(context).likes}'),
                       ],
                     ),
                   ),

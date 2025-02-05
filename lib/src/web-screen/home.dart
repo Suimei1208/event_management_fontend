@@ -110,7 +110,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Upcoming Events',
+                    S.of(context).next_events,
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall
@@ -227,7 +227,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                               await getQrTicket(event.id);
                           _viewQRCode(context, qrCode['qr']);
                         },
-                        child: const Text('View Ticket'),
+                        child: Text(S.of(context).view_ticket),
                       ),
                       const SizedBox(height: 8),
                       ElevatedButton(
@@ -240,7 +240,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                               endDate: event.endDate,
                               context: context);
                         },
-                        child: const Text('Add Google Calendar'),
+                        child: Text(S.of(context).add_gg_cal),
                       ),
                     ],
                   ),
@@ -270,7 +270,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Your QR Code',
+                'QR Code',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
@@ -284,7 +284,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                child: Text(S.of(context).cancel),
               ),
             ],
           ),

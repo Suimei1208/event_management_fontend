@@ -473,7 +473,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       leading: const Icon(Icons.calendar_today),
                                       title: Text(S.of(context).add_gg_cal),
                                       onTap: () async {
-                                        Navigator.pop(context);
                                         await addGoogleCalendarEvent(
                                             email: user!.email,
                                             name: event.name,
@@ -481,6 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             startDate: event.startDate,
                                             endDate: event.endDate,
                                             context: context);
+                                        Navigator.pop(context);
                                       },
                                     ),
                                   ],
