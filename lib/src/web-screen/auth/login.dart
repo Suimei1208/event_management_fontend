@@ -1,5 +1,4 @@
 import 'package:event_management/src/mobile_screen/auth/forgot_password.dart';
-import 'package:event_management/src/service/auth_service.dart';
 import 'package:event_management/src/service/user_service_web.dart';
 import 'package:flutter/material.dart';
 
@@ -91,7 +90,7 @@ class _WebLoginScreenState extends State<WebLoginScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          await signInWithEmailPassword(
+                          await signInWithEmailPasswordWed(
                             context,
                             _emailController.text,
                             _passwordController.text,
