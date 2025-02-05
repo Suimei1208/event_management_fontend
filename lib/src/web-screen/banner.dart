@@ -1,3 +1,4 @@
+import 'package:event_management/generated/l10n.dart';
 import 'package:flutter/material.dart';
 
 class HeroSection extends StatefulWidget {
@@ -76,7 +77,7 @@ class _HeroSectionState extends State<HeroSection> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome to Event Management',
+                  S.of(context).welcome,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -84,7 +85,7 @@ class _HeroSectionState extends State<HeroSection> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Discover and manage your favorite events effortlessly.',
+                  S.of(context).welcome_back,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Colors.white70,
                       ),
@@ -98,9 +99,9 @@ class _HeroSectionState extends State<HeroSection> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 24, vertical: 12),
                   ),
-                  child: const Text(
-                    'Explore Events',
-                    style: TextStyle(fontSize: 16),
+                  child: Text(
+                    S.of(context).explore_events,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 )
               ],

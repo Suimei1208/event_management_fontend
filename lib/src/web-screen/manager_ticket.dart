@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/mobile_screen/ticket/form_cancel_ticket.dart';
 import 'package:event_management/src/service/ticket_service.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
@@ -31,11 +32,11 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
 
   String text(String status) {
     if (status == "Pending") {
-      return "Đang chờ xử lý";
+      return S.of(context).pending;
     } else if (status == "Approved") {
-      return "Đã được chấp nhận";
+      return S.of(context).approved;
     } else if (status == "Rejected") {
-      return "Đã bị từ chối";
+      return S.of(context).rejected;
     } else {
       return "";
     }
@@ -55,8 +56,8 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
               child: Text('Error: ${snapshot.error}'),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No tickets available.'),
+            return Center(
+              child: Text(S.of(context).noTicketsAvailable),
             );
           }
 
@@ -80,9 +81,11 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildEventSection(context, 'Upcoming Events', upcomingTickets),
+                _buildEventSection(
+                    context, S.of(context).upcomingEvents, upcomingTickets),
                 const SizedBox(height: 24),
-                _buildEventSection(context, 'Past Events', pastTickets),
+                _buildEventSection(
+                    context, S.of(context).pastEvents, pastTickets),
               ],
             ),
           );
@@ -106,7 +109,7 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
         ),
         const SizedBox(height: 16),
         if (tickets.isEmpty)
-          const Center(child: Text('No tickets available in this category.')),
+          Center(child: Text(S.of(context).noTicketsAvailable)),
         ...tickets.map((ticket) => _buildEventCard(context, ticket)),
       ],
     );
@@ -138,9 +141,9 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildTicketDetails('Ticket Status:', displayStatus),
+                _buildTicketDetails(S.of(context).ticketStatus, displayStatus),
                 _buildTicketDetails(
-                    'Ticket #:',
+                    S.of(context).ticketNumber,
                     ticket.qrCode.length > 6
                         ? ticket.qrCode.substring(ticket.qrCode.length - 6)
                         : ticket.qrCode),
@@ -191,7 +194,7 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                child: const Text('Hủy vé'),
+                                child: Text(S.of(context).cancelTicket),
                               ),
                             ],
                           )
@@ -199,8 +202,8 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
                             children: [
                               Text((ticket.status == "Cancelled" &&
                                       ticket.cancel_status == "Accepted")
-                                  ? "Hủy vé thành công"
-                                  : "Đã hết hạn hủy vé"),
+                                  ? S.of(context).ticketCancellation
+                                  : S.of(context).outdated_cancel),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red[300],
@@ -209,7 +212,7 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
                                   ),
                                 ),
                                 onPressed: null,
-                                child: const Text('Hủy vé'),
+                                child: Text(S.of(context).ticketCancellation),
                               ),
                             ],
                           )
@@ -221,9 +224,8 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
-                                  return const DialogWidget(
-                                    message:
-                                        'Vui lòng liên hệ Admin qua email để hủy vé!',
+                                  return DialogWidget(
+                                    message: S.of(context).please_contact_admin,
                                     title: 'Notification',
                                   );
                                 },
@@ -235,7 +237,7 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
-                            child: const Text('Hủy vé'),
+                            child: Text(S.of(context).cancelTicket),
                           ),
                         ],
                       ),
@@ -253,7 +255,7 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
-                      child: const Text('View QR Code'),
+                      child: Text(S.of(context).view_ticket),
                     )
                   ],
                 ),
@@ -333,7 +335,7 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'Your QR Code',
+                'QR Code',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
@@ -347,7 +349,7 @@ class _MyTicketsPageWebState extends State<MyTicketsPageWeb> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
+                child: Text(S.of(context).cancel),
               ),
             ],
           ),

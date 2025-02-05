@@ -256,9 +256,9 @@ class _ForumPostPageWebState extends State<ForumPostPageWeb> {
                               ],
                             ),
                             const SizedBox(height: 20),
-                            const Text(
-                              'Comments',
-                              style: TextStyle(
+                            Text(
+                              S.of(context).comment,
+                              style: const TextStyle(
                                   fontSize: 20, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 20),
@@ -299,7 +299,7 @@ class _ForumPostPageWebState extends State<ForumPostPageWeb> {
                               child: TextField(
                                 controller: _commentController,
                                 decoration: InputDecoration(
-                                  hintText: 'Write a comment...',
+                                  hintText: S.of(context).write_comment,
                                   border: const OutlineInputBorder(),
                                   suffixIcon: IconButton(
                                     icon: const Icon(Icons.send),
@@ -402,7 +402,7 @@ class _CommentItemState extends State<CommentItem> {
                           _isReplying = !_isReplying;
                         });
                       },
-                      child: const Text('Reply'),
+                      child: Text(S.of(context).reply),
                     ),
                   ],
                 ),

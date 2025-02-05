@@ -54,10 +54,17 @@ class MessageLookup extends MessageLookupByLibrary {
         "await_appro":
             MessageLookupByLibrary.simpleMessage("Awaiting approval"),
         "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
+        "cancelTicket": MessageLookupByLibrary.simpleMessage("Cancel Ticket"),
         "cancel_event": MessageLookupByLibrary.simpleMessage("Cancel Event"),
         "cancel_list": MessageLookupByLibrary.simpleMessage("Cancel List"),
         "cancel_user": MessageLookupByLibrary.simpleMessage("Cancelled Users"),
+        "cancellationFailed":
+            MessageLookupByLibrary.simpleMessage("Unable to cancel ticket"),
+        "cancellationSuccess": MessageLookupByLibrary.simpleMessage(
+            "Ticket canceled successfully"),
         "category": MessageLookupByLibrary.simpleMessage("Category"),
+        "comment": MessageLookupByLibrary.simpleMessage("Comment"),
+        "comments": MessageLookupByLibrary.simpleMessage("comments"),
         "content_review": MessageLookupByLibrary.simpleMessage(
             "Write Your Review (Optional)"),
         "create_event": MessageLookupByLibrary.simpleMessage("Create Event"),
@@ -81,10 +88,15 @@ class MessageLookup extends MessageLookupByLibrary {
         "enter": MessageLookupByLibrary.simpleMessage("Enter"),
         "enter_link":
             MessageLookupByLibrary.simpleMessage("Enter External Link"),
+        "error": MessageLookupByLibrary.simpleMessage("Error"),
+        "eventStatus": MessageLookupByLibrary.simpleMessage("Event Status"),
         "event_name": MessageLookupByLibrary.simpleMessage("Event Name"),
         "event_type": MessageLookupByLibrary.simpleMessage("Event Type"),
         "existed_participant":
             MessageLookupByLibrary.simpleMessage("Existed Participant"),
+        "expired": MessageLookupByLibrary.simpleMessage("Expired"),
+        "explore_events":
+            MessageLookupByLibrary.simpleMessage("Explore Events"),
         "facebook_sign_in":
             MessageLookupByLibrary.simpleMessage("Sign in with Facebook"),
         "feedback": MessageLookupByLibrary.simpleMessage("Feedback"),
@@ -103,6 +115,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "latest": MessageLookupByLibrary.simpleMessage("latest"),
         "like_event_review": MessageLookupByLibrary.simpleMessage(
             "Would you recommend this event?"),
+        "likes": MessageLookupByLibrary.simpleMessage("likes"),
         "list_participants":
             MessageLookupByLibrary.simpleMessage("Participation list"),
         "location": MessageLookupByLibrary.simpleMessage("Location"),
@@ -114,6 +127,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "myTicket": MessageLookupByLibrary.simpleMessage("My Ticket"),
         "next_event": MessageLookupByLibrary.simpleMessage("Next Event"),
         "next_events": MessageLookupByLibrary.simpleMessage("Next Events"),
+        "noTicketsAvailable":
+            MessageLookupByLibrary.simpleMessage("No tickets available."),
         "no_events_available":
             MessageLookupByLibrary.simpleMessage("No Event Available"),
         "no_transactions":
@@ -122,13 +137,21 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("No upcoming event"),
         "not_yet_review":
             MessageLookupByLibrary.simpleMessage("Pending review"),
+        "notification": MessageLookupByLibrary.simpleMessage("Notification"),
         "obj": MessageLookupByLibrary.simpleMessage("Event Objectives"),
         "ongoing_event": MessageLookupByLibrary.simpleMessage("On-going Event"),
+        "outdated_cancel":
+            MessageLookupByLibrary.simpleMessage("Outdated to cancel ticket"),
         "overview": MessageLookupByLibrary.simpleMessage("General overview"),
         "participant_list":
             MessageLookupByLibrary.simpleMessage("Participant List"),
+        "pastEvents": MessageLookupByLibrary.simpleMessage("Past Events"),
+        "pending": MessageLookupByLibrary.simpleMessage("Pending"),
         "pending_request":
             MessageLookupByLibrary.simpleMessage("Pending Request"),
+        "pick_image": MessageLookupByLibrary.simpleMessage("Pick an image"),
+        "please_contact_admin":
+            MessageLookupByLibrary.simpleMessage("Please contact admin"),
         "popular": MessageLookupByLibrary.simpleMessage("Popular"),
         "post": MessageLookupByLibrary.simpleMessage("Post"),
         "post_title": MessageLookupByLibrary.simpleMessage("Post Title"),
@@ -145,6 +168,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Register Schedule"),
         "registration_list":
             MessageLookupByLibrary.simpleMessage("Registration List"),
+        "rejected": MessageLookupByLibrary.simpleMessage("Rejected"),
         "remain": MessageLookupByLibrary.simpleMessage("Balance remaining"),
         "remove_speaker":
             MessageLookupByLibrary.simpleMessage("Remove Speaker"),
@@ -153,6 +177,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "reopen": MessageLookupByLibrary.simpleMessage("Re-open Event"),
         "reopen_event":
             MessageLookupByLibrary.simpleMessage("Reopen the event"),
+        "reply": MessageLookupByLibrary.simpleMessage("Reply"),
         "review_event": MessageLookupByLibrary.simpleMessage("Review Events"),
         "reviewed": MessageLookupByLibrary.simpleMessage("Reviewed"),
         "search_event": MessageLookupByLibrary.simpleMessage("Search Event..."),
@@ -185,6 +210,10 @@ class MessageLookup extends MessageLookupByLibrary {
         "stat": MessageLookupByLibrary.simpleMessage("Statistics"),
         "statistics": MessageLookupByLibrary.simpleMessage("Statistics"),
         "submit_review": MessageLookupByLibrary.simpleMessage("Submit Review"),
+        "ticketCancellation":
+            MessageLookupByLibrary.simpleMessage("Ticket Cancellation"),
+        "ticketNumber": MessageLookupByLibrary.simpleMessage("Ticket #:"),
+        "ticketStatus": MessageLookupByLibrary.simpleMessage("Ticket Status:"),
         "tips_tricks": MessageLookupByLibrary.simpleMessage("Tips & Tricks"),
         "title": MessageLookupByLibrary.simpleMessage("Event Management"),
         "toggle_view": MessageLookupByLibrary.simpleMessage("Toggle View"),
@@ -192,6 +221,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "total_spending":
             MessageLookupByLibrary.simpleMessage("Total spending"),
         "unanswered": MessageLookupByLibrary.simpleMessage("Unanswered"),
+        "upcomingEvents":
+            MessageLookupByLibrary.simpleMessage("Upcoming Events"),
+        "update_event": MessageLookupByLibrary.simpleMessage("Update Event"),
         "vietnamese": MessageLookupByLibrary.simpleMessage("Vietnamese"),
         "view_detail": MessageLookupByLibrary.simpleMessage("View Detail"),
         "view_schedule": MessageLookupByLibrary.simpleMessage("View Schedule"),
@@ -200,6 +232,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Welcome to the Event Management app!"),
         "welcome_back": MessageLookupByLibrary.simpleMessage("Welcome Back"),
         "welcome_forum":
-            MessageLookupByLibrary.simpleMessage("Welcome to the Community")
+            MessageLookupByLibrary.simpleMessage("Welcome to the Community"),
+        "write_comment":
+            MessageLookupByLibrary.simpleMessage("Write a comment...")
       };
 }

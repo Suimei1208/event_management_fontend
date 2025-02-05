@@ -404,8 +404,8 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
                             Expanded(
                               child: Text(
                                 _selectedStartDate == null
-                                    ? 'Select Start or After Date'
-                                    : 'Start or After Date: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
+                                    ? S.of(context).select_start_date
+                                    : '${S.of(context).start_date}: ${DateFormat.yMMMd().format(_selectedStartDate!)}',
                               ),
                             ),
                             IconButton(
@@ -475,14 +475,14 @@ class _EventRegisterWebScreenState extends State<EventRegisterWebScreen> {
                             ElevatedButton(
                               onPressed:
                                   _currentPage > 0 ? _previousPage : null,
-                              child: const Text('Previous'),
+                              child: const Text('<'),
                             ),
                             ElevatedButton(
                               onPressed: (_currentPage + 1) * _itemsPerPage <
                                       _filteredEvents.length
                                   ? _nextPage
                                   : null,
-                              child: const Text('Next'),
+                              child: const Text('>'),
                             ),
                           ],
                         ),

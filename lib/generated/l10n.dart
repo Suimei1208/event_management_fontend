@@ -1399,6 +1399,256 @@ class S {
       args: [],
     );
   }
+
+  /// `Explore Events`
+  String get explore_events {
+    return Intl.message(
+      'Explore Events',
+      name: 'explore_events',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `likes`
+  String get likes {
+    return Intl.message(
+      'likes',
+      name: 'likes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `comments`
+  String get comments {
+    return Intl.message(
+      'comments',
+      name: 'comments',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Comment`
+  String get comment {
+    return Intl.message(
+      'Comment',
+      name: 'comment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Write a comment...`
+  String get write_comment {
+    return Intl.message(
+      'Write a comment...',
+      name: 'write_comment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Reply`
+  String get reply {
+    return Intl.message(
+      'Reply',
+      name: 'reply',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Update Event`
+  String get update_event {
+    return Intl.message(
+      'Update Event',
+      name: 'update_event',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pick an image`
+  String get pick_image {
+    return Intl.message(
+      'Pick an image',
+      name: 'pick_image',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Upcoming Events`
+  String get upcomingEvents {
+    return Intl.message(
+      'Upcoming Events',
+      name: 'upcomingEvents',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Past Events`
+  String get pastEvents {
+    return Intl.message(
+      'Past Events',
+      name: 'pastEvents',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ticket Status:`
+  String get ticketStatus {
+    return Intl.message(
+      'Ticket Status:',
+      name: 'ticketStatus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ticket #:`
+  String get ticketNumber {
+    return Intl.message(
+      'Ticket #:',
+      name: 'ticketNumber',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cancel Ticket`
+  String get cancelTicket {
+    return Intl.message(
+      'Cancel Ticket',
+      name: 'cancelTicket',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Expired`
+  String get expired {
+    return Intl.message(
+      'Expired',
+      name: 'expired',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No tickets available.`
+  String get noTicketsAvailable {
+    return Intl.message(
+      'No tickets available.',
+      name: 'noTicketsAvailable',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Event Status`
+  String get eventStatus {
+    return Intl.message(
+      'Event Status',
+      name: 'eventStatus',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ticket Cancellation`
+  String get ticketCancellation {
+    return Intl.message(
+      'Ticket Cancellation',
+      name: 'ticketCancellation',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Notification`
+  String get notification {
+    return Intl.message(
+      'Notification',
+      name: 'notification',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ticket canceled successfully`
+  String get cancellationSuccess {
+    return Intl.message(
+      'Ticket canceled successfully',
+      name: 'cancellationSuccess',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Unable to cancel ticket`
+  String get cancellationFailed {
+    return Intl.message(
+      'Unable to cancel ticket',
+      name: 'cancellationFailed',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Error`
+  String get error {
+    return Intl.message(
+      'Error',
+      name: 'error',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Outdated to cancel ticket`
+  String get outdated_cancel {
+    return Intl.message(
+      'Outdated to cancel ticket',
+      name: 'outdated_cancel',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please contact admin`
+  String get please_contact_admin {
+    return Intl.message(
+      'Please contact admin',
+      name: 'please_contact_admin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Pending`
+  String get pending {
+    return Intl.message(
+      'Pending',
+      name: 'pending',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Rejected`
+  String get rejected {
+    return Intl.message(
+      'Rejected',
+      name: 'rejected',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

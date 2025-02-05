@@ -55,11 +55,18 @@ class MessageLookup extends MessageLookupByLibrary {
         "await_appro":
             MessageLookupByLibrary.simpleMessage("Danh sách chờ duyệt"),
         "cancel": MessageLookupByLibrary.simpleMessage("Hủy"),
+        "cancelTicket": MessageLookupByLibrary.simpleMessage("Hủy vé"),
         "cancel_event": MessageLookupByLibrary.simpleMessage("Hủy Sự kiện"),
         "cancel_list": MessageLookupByLibrary.simpleMessage("Danh sách đã hủy"),
         "cancel_user": MessageLookupByLibrary.simpleMessage(
             "Danh sách người dùng hủy event"),
+        "cancellationFailed":
+            MessageLookupByLibrary.simpleMessage("Không thể hủy vé"),
+        "cancellationSuccess":
+            MessageLookupByLibrary.simpleMessage("Hủy vé thành công"),
         "category": MessageLookupByLibrary.simpleMessage("Danh mục"),
+        "comment": MessageLookupByLibrary.simpleMessage("Bình luận"),
+        "comments": MessageLookupByLibrary.simpleMessage("bình luận"),
         "content_review": MessageLookupByLibrary.simpleMessage(
             "Viết đánh giá của bạn (Không bắt buộc)"),
         "create_event": MessageLookupByLibrary.simpleMessage("Tạo Sự Kiện"),
@@ -84,10 +91,16 @@ class MessageLookup extends MessageLookupByLibrary {
         "english": MessageLookupByLibrary.simpleMessage("Tiếng Anh"),
         "enter": MessageLookupByLibrary.simpleMessage("Nhập"),
         "enter_link": MessageLookupByLibrary.simpleMessage("Nhập link"),
+        "error": MessageLookupByLibrary.simpleMessage("Lỗi"),
+        "eventStatus":
+            MessageLookupByLibrary.simpleMessage("Trạng thái sự kiện"),
         "event_name": MessageLookupByLibrary.simpleMessage("Tên sự kiện"),
         "event_type": MessageLookupByLibrary.simpleMessage("Loại Sự Kiện"),
         "existed_participant":
             MessageLookupByLibrary.simpleMessage("Thành Viên Đã Có"),
+        "expired": MessageLookupByLibrary.simpleMessage("Hết hạn"),
+        "explore_events":
+            MessageLookupByLibrary.simpleMessage("Khám phá sự kiện"),
         "facebook_sign_in":
             MessageLookupByLibrary.simpleMessage("Đăng nhập bằng Facebook"),
         "feedback": MessageLookupByLibrary.simpleMessage("Phản hồi"),
@@ -106,6 +119,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "latest": MessageLookupByLibrary.simpleMessage("Mới nhất"),
         "like_event_review": MessageLookupByLibrary.simpleMessage(
             "Bạn có thích event này không?"),
+        "likes": MessageLookupByLibrary.simpleMessage("lượt thích"),
         "list_participants":
             MessageLookupByLibrary.simpleMessage("Danh sách tham gia"),
         "location": MessageLookupByLibrary.simpleMessage("Địa điểm"),
@@ -118,6 +132,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "next_event": MessageLookupByLibrary.simpleMessage("Sự kiện tiếp theo"),
         "next_events":
             MessageLookupByLibrary.simpleMessage("Những sự kiện tiếp theo"),
+        "noTicketsAvailable":
+            MessageLookupByLibrary.simpleMessage("Không có vé nào."),
         "no_events_available":
             MessageLookupByLibrary.simpleMessage("Không có sự kiện nào"),
         "no_transactions":
@@ -125,14 +141,22 @@ class MessageLookup extends MessageLookupByLibrary {
         "no_upcoming_event":
             MessageLookupByLibrary.simpleMessage("Không có sự kiện nào"),
         "not_yet_review": MessageLookupByLibrary.simpleMessage("Chưa đánh giá"),
+        "notification": MessageLookupByLibrary.simpleMessage("Thông báo"),
         "obj": MessageLookupByLibrary.simpleMessage("Mục tiêu sự kiện"),
         "ongoing_event":
             MessageLookupByLibrary.simpleMessage("Sự kiện đang diễn ra"),
+        "outdated_cancel":
+            MessageLookupByLibrary.simpleMessage("Hết hạn hủy vé"),
         "overview": MessageLookupByLibrary.simpleMessage("Tổng quan"),
         "participant_list":
             MessageLookupByLibrary.simpleMessage("Danh sách người tham gia"),
+        "pastEvents": MessageLookupByLibrary.simpleMessage("Sự kiện đã qua"),
+        "pending": MessageLookupByLibrary.simpleMessage("Đang chờ xử lý"),
         "pending_request":
             MessageLookupByLibrary.simpleMessage("Yêu Cầu Đang Chờ"),
+        "pick_image": MessageLookupByLibrary.simpleMessage("Chọn ảnh"),
+        "please_contact_admin":
+            MessageLookupByLibrary.simpleMessage("Vui lòng liên hệ admin"),
         "popular": MessageLookupByLibrary.simpleMessage("Phổ biến"),
         "post": MessageLookupByLibrary.simpleMessage("Đăng bài"),
         "post_title": MessageLookupByLibrary.simpleMessage("Tiêu đề bài viết"),
@@ -150,12 +174,14 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Đăng ký tham gia lịch trình"),
         "registration_list":
             MessageLookupByLibrary.simpleMessage("Danh sách đăng ký"),
+        "rejected": MessageLookupByLibrary.simpleMessage("Đã bị từ chối"),
         "remain": MessageLookupByLibrary.simpleMessage("Số dư còn lại"),
         "remove_speaker": MessageLookupByLibrary.simpleMessage("Xóa Diễn Giả"),
         "remove_special_guest":
             MessageLookupByLibrary.simpleMessage("Xóa Khách Mời Đặc Biệt"),
         "reopen": MessageLookupByLibrary.simpleMessage("Mở lại sự kiện"),
         "reopen_event": MessageLookupByLibrary.simpleMessage("Mở lại sự kiện"),
+        "reply": MessageLookupByLibrary.simpleMessage("Phản hồi"),
         "review_event":
             MessageLookupByLibrary.simpleMessage("Đánh giá sự kiện"),
         "reviewed": MessageLookupByLibrary.simpleMessage("Đã đánh giá"),
@@ -191,12 +217,19 @@ class MessageLookup extends MessageLookupByLibrary {
         "stat": MessageLookupByLibrary.simpleMessage("Thống kê"),
         "statistics": MessageLookupByLibrary.simpleMessage("Thống kê"),
         "submit_review": MessageLookupByLibrary.simpleMessage("Gửi phản hồi"),
+        "ticketCancellation": MessageLookupByLibrary.simpleMessage("Hủy vé"),
+        "ticketNumber": MessageLookupByLibrary.simpleMessage("Số vé #: "),
+        "ticketStatus": MessageLookupByLibrary.simpleMessage("Trạng thái vé:"),
         "tips_tricks": MessageLookupByLibrary.simpleMessage("Mẹo & Thủ thuật"),
         "title": MessageLookupByLibrary.simpleMessage("Quản lý sự kiện"),
         "toggle_view": MessageLookupByLibrary.simpleMessage("Chế độ xem"),
         "total_income": MessageLookupByLibrary.simpleMessage("Tổng thu nhập"),
         "total_spending": MessageLookupByLibrary.simpleMessage("Tổng chi tiêu"),
         "unanswered": MessageLookupByLibrary.simpleMessage("Chưa được trả lời"),
+        "upcomingEvents":
+            MessageLookupByLibrary.simpleMessage("Sự kiện sắp tới"),
+        "update_event":
+            MessageLookupByLibrary.simpleMessage("Cập nhật sự kiện"),
         "vietnamese": MessageLookupByLibrary.simpleMessage("Tiếng Việt"),
         "view_detail": MessageLookupByLibrary.simpleMessage("Xem Chi Tiết"),
         "view_schedule": MessageLookupByLibrary.simpleMessage("Xem lịch trình"),
@@ -204,6 +237,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "welcome": MessageLookupByLibrary.simpleMessage(
             "Chào mừng bạn đến với ứng dụng Quản lý sự kiện!"),
         "welcome_back": MessageLookupByLibrary.simpleMessage("Chào mừng"),
-        "welcome_forum": MessageLookupByLibrary.simpleMessage("Diễn đàn")
+        "welcome_forum": MessageLookupByLibrary.simpleMessage("Diễn đàn"),
+        "write_comment":
+            MessageLookupByLibrary.simpleMessage("Viết bình luận...")
       };
 }

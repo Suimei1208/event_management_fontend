@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_web_libraries_in_flutter, use_build_context_synchronously
 
 import 'dart:html' as html;
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -243,6 +244,39 @@ class _UpdateEventWebState extends State<UpdateEventWeb> {
     }
   }
 
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    IconData? suffixIcon,
+    int maxLines = 1,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: TextFormField(
+        controller: controller,
+        readOnly: readOnly,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          contentPadding: const EdgeInsets.all(16),
+        ),
+        onTap: onTap,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'This field cannot be empty';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Brightness brightness = Theme.of(context).brightness;
@@ -254,236 +288,260 @@ class _UpdateEventWebState extends State<UpdateEventWeb> {
           : Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 800),
-                  child: SingleChildScrollView(
-                    child: Center(
-                      child: Column(
-                        children: [
-                          TextField(
-                            controller: _nameController,
-                            decoration:
-                                const InputDecoration(labelText: 'Event Name'),
-                          ),
-                          const SizedBox(width: 20),
-                          TextField(
-                            controller: _descriptionController,
-                            decoration:
-                                const InputDecoration(labelText: 'Description'),
-                            maxLines: 3,
-                          ),
-                          const SizedBox(width: 20),
-                          DropdownButtonFormField<String>(
-                            value: selectedEventType,
-                            decoration:
-                                const InputDecoration(labelText: 'Event Type'),
-                            items: [
-                              'Seminar',
-                              'Workshop',
-                              'Conference',
-                              'Competition'
-                            ]
-                                .map((type) => DropdownMenuItem(
-                                    value: type, child: Text(type)))
-                                .toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedEventType = value;
-                              });
-                            },
-                          ),
-                          const SizedBox(width: 20),
-                          TextField(
-                            controller: _audienceController,
-                            decoration: const InputDecoration(
-                                labelText: 'Target Audience'),
-                          ),
-                          const SizedBox(width: 20),
-                          TextField(
-                            controller: _locationController,
-                            decoration:
-                                const InputDecoration(labelText: 'Location'),
-                          ),
-                          const SizedBox(width: 20),
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _selectDate(context),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: Theme.of(context).dividerColor,
-                                        width: 1,
-                                      ),
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: Column(
+                      children: [
+                        _buildTextField(
+                            label: S.of(context).event_name,
+                            controller: _nameController),
+                        _buildTextField(
+                          label: S.of(context).desc,
+                          controller: _descriptionController,
+                          maxLines: 4,
+                        ),
+                        _buildTextField(
+                          label: S.of(context).location,
+                          controller: _locationController,
+                          maxLines: 4,
+                        ),
+                        _buildTextField(
+                          label: S.of(context).obj,
+                          controller: _audienceController,
+                          maxLines: 4,
+                        ),
+                        const SizedBox(height: 20),
+                        DropdownButtonFormField<String>(
+                          value: selectedEventType,
+                          decoration: InputDecoration(
+                              labelText: S.of(context).event_type),
+                          items: [
+                            'Seminar',
+                            'Workshop',
+                            'Conference',
+                            'Competition'
+                          ]
+                              .map((type) => DropdownMenuItem(
+                                  value: type, child: Text(type)))
+                              .toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              selectedEventType = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => _selectDate(context),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Theme.of(context).dividerColor,
+                                      width: 1,
                                     ),
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              12, 12, 12, 12),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          const Icon(
-                                            Icons.calendar_today,
-                                            size: 24,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _startDateController,
-                                              readOnly: true,
-                                              decoration: const InputDecoration(
-                                                hintText: 'Select Date',
-                                                border: InputBorder.none,
-                                              ),
+                                  ),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12, 12, 12, 12),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        const Icon(
+                                          Icons.calendar_today,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _startDateController,
+                                            readOnly: true,
+                                            decoration: InputDecoration(
+                                              hintText: S
+                                                  .of(context)
+                                                  .select_start_date,
+                                              border: InputBorder.none,
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _selectTime(context),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: Theme.of(context).dividerColor,
-                                        width: 1,
-                                      ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => _selectTime(context),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Theme.of(context).dividerColor,
+                                      width: 1,
                                     ),
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              12, 12, 12, 12),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          const Icon(
-                                            Icons.access_time,
-                                            size: 24,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _startTimeController,
-                                              readOnly: true,
-                                              decoration: const InputDecoration(
-                                                hintText: 'Select Time',
-                                                border: InputBorder.none,
-                                              ),
+                                  ),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12, 12, 12, 12),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        const Icon(
+                                          Icons.access_time,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _startTimeController,
+                                            readOnly: true,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  S.of(context).select_time,
+                                              border: InputBorder.none,
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => _selectEndDate(context),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Theme.of(context).dividerColor,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12, 12, 12, 12),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        const Icon(
+                                          Icons.calendar_today,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _endDateController,
+                                            readOnly: true,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  S.of(context).select_end_date,
+                                              border: InputBorder.none,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => _selectEndTime(context),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Theme.of(context).dividerColor,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsetsDirectional.fromSTEB(
+                                            12, 12, 12, 12),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        const Icon(
+                                          Icons.access_time,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _endTimeController,
+                                            readOnly: true,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  S.of(context).select_time,
+                                              border: InputBorder.none,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: brightness == Brightness.light
+                                ? Colors.blue
+                                : Colors.blue[700],
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 20,
+                              horizontal: 20,
+                            ),
                           ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _selectEndDate(context),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: Theme.of(context).dividerColor,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              12, 12, 12, 12),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          const Icon(
-                                            Icons.calendar_today,
-                                            size: 24,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _endDateController,
-                                              readOnly: true,
-                                              decoration: const InputDecoration(
-                                                hintText: 'Select End Date',
-                                                border: InputBorder.none,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => _selectEndTime(context),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .scaffoldBackgroundColor,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: Theme.of(context).dividerColor,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsetsDirectional.fromSTEB(
-                                              12, 12, 12, 12),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        children: [
-                                          const Icon(
-                                            Icons.access_time,
-                                            size: 24,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: TextField(
-                                              controller: _endTimeController,
-                                              readOnly: true,
-                                              decoration: const InputDecoration(
-                                                hintText: 'Select End Time',
-                                                border: InputBorder.none,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                          onPressed: _pickImage,
+                          child: Text(
+                            S.of(context).pick_image,
+                            style: const TextStyle(
+                                fontSize: 18, color: Colors.white),
                           ),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
+                        ),
+                        const SizedBox(width: 20),
+                        if (uploadedImageUrl != null)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Image.network(uploadedImageUrl!,
+                                height: 250, width: double.infinity),
+                          ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: brightness == Brightness.light
                                   ? Colors.blue
@@ -493,43 +551,15 @@ class _UpdateEventWebState extends State<UpdateEventWeb> {
                                 horizontal: 20,
                               ),
                             ),
-                            onPressed: _pickImage,
-                            child: const Text(
-                              'Select Image',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.white),
+                            onPressed: _updateEvent,
+                            child: Text(
+                              S.of(context).update_event,
+                              style: const TextStyle(
+                                  fontSize: 18, color: Colors.white),
                             ),
                           ),
-                          const SizedBox(width: 20),
-                          if (uploadedImageUrl != null)
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Image.network(uploadedImageUrl!,
-                                  height: 250, width: double.infinity),
-                            ),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: brightness == Brightness.light
-                                    ? Colors.blue
-                                    : Colors.blue[700],
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 20,
-                                  horizontal: 20,
-                                ),
-                              ),
-                              onPressed: _updateEvent,
-                              child: const Text(
-                                'Update Event',
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
