@@ -292,3 +292,40 @@ Future<void> _sendIdTokenToBackend(BuildContext context, String idToken) async {
     ));
   }
 }
+
+Future<void> signInWithEmailPasswordWed(
+    BuildContext context, String email, String password) async {
+  try {
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email and password!')),
+      );
+      return;
+    } else if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Password must be at least 6 characters!')),
+      );
+      return;
+    } else if (!email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid email!')),
+      );
+      return;
+    }
+
+    final UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    if (userCredential.user != null) {
+      Navigator.pushNamed(context, '/home');
+    }
+
+  } on FirebaseAuthException {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Login failed: Check your email and password')));
+  }
+}

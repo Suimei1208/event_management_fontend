@@ -100,7 +100,7 @@ class _MyWebAppState extends State<MyWebApp> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasData) {
-                    return const WebLoginScreen();
+                    return const WebHomeScreen();
                   } else {
                     return const WebLoginScreen();
                   }
