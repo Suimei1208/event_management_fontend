@@ -1,13 +1,13 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, avoid_web_libraries_in_flutter, unused_field
 
 import 'dart:io';
-import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/participants.dart';
 import 'package:event_management/src/service/user_service.dart';
+import 'package:event_management/src/service/user_service_web.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'dart:html' as html;
 
 class WebSpecialParticipantsPage extends StatefulWidget {
   final int eventId;
@@ -20,14 +20,16 @@ class WebSpecialParticipantsPage extends StatefulWidget {
 
 class _SpecialParticipantsPageState extends State<WebSpecialParticipantsPage> {
   String userRole = "";
-  final List<Map<String, dynamic>> _participants = [];
+  List<Map<String, dynamic>> _participants = [];
   final TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> searchResults = [];
   bool _isSearching = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _fetchParticipants();
   }
 
   void _addUserToParticipants(Map<String, dynamic> user) {
@@ -47,6 +49,23 @@ class _SpecialParticipantsPageState extends State<WebSpecialParticipantsPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _fetchParticipants() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final participant = await fetchSpecialParticipants(widget.eventId);
+      setState(() {
+        _participants = participant;
+        _isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _searchUsers(String name) async {
@@ -79,6 +98,19 @@ class _SpecialParticipantsPageState extends State<WebSpecialParticipantsPage> {
       setState(() {
         _isSearching = false;
       });
+    }
+  }
+
+  Future<void> _removeParticipant(int participantId, int index) async {
+    try {
+      await removeSpecialParticipant(widget.eventId, participantId);
+      setState(() {
+        _participants.removeAt(index);
+      });
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to remove participant: $error')),
+      );
     }
   }
 
@@ -153,6 +185,12 @@ class _SpecialParticipantsPageState extends State<WebSpecialParticipantsPage> {
                               ),
                               title: Text(participant['name']),
                               subtitle: Text(participant['role'] ?? 'No role'),
+                              trailing: IconButton(
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => _removeParticipant(
+                                    participant['id'], index),
+                              ),
                             );
                           },
                         ),
@@ -208,21 +246,54 @@ class _AddSpecialParticipantFormWithImageState
   String? _selectedRole;
   File? _selectedImage;
   bool _isLoading = false;
+  String _uploadedBase64Data = "";
+  String? uploadedImageUrl;
 
   final List<String> _roles = ['Speaker', 'Special Guest'];
 
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
+    setState(() {
+      _isLoading = true;
+    });
+
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement()
+      ..accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final files = uploadInput.files;
+      if (files?.isEmpty ?? true) {
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final reader = html.FileReader();
+      reader.readAsDataUrl(files![0]);
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _uploadedBase64Data = reader.result as String;
+          uploadedImageUrl = _uploadedBase64Data;
+          _isLoading = false;
+        });
       });
-    }
+    });
   }
 
+  // Future<void> _pickImage() async {
+  //   final picker = ImagePicker();
+  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       _selectedImage = File(pickedFile.path);
+  //     });
+  //   }
+  // }
+
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate() || _selectedImage == null) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
     setState(() {
@@ -231,8 +302,10 @@ class _AddSpecialParticipantFormWithImageState
     try {
       final fileName =
           '${_nameController.text}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final photoUrl = await uploadImageEventToImageKit(
-          _selectedImage!, widget.eventId, fileName, widget.eventId.toString());
+      final photoUrl = await uploadDocumentsToImageKitWebVersion(
+          _uploadedBase64Data,
+          "${widget.eventId}/special-participant",
+          fileName);
       final participant = {
         'name': _nameController.text,
         'role': _selectedRole!,
@@ -250,6 +323,7 @@ class _AddSpecialParticipantFormWithImageState
       widget.onParticipantAdded(participant);
       Navigator.of(context).pop();
     } catch (error) {
+      LoggerService.logger.e(error);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to add participant: $error')),
       );
