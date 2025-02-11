@@ -161,5 +161,6 @@
   "outdated_cancel": "Hết hạn hủy vé",
   "please_contact_admin": "Vui lòng liên hệ admin",
   "pending": "Đang chờ xử lý",
-  "rejected": "Đã bị từ chối"
+  "rejected": "Đã bị từ chối",
+  "ur_event": "Event của bạn"
 }

@@ -224,6 +224,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "upcomingEvents":
             MessageLookupByLibrary.simpleMessage("Upcoming Events"),
         "update_event": MessageLookupByLibrary.simpleMessage("Update Event"),
+        "ur_event": MessageLookupByLibrary.simpleMessage("Your Event"),
         "vietnamese": MessageLookupByLibrary.simpleMessage("Vietnamese"),
         "view_detail": MessageLookupByLibrary.simpleMessage("View Detail"),
         "view_schedule": MessageLookupByLibrary.simpleMessage("View Schedule"),

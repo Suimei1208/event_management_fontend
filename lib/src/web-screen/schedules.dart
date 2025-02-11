@@ -6,6 +6,7 @@ import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
 import 'package:event_management/src/service/participants.dart';
+import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -78,8 +79,8 @@ class _SchedulesWidgetState extends State<WebSchedulesWidget> {
       eventDate =
           "${DateFormat.jm().format(DateTime.parse(eventStartDate))} - ${DateFormat('dd/MM/yyyy').format(DateTime.parse(eventStartDate))}";
 
-      DateTime startDate = DateTime.parse(eventStartDate);
-      DateTime endDate = DateTime.parse(eventEndDate);
+      startDate = DateTime.parse(eventStartDate);
+      endDate = DateTime.parse(eventEndDate);
       eventDays = List.generate(
         endDate.difference(startDate).inDays + 1,
         (index) => startDate.add(Duration(days: index)),
@@ -105,6 +106,9 @@ class _SchedulesWidgetState extends State<WebSchedulesWidget> {
     final TextEditingController titleController = TextEditingController();
     final TextEditingController locationController = TextEditingController();
     DateTime? chosenDate = selectedDate;
+
+    LoggerService.logger.e("startDate: $startDate");
+    LoggerService.logger.e("endDate: $endDate");
 
     showDialog(
       context: context,
@@ -268,11 +272,7 @@ class _SchedulesWidgetState extends State<WebSchedulesWidget> {
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        title: const Text("Event Schedule"),
-        automaticallyImplyLeading: false,
-      ),
+      appBar: const CustomAppBar(),
       body: SafeArea(
         top: true,
         child: Column(
@@ -282,7 +282,7 @@ class _SchedulesWidgetState extends State<WebSchedulesWidget> {
               height: 160,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.grey, Color(0xFF6A1B9A)],
+                  colors: [Colors.grey, Colors.red],
                   stops: [0, 1],
                   begin: AlignmentDirectional(0, -1),
                   end: AlignmentDirectional(0, 1),
@@ -450,7 +450,7 @@ class _SchedulesWidgetState extends State<WebSchedulesWidget> {
               userRole == "Staff-${widget.eventId}")
           ? FloatingActionButton(
               onPressed: _addNewEvent,
-              backgroundColor: Colors.purple,
+              backgroundColor: Colors.blueAccent,
               child: const Icon(Icons.add),
             )
           : null,

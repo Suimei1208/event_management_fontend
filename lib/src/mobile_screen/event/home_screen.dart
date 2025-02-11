@@ -427,13 +427,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Icon(Icons.location_on),
-                              Text(
-                                event.location,
-                                style: const TextStyle(color: Colors.grey),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on),
+                                  SizedBox(
+                                    width: 200,
+                                    child: Text(
+                                      event.location,
+                                      style:
+                                          const TextStyle(color: Colors.grey),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -489,15 +498,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           );
                         },
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Icon(Icons.add_card_outlined),
-                            Text('Add to calendar'),
+                            const Icon(Icons.add_card_outlined),
+                            Text(S.of(context).add_gg_cal),
                           ],
                         ),
                       ),
                       event.idCreate == user?.uid
-                          ? const Text("Event của bạn")
+                          ? Text(S.of(context).ur_event)
                           : ElevatedButton(
                               style: Theme.of(context).brightness ==
                                       Brightness.dark
@@ -509,7 +518,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     await getQrTicket(event.id);
                                 _viewQRCode(context, qrCode['qr']);
                               },
-                              child: const Text('View your ticket'),
+                              child: Text(S.of(context).view_ticket),
                             )
                     ],
                   )

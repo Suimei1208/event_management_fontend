@@ -190,9 +190,9 @@ class _WebPostItemState extends State<WebPostItem> {
 
     if (difference.inHours < 24) {
       if (difference.inMinutes < 60) {
-        return '${difference.inMinutes} minutes ago';
+        return '${difference.inMinutes} ${S.of(context).minutes_ago}';
       } else {
-        return '${difference.inHours} hours ago';
+        return '${difference.inHours} ${S.of(context).hours_ago}';
       }
     } else {
       return DateFormat('dd/MM/yyyy hh:mm a').format(time);
