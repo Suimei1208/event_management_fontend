@@ -230,6 +230,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Sự kiện sắp tới"),
         "update_event":
             MessageLookupByLibrary.simpleMessage("Cập nhật sự kiện"),
+        "ur_event": MessageLookupByLibrary.simpleMessage("Event của bạn"),
         "vietnamese": MessageLookupByLibrary.simpleMessage("Tiếng Việt"),
         "view_detail": MessageLookupByLibrary.simpleMessage("Xem Chi Tiết"),
         "view_schedule": MessageLookupByLibrary.simpleMessage("Xem lịch trình"),

@@ -199,7 +199,7 @@ Future<void> createComment(String comment, int postId) async {
   }
 }
 
-Future<void> createReplyComment(String comment, int commentId) async{
+Future<void> createReplyComment(String comment, int commentId) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -224,7 +224,8 @@ Future<void> createReplyComment(String comment, int commentId) async{
     if (response.statusCode == 200) {
       LoggerService.logger.i('Create reply comment request successful');
     } else {
-      LoggerService.logger.e('Failed to create reply comment: ${response.body}');
+      LoggerService.logger
+          .e('Failed to create reply comment: ${response.body}');
     }
   } catch (e) {
     LoggerService.logger.e('Failed to create reply comment: $e');

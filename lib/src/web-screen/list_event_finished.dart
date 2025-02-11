@@ -226,8 +226,8 @@ class _EventFinishedScreenWebState extends State<EventFinishedScreenWeb> {
                     DropdownButtonFormField<String>(
                       value: _selectedType,
                       items: [
-                        const DropdownMenuItem(
-                            value: '', child: Text('All Types')),
+                        DropdownMenuItem(
+                            value: '', child: Text(S.of(context).all)),
                         ..._eventTypes.map((type) {
                           return DropdownMenuItem(
                             value: type,
@@ -258,8 +258,8 @@ class _EventFinishedScreenWebState extends State<EventFinishedScreenWeb> {
                         Expanded(
                           child: Text(
                             _selectedEndDate == null
-                                ? 'Select End or Before Date'
-                                : 'End or Before Date: ${DateFormat.yMMMd().format(_selectedEndDate!)}',
+                                ? S.of(context).select_end_date
+                                : '${S.of(context).end_date}: ${DateFormat.yMMMd().format(_selectedEndDate!)}',
                           ),
                         ),
                         IconButton(

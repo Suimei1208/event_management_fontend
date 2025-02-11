@@ -1,4 +1,3 @@
-// lib/src/mobile_app.dart
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/settings/settings_view.dart';
 import 'package:flutter/material.dart';

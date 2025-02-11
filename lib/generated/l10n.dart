@@ -1649,6 +1649,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Your Event`
+  String get ur_event {
+    return Intl.message(
+      'Your Event',
+      name: 'ur_event',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

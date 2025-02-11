@@ -161,5 +161,6 @@
   "outdated_cancel": "Outdated to cancel ticket",
   "please_contact_admin": "Please contact admin",
   "pending": "Pending",
-  "rejected": "Rejected"
+  "rejected": "Rejected",
+  "ur_event": "Your Event"
 }

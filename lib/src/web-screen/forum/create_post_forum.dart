@@ -1,9 +1,13 @@
-// ignore: avoid_web_libraries_in_flutter
+// ignore_for_file: use_build_context_synchronously, avoid_web_libraries_in_flutter
+
 import 'dart:html' as html;
 
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/service/forum_service.dart';
+import 'package:event_management/src/service/logger_service.dart';
+import 'package:event_management/src/service/user_service_web.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CreatePostScreenWeb extends StatefulWidget {
@@ -16,39 +20,75 @@ class CreatePostScreenWeb extends StatefulWidget {
 }
 
 class _CreatePostScreenWebState extends State<CreatePostScreenWeb> {
+  User? user = FirebaseAuth.instance.currentUser;
   String? selectedCategory;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  html.File? _imageFile;
-  String? _imageUrl;
+  html.File? uploadedImage;
+  String? uploadedImageUrl;
+  String _uploadedBase64Data = "";
   bool isLoading = false;
   String? titleError;
   String? descriptionError;
   String? categoryError;
 
-  void _pickImage() async {
-    html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
-    uploadInput.accept = 'image/*';
+  Future<void> _pickImage() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement()
+      ..accept = 'image/*';
     uploadInput.click();
 
-    uploadInput.onChange.listen((e) async {
+    uploadInput.onChange.listen((e) {
       final files = uploadInput.files;
-      if (files?.isEmpty ?? true) return;
-      setState(() {
-        _imageFile = files!.first;
-        // Create an object URL from the file
-        final reader = html.FileReader();
-        reader.readAsDataUrl(_imageFile!);
-        reader.onLoadEnd.listen((e) {
-          setState(() {
-            _imageUrl = reader.result as String?;
-          });
+      if (files?.isEmpty ?? true) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      final reader = html.FileReader();
+      reader.readAsDataUrl(files![0]);
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _uploadedBase64Data = reader.result as String;
+          uploadedImageUrl = _uploadedBase64Data;
+          isLoading = false;
         });
       });
     });
   }
 
-  void _handlePost(BuildContext context) {
+  Future<void> _uploadImage(uploadedBase64Data) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      // ignore: unused_local_variable
+      String imgUrl = await uploadDocumentsToImageKitWebVersion(
+          _uploadedBase64Data, "forum_images", "${user?.uid}_$timestamp");
+
+      setState(() {
+        uploadedImageUrl = imgUrl;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to upload image: $e')),
+      );
+    }
+  }
+
+  Future<void> _handlePost(BuildContext context) async {
     setState(() {
       titleError = _titleController.text.isEmpty ? 'Title is required' : null;
       descriptionError = _descriptionController.text.isEmpty
@@ -63,13 +103,17 @@ class _CreatePostScreenWebState extends State<CreatePostScreenWeb> {
       setState(() {
         isLoading = true;
       });
-      if (_imageFile != null) {
-        String imageUrl = _imageUrl!;
+      if (_uploadedBase64Data != "") {
+        await _uploadImage(_uploadedBase64Data);
+      }
+      if (uploadedImageUrl != "") {
+        LoggerService.logger.i("here !null");
+        LoggerService.logger.i(uploadedImageUrl);
         createPost(
           _titleController.text,
           _descriptionController.text,
           selectedCategory!,
-          imageUrl,
+          uploadedImageUrl!,
         ).then((_) {
           setState(() {
             isLoading = false;
@@ -85,9 +129,9 @@ class _CreatePostScreenWebState extends State<CreatePostScreenWeb> {
         ).then((_) {
           setState(() {
             isLoading = false;
+            Navigator.of(context).pop();
           });
         });
-        Navigator.of(context).pop();
       }
     }
   }
@@ -178,7 +222,7 @@ class _CreatePostScreenWebState extends State<CreatePostScreenWeb> {
                       child: Column(
                         children: [
                           InkWell(
-                            onTap: _pickImage,
+                            // onTap: _pickImage,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -190,16 +234,12 @@ class _CreatePostScreenWebState extends State<CreatePostScreenWeb> {
                               ],
                             ),
                           ),
-                          if (_imageFile != null) ...[
-                            const SizedBox(height: 16.0),
-                            // Display the image selected by the user
-                            Image.network(
-                              _imageUrl!,
-                              height: 500,
-                              width: 500,
-                              fit: BoxFit.cover,
+                          if (uploadedImageUrl != null)
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.network(uploadedImageUrl!,
+                                  height: 250, width: double.infinity),
                             ),
-                          ],
                           const SizedBox(height: 16.0),
                         ],
                       ),
