@@ -1,30 +1,51 @@
-# event_management
+# Event Management Application - Setup Guide
 
 A new Flutter project.
 
-## Getting Started
+## Preparation
 
-This project is a starting point for a Flutter application that follows the
-[simple app state management
-tutorial](https://flutter.dev/docs/development/data-and-backend/state-mgmt/simple).
+Ensure Docker is installed and running on your machine.
 
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Install Visual Studio and Visual Studio Code.
 
-## Assets
+Have an Android Emulator or a physical device for mobile testing.
 
-The `assets` directory houses images, fonts, and any other files you want to
-include with your application.
+## Backend Setup
 
-The `assets/images` directory contains [resolution-aware
-images](https://flutter.dev/docs/development/ui/assets-and-images#resolution-aware).
+Start Docker.
 
-## Localization
+Open the folder event_management_backend.
 
-This project generates localized messages based on arb files found in
-the `lib/src/localization` directory.
+Open event_management_backend.sln in Visual Studio.
 
-To support additional languages, please visit the tutorial on
-[Internationalizing Flutter
-apps](https://flutter.dev/docs/development/accessibility-and-localization/internationalization)
+Click on the Docker Compose button (the one with the green play icon).
+
+Wait for Docker to download and set up the necessary dependencies.
+
+## Frontend Setup
+
+Open the folder event_management_frontend in Visual Studio Code.
+
+Navigate to lib/config.dart.
+
+Modify the configuration to match your IP address.
+
+Running the Application
+
+#On Mobile
+
+Choose your emulator device or connect a real device.
+
+Run the application.
+
+#On Web
+
+Choose a browser.
+
+Run the application.
+
+##Notes
+
+Ensure that the backend is fully set up before running the frontend.
+
+If running on a mobile device, make sure your device and machine are on the same network for proper communication.
