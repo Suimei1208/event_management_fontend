@@ -32,13 +32,13 @@ Modify the configuration to match your IP address.
 
 Running the Application
 
-# On Mobile
+### On Mobile
 
 Choose your emulator device or connect a real device.
 
 Run the application.
 
-# On Web
+### On Web
 
 Choose a browser.
 
