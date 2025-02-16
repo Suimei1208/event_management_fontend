@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_web_libraries_in_flutter, use_build_context_synchronously
+// ignore_for_file: avoid_web_libraries_in_flutter, use_build_context_synchronously, deprecated_member_use
 
 import 'dart:async';
 import 'dart:convert';

@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, avoid_web_libraries_in_flutter, unused_field
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, avoid_web_libraries_in_flutter, unused_field, deprecated_member_use
 
 import 'dart:io';
 import 'package:event_management/src/service/logger_service.dart';

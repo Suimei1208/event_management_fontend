@@ -63,15 +63,16 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
     try {
       String imageUrl = widget.initialImageUrl ?? '';
-      // if (_imageFile != null) {
-      //   imageUrl = await uploadImageForumToImageKit(_imageFile!, _titleController.text);
-      // }
+      if (_imageFile != null) {
+        imageUrl = await uploadImageForumToImageKit(
+            _imageFile!, _titleController.text);
+      }
       await editPost(
         widget.postId,
         _titleController.text,
         _descriptionController.text,
         selectedCategory,
-        imageUrl,
+        "$imageUrl?updatedAt=${DateTime.now().millisecondsSinceEpoch}",
       );
       await showDialog(
         context: context,

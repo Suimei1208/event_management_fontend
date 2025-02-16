@@ -144,8 +144,8 @@ Future<String> uploadImageForumToImageKit(
   );
   request.headers['Authorization'] = 'Basic $base64EncodedKey';
   request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
-  final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-  request.fields['fileName'] = "${user.uid}_${postTitle}_$timestamp";
+  // final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+  request.fields['fileName'] = "${user.uid}_$postTitle";
   request.fields['useUniqueFileName'] = 'false';
   request.fields['folder'] = '/forum_images';
 
@@ -256,8 +256,8 @@ Future<void> deletePost(int id) async {
   }
 }
 
-Future<void> editPost(
-    int id, String title, String description, String category, String? image) async {
+Future<void> editPost(int id, String title, String description, String category,
+    String? image) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
