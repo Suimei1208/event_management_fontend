@@ -67,6 +67,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "category": MessageLookupByLibrary.simpleMessage("Danh mục"),
         "comment": MessageLookupByLibrary.simpleMessage("Bình luận"),
         "comments": MessageLookupByLibrary.simpleMessage("bình luận"),
+        "confirm_del": MessageLookupByLibrary.simpleMessage("Xác nhận xóa"),
         "content_review": MessageLookupByLibrary.simpleMessage(
             "Viết đánh giá của bạn (Không bắt buộc)"),
         "create_event": MessageLookupByLibrary.simpleMessage("Tạo Sự Kiện"),
@@ -74,6 +75,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "data_cancel":
             MessageLookupByLibrary.simpleMessage("Dữ liệu hủy tham gia"),
         "decentralization": MessageLookupByLibrary.simpleMessage("Phân quyền"),
+        "del_post": MessageLookupByLibrary.simpleMessage("Xóa bài viết"),
         "desc": MessageLookupByLibrary.simpleMessage("Mô tả"),
         "describe": MessageLookupByLibrary.simpleMessage("Mô Tả"),
         "detail_post":
@@ -85,6 +87,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "edit_event": MessageLookupByLibrary.simpleMessage("Chỉnh sửa sự kiện"),
         "edit_guest":
             MessageLookupByLibrary.simpleMessage("Điều chỉnh khách mời"),
+        "edit_post": MessageLookupByLibrary.simpleMessage("Chỉnh sửa"),
+        "edit_post_ans": MessageLookupByLibrary.simpleMessage(
+            "Chỉnh sửa bài viết thành công"),
         "edit_special_participants": MessageLookupByLibrary.simpleMessage(
             "Chỉnh sửa người tham gia đặc biệt"),
         "end_date": MessageLookupByLibrary.simpleMessage("Ngày kết thúc"),
@@ -161,6 +166,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "post": MessageLookupByLibrary.simpleMessage("Đăng bài"),
         "post_title": MessageLookupByLibrary.simpleMessage("Tiêu đề bài viết"),
         "profile": MessageLookupByLibrary.simpleMessage("Hồ sơ"),
+        "quest_del": MessageLookupByLibrary.simpleMessage(
+            "Bạn có chắc chắn muốn xóa bài viết này không?"),
         "questions": MessageLookupByLibrary.simpleMessage("Câu hỏi"),
         "rate": MessageLookupByLibrary.simpleMessage(
             "Đánh giá trải nghiệm của bạn về sự kiện"),

@@ -1659,6 +1659,56 @@ class S {
       args: [],
     );
   }
+
+  /// `Edit Post`
+  String get edit_post {
+    return Intl.message(
+      'Edit Post',
+      name: 'edit_post',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete Confirmation`
+  String get confirm_del {
+    return Intl.message(
+      'Delete Confirmation',
+      name: 'confirm_del',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Are you sure you want to delete this post?`
+  String get quest_del {
+    return Intl.message(
+      'Are you sure you want to delete this post?',
+      name: 'quest_del',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Edit post successfully`
+  String get edit_post_ans {
+    return Intl.message(
+      'Edit post successfully',
+      name: 'edit_post_ans',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete Post`
+  String get del_post {
+    return Intl.message(
+      'Delete Post',
+      name: 'del_post',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

@@ -162,5 +162,10 @@
   "please_contact_admin": "Please contact admin",
   "pending": "Pending",
   "rejected": "Rejected",
-  "ur_event": "Your Event"
+  "ur_event": "Your Event",
+  "edit_post": "Edit Post",
+  "confirm_del" : "Delete Confirmation",
+  "quest_del" : "Are you sure you want to delete this post?",
+  "edit_post_ans" : "Edit post successfully",
+  "del_post" : "Delete Post"
 }

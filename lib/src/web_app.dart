@@ -16,7 +16,9 @@ import 'package:event_management/src/web-screen/error.dart';
 import 'package:event_management/src/web-screen/event_analystics.dart';
 import 'package:event_management/src/web-screen/existed_participants.dart';
 import 'package:event_management/src/web-screen/forum/create_post_forum.dart';
-import 'package:event_management/src/web-screen/forum/detail_post_web.dart';
+import 'package:event_management/src/web-screen/forum/detail_post_web.dart'
+    as custom;
+import 'package:event_management/src/web-screen/forum/edit_post.dart';
 import 'package:event_management/src/web-screen/forum/forum_screen.dart';
 import 'package:event_management/src/web-screen/list_event_finished.dart';
 import 'package:event_management/src/web-screen/list_user_cancel.dart';
@@ -140,12 +142,32 @@ class _MyWebAppState extends State<MyWebApp> {
                         if (id != null) {
                           return buildDetailEventRoute(uri, id);
                         }
+                      } else if (uri.pathSegments.length == 4 &&
+                          uri.pathSegments[0] == 'forum' &&
+                          uri.pathSegments[1] == 'detail-post' &&
+                          uri.pathSegments[3] == 'edit') {
+                        final id = int.tryParse(
+                            uri.pathSegments[2]); // Lấy đúng vị trí ID
+                        final args =
+                            routeSettings.arguments as Map<String, dynamic>? ??
+                                {};
+
+                        if (id != null) {
+                          return EditPostScreenWeb(
+                            postId: id,
+                            initialTitle: args['initialTitle'] ?? '',
+                            initialDescription:
+                                args['initialDescription'] ?? '',
+                            initialCategory: args['initialCategory'] ?? '',
+                            initialImageUrl: args['initialImageUrl'],
+                          );
+                        }
                       } else if (uri.pathSegments.length == 3 &&
                           uri.pathSegments.first == 'forum' &&
                           uri.pathSegments[1] == 'detail-post') {
                         final id = int.tryParse(uri.pathSegments[2]);
                         if (id != null) {
-                          return ForumPostPageWeb(idPost: id);
+                          return custom.ForumPostPageWeb(idPost: id);
                         }
                       } else if (uri.pathSegments.length == 5 &&
                           uri.pathSegments.first == 'home' &&
@@ -198,7 +220,6 @@ class _MyWebAppState extends State<MyWebApp> {
                           return const RegisterScreenWeb();
                         case CreatePostScreenWeb.routeName:
                           return const CreatePostScreenWeb();
-
                         case SettingsView.routeName:
                           return SettingsView(
                               controller: widget.settingsController);

@@ -1,4 +1,5 @@
 import 'package:event_management/generated/l10n.dart';
+import 'package:event_management/src/mobile_screen/forum/edit_post.dart';
 import 'package:event_management/src/models/info_user.dart';
 import 'package:event_management/src/service/forum_service.dart';
 import 'package:flutter/material.dart';
@@ -166,25 +167,113 @@ class _ForumPostPageState extends State<ForumPostPage> {
                       if (_hostPost != null)
                         Row(
                           children: [
-                            CircleAvatar(
-                              foregroundImage: NetworkImage(_hostPost!.avtUrl),
-                            ),
-                            const SizedBox(width: 10),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Row(
                               children: [
-                                Text(_hostPost!.name,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
-                                if (post['timepost'] != null)
-                                  Text(
-                                      formatTime(
-                                          DateTime.parse(post['timepost']),
-                                          context),
-                                      style:
-                                          const TextStyle(color: Colors.grey)),
+                                CircleAvatar(
+                                  foregroundImage:
+                                      NetworkImage(_hostPost!.avtUrl),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(_hostPost!.name,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    if (post['timepost'] != null)
+                                      Text(
+                                          formatTime(
+                                              DateTime.parse(post['timepost']),
+                                              context),
+                                          style: const TextStyle(
+                                              color: Colors.grey)),
+                                  ],
+                                ),
                               ],
                             ),
+                            const Spacer(),
+                            if (user != null && user!.uid == _hostPost!.id)
+                              IconButton(
+                                icon:
+                                    const Icon(Icons.more_vert), // Ba chấm dọc
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return Wrap(
+                                        children: [
+                                          ListTile(
+                                            leading: const Icon(Icons.edit,
+                                                color: Colors.blue),
+                                            title:  Text(S.of(context).edit_post),
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => EditPostScreen(
+                                                    postId: widget.idPost,
+                                                    initialTitle: post['title'],
+                                                    initialDescription: post['description'],
+                                                    initialCategory: post['category'],
+                                                    initialImageUrl: post['image'],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                          ListTile(
+                                            leading: const Icon(Icons.delete,
+                                                color: Colors.red),
+                                            title:  Text(S.of(context).del_post),
+                                            onTap: () async {
+                                              Navigator.pop(
+                                                  context); 
+                                              showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title:  Text(
+                                                        S.of(context).confirm_del),
+                                                    content:  Text(
+                                                        S.of(context).quest_del),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child:
+                                                             Text(S.of(context).cancel),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () async {
+                                                          await deletePost(
+                                                              widget.idPost);
+                                                          Navigator.pop(
+                                                              // ignore: use_build_context_synchronously
+                                                              context);
+                                                          Navigator.pop(
+                                                              // ignore: use_build_context_synchronously
+                                                              context);
+                                                        },
+                                                        child: const Text('Có',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .red)),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                           ],
                         ),
                       const SizedBox(height: 10),

@@ -162,5 +162,10 @@
   "please_contact_admin": "Vui lòng liên hệ admin",
   "pending": "Đang chờ xử lý",
   "rejected": "Đã bị từ chối",
-  "ur_event": "Event của bạn"
+  "ur_event": "Event của bạn",
+  "edit_post" : "Chỉnh sửa",
+  "confirm_del" : "Xác nhận xóa",
+  "quest_del" : "Bạn có chắc chắn muốn xóa bài viết này không?",
+  "edit_post_ans" : "Chỉnh sửa bài viết thành công",
+  "del_post" : "Xóa bài viết"
 }

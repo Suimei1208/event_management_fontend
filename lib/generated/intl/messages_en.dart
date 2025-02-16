@@ -65,6 +65,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "category": MessageLookupByLibrary.simpleMessage("Category"),
         "comment": MessageLookupByLibrary.simpleMessage("Comment"),
         "comments": MessageLookupByLibrary.simpleMessage("comments"),
+        "confirm_del":
+            MessageLookupByLibrary.simpleMessage("Delete Confirmation"),
         "content_review": MessageLookupByLibrary.simpleMessage(
             "Write Your Review (Optional)"),
         "create_event": MessageLookupByLibrary.simpleMessage("Create Event"),
@@ -72,6 +74,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "data_cancel": MessageLookupByLibrary.simpleMessage("Opt-out data"),
         "decentralization":
             MessageLookupByLibrary.simpleMessage("Decentralization"),
+        "del_post": MessageLookupByLibrary.simpleMessage("Delete Post"),
         "desc": MessageLookupByLibrary.simpleMessage("Description"),
         "describe": MessageLookupByLibrary.simpleMessage("Describe"),
         "detail_post": MessageLookupByLibrary.simpleMessage("Detail post"),
@@ -81,6 +84,9 @@ class MessageLookup extends MessageLookupByLibrary {
         "editProfile": MessageLookupByLibrary.simpleMessage("Edit Profile"),
         "edit_event": MessageLookupByLibrary.simpleMessage("Edit Event"),
         "edit_guest": MessageLookupByLibrary.simpleMessage("Edit Guest"),
+        "edit_post": MessageLookupByLibrary.simpleMessage("Edit Post"),
+        "edit_post_ans":
+            MessageLookupByLibrary.simpleMessage("Edit post successfully"),
         "edit_special_participants":
             MessageLookupByLibrary.simpleMessage("Edit Special Participants"),
         "end_date": MessageLookupByLibrary.simpleMessage("End Date"),
@@ -156,6 +162,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "post": MessageLookupByLibrary.simpleMessage("Post"),
         "post_title": MessageLookupByLibrary.simpleMessage("Post Title"),
         "profile": MessageLookupByLibrary.simpleMessage("Profile"),
+        "quest_del": MessageLookupByLibrary.simpleMessage(
+            "Are you sure you want to delete this post?"),
         "questions": MessageLookupByLibrary.simpleMessage("Questions"),
         "rate": MessageLookupByLibrary.simpleMessage("Rate Your Experience"),
         "rate_event": MessageLookupByLibrary.simpleMessage("Rate Event"),
