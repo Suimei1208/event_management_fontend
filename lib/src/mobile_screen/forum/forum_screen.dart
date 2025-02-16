@@ -311,12 +311,14 @@ class _PostItemState extends State<PostItem> {
               const SizedBox(height: 5),
               Text(widget.content),
               const SizedBox(height: 10),
-              Center(
-                  child: Image.network(
-                widget.image,
-                height: 200,
-                width: 200,
-              )),
+              // ignore: unnecessary_null_comparison
+              if (widget.image != null && widget.image.isNotEmpty)
+                Center(
+                    child: Image.network(
+                  widget.image,
+                  height: 200,
+                  width: 200,
+                )),
               const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

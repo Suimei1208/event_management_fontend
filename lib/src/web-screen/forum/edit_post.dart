@@ -3,27 +3,48 @@
 import 'dart:io';
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/service/forum_service.dart';
+import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:event_management/widget/dialog_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({super.key});
+class EditPostScreenWeb extends StatefulWidget {
+  final int postId;
+  final String initialTitle;
+  final String initialDescription;
+  final String initialCategory;
+  final String? initialImageUrl;
+
+  const EditPostScreenWeb({
+    super.key,
+    required this.postId,
+    required this.initialTitle,
+    required this.initialDescription,
+    required this.initialCategory,
+    this.initialImageUrl,
+  });
+
+  static const routeName = "forum/detail-post/edit/";
 
   @override
-  State<CreatePostScreen> createState() => _CreatePostScreenState();
+  State<EditPostScreenWeb> createState() => _EditPostScreenWebState();
 }
 
-class _CreatePostScreenState extends State<CreatePostScreen> {
-  String? selectedCategory;
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
+class _EditPostScreenWebState extends State<EditPostScreenWeb> {
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late String selectedCategory;
   File? _imageFile;
   bool isLoading = false;
 
-  String? titleError;
-  String? descriptionError;
-  String? categoryError;
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController(text: widget.initialTitle);
+    _descriptionController =
+        TextEditingController(text: widget.initialDescription);
+    selectedCategory = widget.initialCategory;
+  }
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
@@ -38,104 +59,82 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     }
   }
 
-  void _handlePost(BuildContext context) {
+  void _handleUpdate(BuildContext context) async {
     setState(() {
-      titleError = _titleController.text.isEmpty ? 'Title is required' : null;
-      descriptionError = _descriptionController.text.isEmpty
-          ? 'Description is required'
-          : null;
-      categoryError = selectedCategory == null || selectedCategory!.isEmpty
-          ? 'Please select a category'
-          : null;
+      isLoading = true;
     });
 
-    if (titleError == null &&
-        descriptionError == null &&
-        categoryError == null) {
-      setState(() {
-        isLoading = true;
-      });
-
-      Future<void> handlePost() async {
-        try {
-          String imageUrl = '';
-          if (_imageFile != null) {
-            imageUrl = await uploadImageForumToImageKit(
-                _imageFile!, _titleController.text);
-          }
-          await createPost(
-            _titleController.text,
-            _descriptionController.text,
-            selectedCategory!,
-            imageUrl,
+    try {
+      String imageUrl = widget.initialImageUrl ?? '';
+      // if (_imageFile != null) {
+      //   imageUrl = await uploadImageForumToImageKit(_imageFile!, _titleController.text);
+      // }
+      await editPost(
+        widget.postId,
+        _titleController.text,
+        _descriptionController.text,
+        selectedCategory,
+        imageUrl,
+      );
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return DialogWidget(
+            message: S.of(context).edit_post_ans,
+            title: S.of(context).notification,
           );
-        } catch (error) {
-          if (mounted) {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return const DialogWidget(
-                  message: 'Failed to upload image.',
-                  title: 'Error',
-                );
-              },
-            );
-          }
-        } finally {
-          if (mounted) {
-            setState(() {
-              isLoading = false;
-            });
-          }
-        }
+        },
+      );
+      if (mounted) {
+        Navigator.pop(context);
       }
-
-      handlePost();
+    } catch (error) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return const DialogWidget(
+              message: 'Failed to update post.',
+              title: 'Error',
+            );
+          },
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context).create_post),
-      ),
+      appBar: const CustomAppBar(),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(left: 600, right: 600, top: 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               TextField(
+                controller: _titleController,
                 decoration: InputDecoration(
                   labelText: S.of(context).post_title,
                   border: const OutlineInputBorder(),
-                  errorText: titleError,
                 ),
-                controller: _titleController,
               ),
-              const SizedBox(height: 8.0),
-              if (titleError != null)
-                Text(
-                  titleError!,
-                  style: const TextStyle(color: Colors.red),
-                ),
               const SizedBox(height: 16.0),
               TextField(
+                controller: _descriptionController,
                 maxLines: 5,
                 decoration: InputDecoration(
                   labelText: S.of(context).share_thought,
                   border: const OutlineInputBorder(),
-                  errorText: descriptionError,
                 ),
-                controller: _descriptionController,
               ),
-              const SizedBox(height: 8.0),
-              if (descriptionError != null)
-                Text(
-                  descriptionError!,
-                  style: const TextStyle(color: Colors.red),
-                ),
               const SizedBox(height: 16.0),
               Text(
                 S.of(context).category,
@@ -152,12 +151,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   _buildCategoryChip(S.of(context).feedback),
                 ],
               ),
-              const SizedBox(height: 8.0),
-              if (categoryError != null)
-                Text(
-                  categoryError!,
-                  style: const TextStyle(color: Colors.red),
-                ),
               const SizedBox(height: 16.0),
               Text(
                 S.of(context).attachments,
@@ -184,14 +177,23 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                         ],
                       ),
                     ),
-                    if (_imageFile != null) ...[
+                    if (_imageFile != null ||
+                        (widget.initialImageUrl != null &&
+                            widget.initialImageUrl!.isNotEmpty)) ...[
                       const SizedBox(height: 16.0),
-                      Image.file(
-                        _imageFile!,
-                        height: 150,
-                        width: 150,
-                        fit: BoxFit.cover,
-                      ),
+                      _imageFile != null
+                          ? Image.file(
+                              _imageFile!,
+                              height: 150,
+                              width: 150,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.network(
+                              widget.initialImageUrl!,
+                              height: 150,
+                              width: 150,
+                              fit: BoxFit.cover,
+                            ),
                     ],
                     const SizedBox(height: 16.0),
                   ],
@@ -206,17 +208,10 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                       backgroundColor:
                           Theme.of(context).colorScheme.inversePrimary,
                     ),
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            _handlePost(context);
-                            Navigator.pop(context);
-                          },
+                    onPressed: isLoading ? null : () => _handleUpdate(context),
                     child: isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
-                        : Text(S.of(context).post),
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(S.of(context).edit_post),
                   ),
                 ),
               ),
@@ -234,7 +229,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       onSelected: (bool selected) {
         if (mounted) {
           setState(() {
-            selectedCategory = selected ? label : null;
+            selectedCategory = selected ? label : selectedCategory;
           });
         }
       },

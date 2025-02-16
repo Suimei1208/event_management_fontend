@@ -231,3 +231,59 @@ Future<void> createReplyComment(String comment, int commentId) async {
     LoggerService.logger.e('Failed to create reply comment: $e');
   }
 }
+
+Future<void> deletePost(int id) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User not logged in');
+    }
+    String? idToken = await user.getIdToken();
+    final response = await http.delete(
+      Uri.parse('${Config.baseUrl}/forum-service/forum/delete-post/$id'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 200) {
+      LoggerService.logger.i('Delete post request successful');
+    } else {
+      LoggerService.logger.e('Failed to delete post: ${response.body}');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Failed to delete post: $e');
+  }
+}
+
+Future<void> editPost(
+    int id, String title, String description, String category, String? image) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('User not logged in');
+    }
+    String? idToken = await user.getIdToken();
+    final response = await http.put(
+      Uri.parse('${Config.baseUrl}/forum-service/forum/edit-post'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'postId': id,
+        'title': title,
+        'description': description,
+        'category': category,
+        'image': image,
+      }),
+    );
+    if (response.statusCode == 200) {
+      LoggerService.logger.i('Edit post request successful');
+    } else {
+      LoggerService.logger.e('Failed to edit post: ${response.body}');
+    }
+  } catch (e) {
+    LoggerService.logger.e('Failed to edit post: $e');
+  }
+}
