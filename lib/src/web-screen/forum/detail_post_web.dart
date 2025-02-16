@@ -3,7 +3,6 @@ import 'package:event_management/src/models/info_user.dart';
 import 'package:event_management/src/service/forum_service.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
