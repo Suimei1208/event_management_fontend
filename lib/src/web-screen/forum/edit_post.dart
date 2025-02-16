@@ -3,10 +3,12 @@
 import 'dart:io';
 import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/service/forum_service.dart';
+import 'package:event_management/src/service/user_service_web.dart';
 import 'package:event_management/src/web-screen/custom_appbar.dart';
 import 'package:event_management/widget/dialog_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:universal_html/html.dart' as html;
 
 class EditPostScreenWeb extends StatefulWidget {
   final int postId;
@@ -36,6 +38,10 @@ class _EditPostScreenWebState extends State<EditPostScreenWeb> {
   late String selectedCategory;
   File? _imageFile;
   bool isLoading = false;
+  html.File? uploadedImage;
+  String? uploadedImageUrl;
+  String _uploadedBase64Data = "";
+  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -47,15 +53,55 @@ class _EditPostScreenWebState extends State<EditPostScreenWeb> {
   }
 
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile =
-        await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      if (mounted) {
+    setState(() {
+      isLoading = true;
+    });
+
+    html.FileUploadInputElement uploadInput = html.FileUploadInputElement()
+      ..accept = 'image/*';
+    uploadInput.click();
+
+    uploadInput.onChange.listen((e) {
+      final files = uploadInput.files;
+      if (files?.isEmpty ?? true) {
         setState(() {
-          _imageFile = File(pickedFile.path);
+          isLoading = false;
         });
+        return;
       }
+
+      final reader = html.FileReader();
+      reader.readAsDataUrl(files![0]);
+
+      reader.onLoadEnd.listen((e) {
+        setState(() {
+          _uploadedBase64Data = reader.result as String;
+          uploadedImageUrl = _uploadedBase64Data;
+          isLoading = false;
+        });
+      });
+    });
+  }
+
+  Future<void> _uploadImage(uploadedBase64Data) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      String imgUrl = await uploadImageToImageKitWebVersion(uploadedBase64Data!,
+          "forum_images/${user?.uid}_${_titleController.text}");
+      setState(() {
+        uploadedImageUrl = imgUrl;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to upload image: $e')),
+      );
     }
   }
 
@@ -65,17 +111,26 @@ class _EditPostScreenWebState extends State<EditPostScreenWeb> {
     });
 
     try {
-      String imageUrl = widget.initialImageUrl ?? '';
-      // if (_imageFile != null) {
-      //   imageUrl = await uploadImageForumToImageKit(_imageFile!, _titleController.text);
-      // }
-      await editPost(
-        widget.postId,
-        _titleController.text,
-        _descriptionController.text,
-        selectedCategory,
-        imageUrl,
-      );
+      if (_uploadedBase64Data != "") {
+        await _uploadImage(_uploadedBase64Data);
+      }
+      if (uploadedImageUrl != "") {
+        await editPost(
+          widget.postId,
+          _titleController.text,
+          _descriptionController.text,
+          selectedCategory,
+          "$uploadedImageUrl?updatedAt=${DateTime.now().millisecondsSinceEpoch}",
+        );
+      } else {
+        await editPost(
+          widget.postId,
+          _titleController.text,
+          _descriptionController.text,
+          selectedCategory,
+          widget.initialImageUrl,
+        );
+      }
       await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -181,13 +236,9 @@ class _EditPostScreenWebState extends State<EditPostScreenWeb> {
                         (widget.initialImageUrl != null &&
                             widget.initialImageUrl!.isNotEmpty)) ...[
                       const SizedBox(height: 16.0),
-                      _imageFile != null
-                          ? Image.file(
-                              _imageFile!,
-                              height: 150,
-                              width: 150,
-                              fit: BoxFit.cover,
-                            )
+                      uploadedImageUrl != null
+                          ? Image.network(uploadedImageUrl!,
+                              height: 250, width: double.infinity)
                           : Image.network(
                               widget.initialImageUrl!,
                               height: 150,

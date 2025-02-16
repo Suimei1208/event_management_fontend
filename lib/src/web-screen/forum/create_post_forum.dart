@@ -107,7 +107,6 @@ class _CreatePostScreenWebState extends State<CreatePostScreenWeb> {
         await _uploadImage(_uploadedBase64Data);
       }
       if (uploadedImageUrl != "") {
-        LoggerService.logger.i("here !null");
         LoggerService.logger.i(uploadedImageUrl);
         createPost(
           _titleController.text,
