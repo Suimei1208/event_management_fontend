@@ -221,6 +221,7 @@ class _WebHomeScreenState extends State<WebHomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
+                      if(user!.uid != event.idCreate)
                       ElevatedButton(
                         onPressed: () async {
                           Map<String, dynamic> qrCode =
