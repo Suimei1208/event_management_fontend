@@ -56,3 +56,8 @@ Run the application.
 Ensure that the backend is fully set up before running the frontend.
 
 If running on a mobile device, make sure your device and machine are on the same network for proper communication.
+
+## Account in app
+
+usernme(email): nguyenxuantrieu12082003@gmail.com
+password: 123456789123456789
