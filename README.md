@@ -8,6 +8,8 @@ Install Visual Studio and Visual Studio Code.
 
 Have an Android Emulator or a physical device for mobile testing.
 
+Open Project Firebase, Navigate to Project Settings, at General Tab, scroll down looking for Androids apps and paste your device's SHA key to the SHA certificate fingerprints to use Google Login.
+
 ## Backend Setup
 
 Start Docker.
