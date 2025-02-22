@@ -498,10 +498,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           );
                         },
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(Icons.add_card_outlined),
-                            Text(S.of(context).add_gg_cal),
+                            Icon(Icons.add_card_outlined),
+                            // Text(S.of(context).add_gg_cal),
                           ],
                         ),
                       ),
