@@ -2,6 +2,8 @@
 
 import 'dart:convert';
 
+import 'package:event_management/generated/l10n.dart';
+import 'package:event_management/src/mobile_screen/participants/schedule_participants.dart';
 import 'package:event_management/src/models/events.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -240,7 +242,7 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
       // backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        title: const Text("Event Schedule"),
+        title: Text(S.of(context).view_schedule),
       ),
       body: SafeArea(
         top: true,
@@ -386,16 +388,29 @@ class _SchedulesWidgetState extends State<SchedulesWidget> {
                                 } else if (value == 'delete') {
                                   await deleteSchedule(schedule['id']);
                                   _loadSchedules();
+                                } else if (value == 'list') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ScheduleParticipants(
+                                                id: widget.event.id)),
+                                  );
                                 }
                               },
                               itemBuilder: (BuildContext context) => [
-                                const PopupMenuItem(
+                                PopupMenuItem(
                                   value: 'edit',
-                                  child: Text('Edit'),
+                                  child: Text(S.of(context).edit_event),
                                 ),
                                 const PopupMenuItem(
                                   value: 'delete',
                                   child: Text('Delete'),
+                                ),
+                                PopupMenuItem(
+                                  value: 'list',
+                                  child: Text(
+                                      S.of(context).schedule_participant_list),
                                 ),
                               ],
                             ),

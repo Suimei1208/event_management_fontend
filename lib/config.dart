@@ -6,7 +6,7 @@ class Config {
     if (kIsWeb || Platform.isWindows) {
       return 'http://localhost';
     } else {
-      return 'http://10.0.2.2';
+      return 'http://192.168.0.8';
     }
   }
 }

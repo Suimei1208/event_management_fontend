@@ -335,6 +335,46 @@ Future<bool> removeParticipant(int eventId, int participantId) async {
   }
 }
 
+Future<bool> removeScheduleParticipant(int eventId, int participantId) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.delete(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/event/$eventId/participants/$participantId/remove'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData['success'] == true) {
+        return true;
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Failed to remove participant');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to remove participant: ${response.statusCode} ${response.body}');
+      throw Exception(
+          'Failed to remove participant: ${response.statusCode} ${response.body}');
+    }
+  } catch (e) {
+    throw Exception('Failed to remove participant: $e');
+  }
+}
+
 Future<void> addSpecialParticipant({
   required int eventId,
   required String name,

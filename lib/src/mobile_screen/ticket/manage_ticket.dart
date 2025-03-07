@@ -421,10 +421,10 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
 
   void _viewQRCode(BuildContext context, String qrCode) {
     final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-    final trimmedTimestamp = timestamp.length > 8
-        ? timestamp.substring(timestamp.length - 8)
-        : timestamp;
-    final dynamicQrData = '$qrCode-$trimmedTimestamp';
+    // final trimmedTimestamp = timestamp.length > 8
+    //     ? timestamp.substring(timestamp.length - 8)
+    //     : timestamp;
+    final dynamicQrData = '$qrCode-$timestamp';
 
     showModalBottomSheet(
       backgroundColor: Colors.white,

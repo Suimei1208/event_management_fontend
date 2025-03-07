@@ -26,6 +26,7 @@ import 'package:event_management/src/web-screen/manager_ticket.dart';
 import 'package:event_management/src/web-screen/profile/profile.dart';
 import 'package:event_management/src/web-screen/register_event.dart';
 import 'package:event_management/src/web-screen/request.dart';
+import 'package:event_management/src/web-screen/schedule_participants.dart';
 import 'package:event_management/src/web-screen/share_roles.dart';
 import 'package:event_management/src/web-screen/spending_overview.dart';
 import 'package:event_management/src/web-screen/update_event.dart';
@@ -261,6 +262,8 @@ Widget buildDetailEventRoute(Uri uri, int eventId) {
           return WebSpecialParticipantsPage(eventId: eventId);
         case 'existed-participants':
           return ExistedParticipantsWeb(eventId: eventId);
+        case 'schedule-participants':
+          return ScheduleParticipantsWeb(eventId: eventId);
         case 'documents':
           return WebEventResourcesPage(eventId: eventId);
         case 'share-roles':
@@ -269,7 +272,6 @@ Widget buildDetailEventRoute(Uri uri, int eventId) {
           return WebSpendingOverviewPage(eventId: eventId);
         case 'event-analystics':
           return EventAnalyticsWebPage(eventId: eventId);
-
         case 'list-cancelled-users':
           return CancelledUsersWebScreen(eventID: eventId);
         case 'edit-event':

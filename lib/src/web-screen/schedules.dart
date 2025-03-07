@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:event_management/generated/l10n.dart';
 import 'package:event_management/src/models/event_with_participants.dart';
 import 'package:event_management/src/service/event_service.dart';
 import 'package:event_management/src/service/logger_service.dart';
@@ -424,6 +425,11 @@ class _SchedulesWidgetState extends State<WebSchedulesWidget> {
                                 const PopupMenuItem(
                                   value: 'delete',
                                   child: Text('Delete'),
+                                ),
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text(
+                                      S.of(context).schedule_participant_list),
                                 ),
                               ],
                             ),

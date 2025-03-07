@@ -84,7 +84,7 @@ class _QuickActionsState extends State<QuickActions> {
                                     eventId: widget.eventId)));
                       }),
                       _buildActionButton(
-                          Icons.person, S.of(context).list_participants, () {
+                          Icons.person, S.of(context).participant_list, () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -92,6 +92,16 @@ class _QuickActionsState extends State<QuickActions> {
                                   ExistedParticipants(id: widget.eventId)),
                         );
                       }),
+                      // _buildActionButton(
+                      //     Icons.person, S.of(context).schedule_participant_list,
+                      //     () {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //         builder: (context) =>
+                      //             ScheduleParticipants(id: widget.eventId)),
+                      //   );
+                      // }),
                     ],
                   ),
                 ],
@@ -162,7 +172,8 @@ class _QuickActionsState extends State<QuickActions> {
                           MaterialPageRoute(
                             builder: (context) => QRScannerPage(
                               onQRScanned: (qrCode) async {
-                                await checkIn(widget.eventId, qrCode, "");
+                                await checkIn(
+                                    widget.eventId, qrCode, "", context);
                                 getCheckedInParticipants(widget.eventId)
                                     .then((data) {
                                   Provider.of<CheckInData>(context,

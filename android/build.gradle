@@ -1,3 +1,18 @@
+buildscript {
+    ext.kotlin_version = "1.9.0"
+
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.1.0" // Ensure AGP is correct
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.google.gms:google-services:4.3.15"
+    }
+}
+
 plugins {
     id 'com.google.gms.google-services' version '4.3.15' apply false
 }
@@ -9,14 +24,35 @@ allprojects {
     }
 }
 
+// Ensure correct build directory
 rootProject.buildDir = "../build"
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            project.android {
+                compileOptions {
+                    if (namespace == null) {
+                        namespace project.group
+                    }
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
+                }
+            }
+        }
+    }
+}
+
+// Make sure subprojects build correctly
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
 }
 
+// Task to clean the project
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

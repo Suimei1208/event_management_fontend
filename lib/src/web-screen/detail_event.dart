@@ -269,6 +269,11 @@ class _EventDetailsPageWebState extends State<EventDetailsPageWeb> {
                           Navigator.pushNamed(context,
                               "/home/detail-event/${widget.eventId}/existed-participants");
                         }),
+                        _buildSidebarButton(
+                            Icons.person, "Schedule Participants", () {
+                          Navigator.pushNamed(context,
+                              "/home/detail-event/${widget.eventId}/schedule-participants");
+                        }),
                         const SizedBox(height: 16),
                         _buildSidebarButton(
                             Icons.description, S.of(context).document, () {

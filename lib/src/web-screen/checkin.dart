@@ -36,7 +36,7 @@ class _WebCheckinPageState extends State<WebCheckinPage> {
     String qrCode = '';
     String inputName = _searchController.text.trim();
     if (inputName.isNotEmpty) {
-      checkIn(widget.eventId, qrCode, inputName).then((responseData) {
+      checkIn(widget.eventId, qrCode, inputName, context).then((responseData) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Check-in successful for $inputName')),
         );

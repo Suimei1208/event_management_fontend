@@ -66,7 +66,23 @@ class _QRScannerPageState extends State<QRScannerPage> {
         try {
           await controller.pauseCamera();
           widget.onQRScanned(scanData.code!);
-          Navigator.pop(context);
+          await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('QR Code Scanned'),
+                content: const Text('Scan Successfully'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close dialog
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
         } catch (e) {
           debugPrint('Error during QR scanning: $e');
         }

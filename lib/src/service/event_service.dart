@@ -754,6 +754,56 @@ Future<List<Participant>> getParticipants(
   }
 }
 
+Future<List<Participant>> getScheduleParticipants(int id, String role) async {
+  try {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final response = await http.get(
+      Uri.parse(
+          '${Config.baseUrl}/event-service/event/$id/schedule-participants'),
+      headers: {
+        'Authorization': 'Bearer $idToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (responseData['success'] == true) {
+        List<dynamic> participantsJson = responseData['data'];
+        List<Participant> participants =
+            participantsJson.map((json) => Participant.fromJson(json)).toList();
+
+        for (var participant in participants) {
+          final userData = await getUserData(participant.userId);
+
+          participant.name = userData['name'];
+          participant.photoUrl = userData['photoUrl'];
+        }
+
+        return participants;
+      } else {
+        throw Exception(
+            responseData['message'] ?? 'Failed to fetch participants');
+      }
+    } else {
+      LoggerService.logger.w(
+          'Failed to fetch participants: ${response.statusCode} ${response.body}');
+      throw Exception('Failed to fetch participants');
+    }
+  } catch (e) {
+    throw Exception('Failed to fetch participants');
+  }
+}
+
 Future<void> updateEventAccess(int eventId, bool newAccess) async {
   try {
     User? user = FirebaseAuth.instance.currentUser;
@@ -1271,27 +1321,34 @@ Future<List<Map<String, dynamic>>> getCheckedOutParticipants(
 }
 
 Future<Map<String, dynamic>> checkIn(
-    int eventId, String qrCode, String inputName) async {
+    int eventId, String qrCode, String inputName, BuildContext context) async {
   LoggerService.logger.i(
       'Entering checkIn function with eventId: $eventId and qrCode: $qrCode');
 
-  User? user = FirebaseAuth.instance.currentUser;
-  if (user == null) {
-    LoggerService.logger.e('No user logged in');
-    throw Exception('No user logged in');
-  }
-
-  String? idToken = await user.getIdToken();
-  if (idToken == null) {
-    LoggerService.logger.e('Failed to retrieve ID token');
-    throw Exception('Failed to retrieve ID token');
-  }
-
-  final url = Uri.parse(
-      '${Config.baseUrl}/event-service/event/$eventId/checkin/$inputName');
-  LoggerService.logger.i('Making POST request to URL: $url');
-
   try {
+    List<String> qrParts = qrCode.split('-');
+
+    int qrTimestamp = int.tryParse(qrParts[1]) ?? 0;
+    int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
+
+    if ((currentTimestamp - qrTimestamp) > 180000) {
+      throw Exception('QR code expired. Please generate a new one.');
+    }
+
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception('No user logged in');
+    }
+
+    String? idToken = await user.getIdToken();
+    if (idToken == null) {
+      throw Exception('Failed to retrieve ID token');
+    }
+
+    final url = Uri.parse(
+        '${Config.baseUrl}/event-service/event/$eventId/checkin/$inputName');
+    LoggerService.logger.i('Making POST request to URL: $url');
+
     final response = await http.post(
       url,
       headers: {
@@ -1309,6 +1366,7 @@ Future<Map<String, dynamic>> checkIn(
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       LoggerService.logger.i('Response data: $responseData');
+
       if (responseData['success']) {
         return responseData;
       } else {
@@ -1319,14 +1377,47 @@ Future<Map<String, dynamic>> checkIn(
     }
   } catch (error) {
     LoggerService.logger.e('Error during check-in: $error', error: error);
+
+    _showErrorDialog(context, error.toString());
+
     throw Exception('Error during check-in: $error');
   }
+}
+
+void _showErrorDialog(BuildContext context, String errorMessage) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Check-In Error'),
+        content: Text(errorMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
 }
 
 Future<Map<String, dynamic>> checkOut(
     int eventId, String qrCode, String inputName) async {
   LoggerService.logger.i(
       'Entering checkOut function with eventId: $eventId and qrCode: $qrCode');
+
+  List<String> qrParts = qrCode.split('-');
+  if (qrParts.length != 2) {
+    throw Exception('Invalid QR code format');
+  }
+
+  int qrTimestamp = int.tryParse(qrParts[1]) ?? 0;
+  int currentTimestamp = DateTime.now().millisecondsSinceEpoch;
+
+  if ((currentTimestamp - qrTimestamp) > 180000) {
+    throw Exception('QR code expired. Please generate a new one.');
+  }
 
   User? user = FirebaseAuth.instance.currentUser;
   if (user == null) {
